@@ -64,7 +64,77 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list2);
         }
+        [HttpGet("GetByIDMenu/{id:int}")]
+        // phương thức get by id menu dữ liệu từ firebase 
+        public async Task<IActionResult> GetByIDMenu(int id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Dishes");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Dish>();
+            //danh sách tìm kiếm
 
+            foreach (var item in data)
+            {
+
+                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Dish>();
+            foreach (var item in list)
+            {
+                if (item.Menu_ID == id)
+                    list2.Add(item);
+            }
+            return Ok(list2);
+        }
+
+        [HttpGet("Search")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult Search([FromBody] Dish dish)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Dishes");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Dish>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Dish>();
+            foreach (var item in list)
+            {
+                if (item.DishName.Contains(dish.DishName))
+                {
+                    list2.Add(item);
+                }
+            }
+            return Ok(list2);
+        }
+
+        [HttpGet("GetByIDType/{id:int}")]
+        // phương thức get by id menu dữ liệu từ firebase 
+        public async Task<IActionResult> GetByIDType(int id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Dishes");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Dish>();
+            //danh sách tìm kiếm
+
+            foreach (var item in data)
+            {
+
+                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Dish>();
+            foreach (var item in list)
+            {
+                if (item.DishType_ID == id)
+                    list2.Add(item);
+            }
+            return Ok(list2);
+        }
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(int id, [FromBody] Dish dish)

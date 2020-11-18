@@ -64,6 +64,52 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list2);
         }
+        [HttpGet("GetByIDProvince/{id:int}")]
+        // phương thức get by id dữ liệu từ firebase 
+        public async Task<IActionResult> GetByIDProvince(int id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Store");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Store>();
+            //danh sách tìm kiếm
+
+            foreach (var item in data)
+            {
+
+                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Store>();
+            foreach (var item in list)
+            {
+                if (item.ProvinceID == id)
+                    list2.Add(item);
+            }
+            return Ok(list2);
+        }
+        [HttpGet("GetByIDBusinessType/{id:int}")]
+        // phương thức get by id dữ liệu từ firebase 
+        public async Task<IActionResult> GetByIDBusinessType(int id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Store");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Store>();
+            //danh sách tìm kiếm
+
+            foreach (var item in data)
+            {
+
+                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Store>();
+            foreach (var item in list)
+            {
+                if (item.BusinessTypeID == id)
+                    list2.Add(item);
+            }
+            return Ok(list2);
+        }
 
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id

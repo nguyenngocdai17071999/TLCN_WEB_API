@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "k77jn6HBKAj1AQ90wdl6Pfjafg/88JCnMROfN4dYJ0V7tW8mwr0AA7FLEzr+XgVtMeDFenCHTYDc2rmaSAA60Q==",
+  "dgSpecHash": "TrXfRFWC33oxa4cwNsRKIi/RHOX1R6OcQtJaGLFk1rVf++TwbefV9XHFy7jRZtQQAGMZS43o5vem2sbrH1HlXA==",
   "success": true,
-  "projectFilePath": "D:\\Năm 4\\demo\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
+  "projectFilePath": "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Dai\\.nuget\\packages\\firebase.auth\\1.0.0\\firebase.auth.1.0.0.nupkg.sha512",
     "C:\\Users\\Dai\\.nuget\\packages\\firebasestorage.net\\1.0.3\\firebasestorage.net.1.0.3.nupkg.sha512",

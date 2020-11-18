@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Năm 4\\demo\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj": {}
+    "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj": {}
   },
   "projects": {
-    "D:\\Năm 4\\demo\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj": {
+    "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Năm 4\\demo\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
+        "projectUniqueName": "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
         "projectName": "TLCN_WEB_API",
-        "projectPath": "D:\\Năm 4\\demo\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
+        "projectPath": "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
         "packagesPath": "C:\\Users\\Dai\\.nuget\\packages\\",
-        "outputPath": "D:\\Năm 4\\demo\\TLCN_WEB_API\\TLCN_WEB_API\\obj\\",
+        "outputPath": "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Dai\\AppData\\Roaming\\NuGet\\NuGet.Config",
