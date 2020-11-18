@@ -26,8 +26,13 @@ namespace TLCN_WEB_API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddCors(options => options.AddDefaultPolicy(
-                builder => builder.AllowAnyOrigin())
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder => builder.WithOrigins("https://localhost:44398/"));
+                options.AddPolicy("MyPolicy", builder =>
+                    builder.WithOrigins("https://localhost:44398/"));
+            }
             );
         }
 
