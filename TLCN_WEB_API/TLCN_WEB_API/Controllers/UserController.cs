@@ -18,7 +18,7 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-    [EnableCors("MyPolicy")]
+    [EnableCors]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -35,22 +35,26 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
 
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll()
+        public IActionResult GetAll([FromBody] Token token)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("User");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<User>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
+            if(Decrypt(token.token)=="1")
             {
-                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("User");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<User>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+                }
+                foreach (var item in list)
+                {
+                    item.Password = Decrypt(item.Password);
+                }
+                return Ok(list);
             }
-            foreach (var item in list)
-            {
-                item.Password = Decrypt(item.Password);
-            }
-            return Ok(list);
+            return Ok(new[] { "Bạn không có quyền"});
         }
 
         [HttpGet("GetByID/{id:int}")]
@@ -78,6 +82,8 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list2);
         }
+
+
 
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
@@ -135,8 +141,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email == user.UserName && item.Password == Encrypt(user.PassWord))
                 {
                     err = "Đăng nhập thành công";
-                    return Ok(item);
-                    break;
+                    return Ok(Encrypt(item.UserID.ToString()));
                 }
                 else
                 {
@@ -294,27 +299,36 @@ namespace TLCN_WEB_API.Controllers
         }
         public static string Decrypt(string toDecrypt)
         {
-            bool useHashing = true;
-            byte[] keyArray;
-            byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
-
-            if (useHashing)
+            try
             {
-                MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
-                keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
+                bool useHashing = true;
+                byte[] keyArray;
+                byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
+
+                if (useHashing)
+                {
+                    MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
+                    keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
+                }
+                else
+                    keyArray = UTF8Encoding.UTF8.GetBytes(key);
+
+                TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
+                tdes.Key = keyArray;
+                tdes.Mode = CipherMode.ECB;
+                tdes.Padding = PaddingMode.PKCS7;
+
+                ICryptoTransform cTransform = tdes.CreateDecryptor();
+                byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+
+                return UTF8Encoding.UTF8.GetString(resultArray);
+
             }
-            else
-                keyArray = UTF8Encoding.UTF8.GetBytes(key);
-
-            TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
-            tdes.Key = keyArray;
-            tdes.Mode = CipherMode.ECB;
-            tdes.Padding = PaddingMode.PKCS7;
-
-            ICryptoTransform cTransform = tdes.CreateDecryptor();
-            byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
-
-            return UTF8Encoding.UTF8.GetString(resultArray);
+            catch
+            {
+                return "Loi roi";
+            }
+            
         }
         private bool kiemtraEmail(string email)
         {

@@ -14,7 +14,7 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-    [EnableCors("MyPolicy")]
+    //[EnableCors("MyPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProvinceController : ControllerBase

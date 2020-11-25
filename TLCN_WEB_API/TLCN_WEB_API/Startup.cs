@@ -26,14 +26,27 @@ namespace TLCN_WEB_API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(
-                    builder => builder.WithOrigins("https://localhost:44398/"));
-                options.AddPolicy("MyPolicy", builder =>
-                    builder.WithOrigins("https://localhost:44398/"));
-            }
-            );
+            services.AddCors();
+            //services.AddCors(options =>
+            //{
+            //    //options.AddDefaultPolicy(
+            //    //    builder => builder.WithOrigins("https://localhost:44398/"));
+            //    //options.AddPolicy("MyPolicy", builder =>
+            //    //    builder.WithOrigins("https://localhost:44398/"));
+            //    //options.AddDefaultPolicy( builder =>
+            //    //   builder.AllowAnyOrigin());
+            //    //options.AddPolicy("MyPolicy", builder =>
+            //    //   builder.AllowAnyHeader());
+            //    //options.AddPolicy("MyPolicy", builder =>
+            //    //   builder.AllowAnyMethod());
+
+            //}
+            //);
+
+            //services.AddCors(options => options.AddDefaultPolicy(
+            //        builder => builder.AllowAnyOrigin())
+            //    );
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +61,9 @@ namespace TLCN_WEB_API
 
             app.UseRouting();
 
-            app.UseCors();
+            app.UseCors(builder => builder.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader());
 
             app.UseAuthorization();
 
