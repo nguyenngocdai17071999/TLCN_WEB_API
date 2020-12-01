@@ -95,7 +95,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("Search")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult Search([FromBody] Dish dish)
+        public IActionResult Search(string dishname)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
@@ -109,7 +109,7 @@ namespace TLCN_WEB_API.Controllers
             var list2 = new List<Dish>();
             foreach (var item in list)
             {
-                if (item.DishName.Contains(dish.DishName))
+                if (item.DishName.Contains(dishname))
                 {
                     list2.Add(item);
                 }
