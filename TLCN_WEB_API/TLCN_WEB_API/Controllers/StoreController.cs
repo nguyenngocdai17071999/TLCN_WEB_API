@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using FireSharp.Config;
 using FireSharp.Interfaces;
@@ -19,6 +21,7 @@ namespace TLCN_WEB_API.Controllers
     [ApiController]
     public class StoreController : ControllerBase
     {
+        private static string key = "TLCN";
         IFirebaseConfig config = new FirebaseConfig
         {
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
@@ -115,35 +118,42 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id, [FromBody] Store store)
+        public IActionResult EditByID(int id, string token, [FromBody] Store store)
         {
-
-            try
+            if (GetRole(token) == 1)
             {
-                AddbyidToFireBase(id, store);
-                return Ok(new[] { "sửa thành công" });
+                try
+                {
+                    AddbyidToFireBase(id, store);
+                    return Ok(new[] { "sửa thành công" });
+                }
+                catch
+                {
+                    return Ok(new[] { "Lỗi rồi" });
+                }
             }
-            catch
-            {
-                return Ok(new[] { "Lỗi rồi" });
-            }
+            return Ok(new[] { "Bạn không có quyền" });
         }
 
         [HttpPost("CreateStore")]
-        public IActionResult RegisterStore([FromBody] Store store)
+        public IActionResult RegisterStore(string token, [FromBody] Store store)
         {
-            string err = "";
-            try
+            if (GetRole(token) == 1)
             {
+                    string err = "";
+                try
+                {
                 
-                 AddToFireBase(store);
-                 err = "Đăng ký thành công";               
+                     AddToFireBase(store);
+                     err = "Đăng ký thành công";               
+                }
+                catch
+                {
+                    err = "Lỗi rồi";
+                }
+                return Ok(new[] { err });
             }
-            catch
-            {
-                err = "Lỗi rồi";
-            }
-            return Ok(new[] { err });
+            return Ok(new[] { "Bạn không có quyền" });
 
         }
 
@@ -194,6 +204,59 @@ namespace TLCN_WEB_API.Controllers
             var data = store;
             data.StoreID = id;
             SetResponse setResponse = client.Set("Store/" + data.StoreID, data);
+        }
+
+        public static string Decrypt(string toDecrypt)
+        {
+            try
+            {
+                bool useHashing = true;
+                byte[] keyArray;
+                byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
+
+                if (useHashing)
+                {
+                    MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
+                    keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
+                }
+                else
+                    keyArray = UTF8Encoding.UTF8.GetBytes(key);
+
+                TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
+                tdes.Key = keyArray;
+                tdes.Mode = CipherMode.ECB;
+                tdes.Padding = PaddingMode.PKCS7;
+
+                ICryptoTransform cTransform = tdes.CreateDecryptor();
+                byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+
+                return UTF8Encoding.UTF8.GetString(resultArray);
+
+            }
+            catch
+            {
+                return "Loi roi";
+            }
+
+        }
+        public int GetRole(string token)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<User>();
+            foreach (var item in list)
+            {
+                if (item.UserID.ToString() == Decrypt(token))
+                    return item.UserTypeID;
+            }
+            return 0;
         }
     }
 }

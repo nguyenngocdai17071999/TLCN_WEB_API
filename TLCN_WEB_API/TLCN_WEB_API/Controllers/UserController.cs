@@ -35,9 +35,9 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
 
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll([FromBody] Token token)
+        public IActionResult GetAll(string token)
         {
-            if(Decrypt(token.token)=="1")
+            if (GetRole(token)==1)
             {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("User");
@@ -54,12 +54,12 @@ namespace TLCN_WEB_API.Controllers
                 }
                 return Ok(list);
             }
-            return Ok(new[] { "Bạn không có quyền"});
+            return Ok(new[] { "Bạn không có quyền" });
         }
 
-        [HttpGet("GetByID/{id:int}")]
+        [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id)
+        public async Task<IActionResult> GetByID(string token)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
@@ -73,7 +73,7 @@ namespace TLCN_WEB_API.Controllers
             var list2 = new List<User>();
             foreach (var item in list)
             {
-                if (item.UserID == id)
+                if (item.UserID.ToString() == Decrypt(token))
                     list2.Add(item);
             }
             foreach (var item in list)
@@ -85,13 +85,13 @@ namespace TLCN_WEB_API.Controllers
 
 
 
-        [HttpPost("EditByID/{id:int}")]
+        [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id, [FromBody] User user)
+        public IActionResult EditByID(string token , [FromBody] User user)
         {
             try
             {
-                AddbyidToFireBase(id, user);
+                AddbyidToFireBase(Int32.Parse(Decrypt(token)), user);
                 return Ok(new[] { "Sửa thành công" });
             }
             catch
@@ -347,6 +347,25 @@ namespace TLCN_WEB_API.Controllers
                     return true;
             }
             return false;
+        }
+        public int GetRole(string token)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<User>();
+            foreach (var item in list)
+            {
+                if (item.UserID.ToString() == Decrypt(token))
+                    return item.UserTypeID;
+            }
+            return 0;
         }
     }
 }
