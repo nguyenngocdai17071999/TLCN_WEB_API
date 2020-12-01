@@ -56,6 +56,13 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(new[] { "Bạn không có quyền" });
         }
+        [HttpGet("GetRole")]
+
+        //phương thức get dữ liệu từ firebase
+        public IActionResult getRole(string token)
+        {
+            return Ok(new[] {GetRole(token) });
+        }
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
