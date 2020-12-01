@@ -61,7 +61,12 @@ namespace TLCN_WEB_API.Controllers
         //phương thức get dữ liệu từ firebase
         public IActionResult getRole(string token)
         {
-            return Ok(new[] {GetRole(token) });
+            Role a = new Role();
+            a.UserTyleID = GetRole(token);
+
+
+
+            return Ok(a);
         }
 
         [HttpGet("GetByID")]
