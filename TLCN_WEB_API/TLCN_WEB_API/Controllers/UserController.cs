@@ -80,7 +80,7 @@ namespace TLCN_WEB_API.Controllers
             var list2 = new List<User>();
             foreach (var item in list)
             {
-                if (item.UserID.ToString() == Decrypt(token))
+                if (item.Email.ToString() == Decrypt(token))
                     list2.Add(item);
             }
             foreach (var item in list)
@@ -148,7 +148,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email == user.UserName && item.Password == Encrypt(user.PassWord))
                 {
                     err = "Đăng nhập thành công";
-                    return Ok(Encrypt(item.UserID.ToString()));
+                    return Ok(Encrypt(item.Email.ToString()));
                 }
                 else
                 {
@@ -369,7 +369,7 @@ namespace TLCN_WEB_API.Controllers
             var list2 = new List<User>();
             foreach (var item in list)
             {
-                if (item.UserID.ToString() == Decrypt(token))
+                if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
             return 0;
