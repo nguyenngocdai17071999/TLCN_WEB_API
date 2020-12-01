@@ -103,7 +103,7 @@ namespace TLCN_WEB_API.Controllers
         {
             try
             {
-                AddbyidToFireBase(Int32.Parse(Decrypt(token)), user);
+                AddbyidToFireBase(GetIDToken(token), user);
                 return Ok(new[] { "Sửa thành công" });
             }
             catch
@@ -376,6 +376,25 @@ namespace TLCN_WEB_API.Controllers
             {
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
+            }
+            return 0;
+        }
+        public int GetIDToken(string token)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<User>();
+            foreach (var item in list)
+            {
+                if (item.Email.ToString() == Decrypt(token))
+                    return item.UserID;
             }
             return 0;
         }
