@@ -281,7 +281,7 @@ namespace TLCN_WEB_API.Controllers
             var data = user;
             //  PushResponse response = client.Push("User/", data);
             data.UserID = id;
-            // data.Password = Encrypt(data.Password);
+             data.Password = Encrypt(data.Password);
             SetResponse setResponse = client.Set("User/" + data.UserID, data);
         }
         // mã hóa dữ liệu MD5
