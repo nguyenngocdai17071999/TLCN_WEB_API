@@ -164,7 +164,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [HttpPost("ForgetPass")]
-        public IActionResult ForgetPass([FromBody] User user)
+        public IActionResult ForgetPass([FromBody] User user)///sử dụng thuộc tính Email của models user json chỉ cần Email
         {
 
             if (kiemtraEmail(user.Email) == true)
@@ -197,7 +197,7 @@ namespace TLCN_WEB_API.Controllers
         }
         //resetpass theo gmail
         [HttpPost("ResetPass")]
-        public IActionResult ResetPass([FromBody] User user)
+        public IActionResult ResetPass([FromBody] User user)//Sử dụng thuốc tính Email và Password
         {
             if (kiemtraEmail(user.Email) == true)
             {
