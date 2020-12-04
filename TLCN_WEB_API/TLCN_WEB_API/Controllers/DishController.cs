@@ -166,6 +166,16 @@ namespace TLCN_WEB_API.Controllers
                         if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname))
                             list3.Add(item);
                     }
+                    if(list3.Count==0)
+                    {
+                        var list4 = new List<Store>();
+                        foreach (var item in liststore)
+                        {
+                            if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
+                                list4.Add(item);
+                        }
+                        return Ok(list4);
+                    }    
                     return Ok(list3);
                 }
                 else
