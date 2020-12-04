@@ -97,72 +97,79 @@ namespace TLCN_WEB_API.Controllers
         //phương thức get dữ liệu từ firebase
         public IActionResult Search(string dishname)
         {
-            //danh sach store
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse responsestore = client.Get("Store");
-            dynamic datastore = JsonConvert.DeserializeObject<dynamic>(responsestore.Body);
-            var liststore = new List<Store>();
-            //danh sách tìm kiếm
-            foreach (var itemstore in datastore)
+            try
             {
-                liststore.Add(JsonConvert.DeserializeObject<Store>(((JProperty)itemstore).Value.ToString()));
+                //danh sach store
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse responsestore = client.Get("Store");
+                dynamic datastore = JsonConvert.DeserializeObject<dynamic>(responsestore.Body);
+                var liststore = new List<Store>();
+                //danh sách tìm kiếm
+                foreach (var itemstore in datastore)
+                {
+                    liststore.Add(JsonConvert.DeserializeObject<Store>(((JProperty)itemstore).Value.ToString()));
+                }
+                //danh sach dish
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse responsedish = client.Get("Dishes");
+                dynamic datadish = JsonConvert.DeserializeObject<dynamic>(responsedish.Body);
+                var listdish = new List<Dish>();
+                //danh sách tìm kiếm
+                foreach (var itemdish in datadish)
+                {
+                    listdish.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)itemdish).Value.ToString()));
+                }
+                //danh sach menu
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse responseMenu = client.Get("Menu");
+                dynamic datamenu = JsonConvert.DeserializeObject<dynamic>(responseMenu.Body);
+                var listMenu = new List<Menu>();
+                //danh sách tìm kiếm
+                foreach (var itemMenu in datamenu)
+                {
+                    listMenu.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)itemMenu).Value.ToString()));
+                }
+                var list2 = new List<Store>();
+                var MenuID = new List<int>();
+
+                foreach (var item in listdish)
+                {
+                    if (item.DishName.Contains(dishname))
+                    {
+                        MenuID.Add(item.Menu_ID);
+                    }
+                }
+                var MenuID2 = new List<int>();
+                foreach (var item in MenuID)
+                {
+                    MenuID2.Add(item);
+                    break;
+                }
+                foreach (var item in MenuID)
+                {
+                    int dem = 0;
+                    foreach (var item2 in MenuID2)
+                    {
+
+                        if (item == item2)
+                            dem++;
+                    }
+                    if (dem == 0) MenuID2.Add(item);
+                }
+                foreach (var item in liststore)
+                {
+                    foreach (var item2 in MenuID2)
+                    {
+                        if (item.MenuID == item2) list2.Add(item);
+                    }
+
+                }
+                return Ok(list2);
             }
-            //danh sach dish
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse responsedish = client.Get("Dishes");
-            dynamic datadish = JsonConvert.DeserializeObject<dynamic>(responsedish.Body);
-            var listdish = new List<Dish>();
-            //danh sách tìm kiếm
-            foreach (var itemdish in datadish)
-            {
-                listdish.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)itemdish).Value.ToString()));
+            catch {
+                return Ok("Không có kết quả tìm kiếm");
             }
-            //danh sach menu
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse responseMenu = client.Get("Menu");
-            dynamic datamenu = JsonConvert.DeserializeObject<dynamic>(responseMenu.Body);
-            var listMenu = new List<Menu>();
-            //danh sách tìm kiếm
-            foreach (var itemMenu in datamenu)
-            {
-                listMenu.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)itemMenu).Value.ToString()));
-            }
-            var list2 = new List<Store>();
-            var MenuID = new List<int>();
             
-            foreach (var item in listdish)
-            {
-                if (item.DishName.Contains(dishname))
-                {
-                    MenuID.Add(item.Menu_ID);
-                }
-            }
-            var MenuID2 = new List<int>();
-            foreach(var item in MenuID)
-            {
-                MenuID2.Add(item);
-                break;
-            }
-            foreach(var item in MenuID )
-            {
-                int dem = 0;
-                foreach (var item2 in MenuID2)
-                {        
-                  
-                    if (item == item2)
-                        dem++;                   
-                }
-                if (dem == 0) MenuID2.Add(item);
-            }          
-            foreach(var item in liststore)
-            {
-                foreach(var item2 in MenuID2)
-                {
-                    if (item.MenuID == item2) list2.Add(item);
-                }
-                
-            }
-            return Ok(list2);
         }
 
         [HttpGet("GetByIDType/{id:int}")]
