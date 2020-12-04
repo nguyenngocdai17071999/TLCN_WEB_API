@@ -169,7 +169,7 @@ namespace TLCN_WEB_API.Controllers
                     if(list3.Count==0)
                     {
                         var list4 = new List<Store>();
-                        foreach (var item in liststore)
+                        foreach (var item in liststore) 
                         {
                             if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
                                 list4.Add(item);
