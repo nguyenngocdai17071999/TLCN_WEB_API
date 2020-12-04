@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FireSharp.Config;
 using FireSharp.Interfaces;
@@ -99,6 +100,7 @@ namespace TLCN_WEB_API.Controllers
         {
             try
             {
+                dishname = convertToUnSign3(dishname.ToLower());
                 //danh sach store
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse responsestore = client.Get("Store");
@@ -134,7 +136,7 @@ namespace TLCN_WEB_API.Controllers
 
                 foreach (var item in listdish)
                 {
-                    if (item.DishName.Contains(dishname))
+                    if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname))
                     {
                         MenuID.Add(item.Menu_ID);
                     }
@@ -156,15 +158,29 @@ namespace TLCN_WEB_API.Controllers
                     }
                     if (dem == 0) MenuID2.Add(item);
                 }
-                foreach (var item in liststore)
+                if (MenuID2.Count == 0)
                 {
-                    foreach (var item2 in MenuID2)
+                    var list3 = new List<Store>();
+                    foreach(var item in liststore)
                     {
-                        if (item.MenuID == item2) list2.Add(item);
+                        if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname))
+                            list3.Add(item);
                     }
-
+                    return Ok(list3);
                 }
-                return Ok(list2);
+                else
+                {
+                    foreach (var item in liststore)
+                    {
+                        foreach (var item2 in MenuID2)
+                        {
+                            if (item.MenuID == item2) list2.Add(item);
+                        }
+
+                    }
+                    return Ok(list2);
+                }
+                return Ok("Không có kết quả tìm kiếm");
             }
             catch {
                 return Ok("Không có kết quả tìm kiếm");
@@ -337,6 +353,12 @@ namespace TLCN_WEB_API.Controllers
                     return item.UserTypeID;
             }
             return 0;
+        }
+        public string convertToUnSign3(string s)
+        {
+            Regex regex = new Regex("\\p{IsCombiningDiacriticalMarks}+");
+            string temp = s.Normalize(NormalizationForm.FormD);
+            return regex.Replace(temp, String.Empty).Replace('\u0111', 'd').Replace('\u0110', 'D');
         }
     }
 }
