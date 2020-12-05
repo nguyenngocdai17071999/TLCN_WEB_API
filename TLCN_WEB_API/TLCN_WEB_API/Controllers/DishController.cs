@@ -141,7 +141,7 @@ namespace TLCN_WEB_API.Controllers
                         MenuID.Add(item.Menu_ID);
                     }
                 }
-                var MenuID2 = new List<int>();
+                var MenuID2 = new List<int>(); 
                 foreach (var item in MenuID)
                 {
                     MenuID2.Add(item);
