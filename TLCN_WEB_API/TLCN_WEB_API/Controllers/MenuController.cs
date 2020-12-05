@@ -69,29 +69,29 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list2);
         }
-        [HttpGet("GetByIDStore/{id:int}")]
-        // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDStore(int id)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Menu");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Menu>();
-            //danh sách tìm kiếm
+        //[HttpGet("GetByIDStore/{id:int}")]
+        //// phương thức get by id dữ liệu từ firebase 
+        //public async Task<IActionResult> GetByIDStore(int id)
+        //{
+        //    client = new FireSharp.FirebaseClient(config);
+        //    FirebaseResponse response = client.Get("Menu");
+        //    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        //    var list = new List<Menu>();
+        //    //danh sách tìm kiếm
 
-            foreach (var item in data)
-            {
+        //    foreach (var item in data)
+        //    {
 
-                list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
-            }
-            var list2 = new List<Menu>();
-            foreach (var item in list)
-            {
-                if (item.Store_ID == id)
-                    list2.Add(item);
-            }
-            return Ok(list2);
-        }
+        //        list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
+        //    }
+        //    var list2 = new List<Menu>();
+        //    foreach (var item in list)
+        //    {
+        //        if (item.Store_ID == id)
+        //            list2.Add(item);
+        //    }
+        //    return Ok(list2);
+        //}
 
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
@@ -115,6 +115,7 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("CreateMenu")]
         public IActionResult RegisterMenu(string token, [FromBody] Menu menu)
         {
+            int a = GetRole(token);
             if (GetRole(token) == 1)
             {
                 string err = "";
@@ -228,6 +229,7 @@ namespace TLCN_WEB_API.Controllers
             var list2 = new List<User>();
             foreach (var item in list)
             {
+                string a = Decrypt(token);
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
