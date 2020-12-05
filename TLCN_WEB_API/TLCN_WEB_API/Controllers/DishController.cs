@@ -98,98 +98,102 @@ namespace TLCN_WEB_API.Controllers
         //phương thức get dữ liệu từ firebase
         public IActionResult Search(string dishname)
         {
+            
             try
             {
-                dishname = convertToUnSign3(dishname.ToLower());
-                //danh sach store
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse responsestore = client.Get("Store");
-                dynamic datastore = JsonConvert.DeserializeObject<dynamic>(responsestore.Body);
-                var liststore = new List<Store>();
-                //danh sách tìm kiếm
-                foreach (var itemstore in datastore)
+                if(dishname!=null)
                 {
-                    liststore.Add(JsonConvert.DeserializeObject<Store>(((JProperty)itemstore).Value.ToString()));
-                }
-                //danh sach dish
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse responsedish = client.Get("Dishes");
-                dynamic datadish = JsonConvert.DeserializeObject<dynamic>(responsedish.Body);
-                var listdish = new List<Dish>();
-                //danh sách tìm kiếm
-                foreach (var itemdish in datadish)
-                {
-                    listdish.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)itemdish).Value.ToString()));
-                }
-                //danh sach menu
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse responseMenu = client.Get("Menu");
-                dynamic datamenu = JsonConvert.DeserializeObject<dynamic>(responseMenu.Body);
-                var listMenu = new List<Menu>();
-                //danh sách tìm kiếm
-                foreach (var itemMenu in datamenu)
-                {
-                    listMenu.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)itemMenu).Value.ToString()));
-                }
-                var list2 = new List<Store>();
-                var MenuID = new List<int>();
+                    dishname = convertToUnSign3(dishname.ToLower());
+                    //danh sach store
+                    client = new FireSharp.FirebaseClient(config);
+                    FirebaseResponse responsestore = client.Get("Store");
+                    dynamic datastore = JsonConvert.DeserializeObject<dynamic>(responsestore.Body);
+                    var liststore = new List<Store>();
+                    //danh sách tìm kiếm
+                    foreach (var itemstore in datastore)
+                    {
+                        liststore.Add(JsonConvert.DeserializeObject<Store>(((JProperty)itemstore).Value.ToString()));
+                    }
+                    //danh sach dish
+                    client = new FireSharp.FirebaseClient(config);
+                    FirebaseResponse responsedish = client.Get("Dishes");
+                    dynamic datadish = JsonConvert.DeserializeObject<dynamic>(responsedish.Body);
+                    var listdish = new List<Dish>();
+                    //danh sách tìm kiếm
+                    foreach (var itemdish in datadish)
+                    {
+                        listdish.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)itemdish).Value.ToString()));
+                    }
+                    //danh sach menu
+                    client = new FireSharp.FirebaseClient(config);
+                    FirebaseResponse responseMenu = client.Get("Menu");
+                    dynamic datamenu = JsonConvert.DeserializeObject<dynamic>(responseMenu.Body);
+                    var listMenu = new List<Menu>();
+                    //danh sách tìm kiếm
+                    foreach (var itemMenu in datamenu)
+                    {
+                        listMenu.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)itemMenu).Value.ToString()));
+                    }
+                    var list2 = new List<Store>();
+                    var MenuID = new List<int>();
 
-                foreach (var item in listdish)
-                {
-                    if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname))
+                    foreach (var item in listdish)
                     {
-                        MenuID.Add(item.Menu_ID);
-                    }
-                }
-                var MenuID2 = new List<int>(); 
-                foreach (var item in MenuID)
-                {
-                    MenuID2.Add(item);
-                    break;
-                }
-                foreach (var item in MenuID)
-                {
-                    int dem = 0;
-                    foreach (var item2 in MenuID2)
-                    {
-
-                        if (item == item2)
-                            dem++;
-                    }
-                    if (dem == 0) MenuID2.Add(item);
-                }
-                if (MenuID2.Count == 0)
-                {
-                    var list3 = new List<Store>();
-                    foreach(var item in liststore)
-                    {
-                        if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname))
-                            list3.Add(item);
-                    }
-                    if(list3.Count==0)
-                    {
-                        var list4 = new List<Store>();
-                        foreach (var item in liststore) 
+                        if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname))
                         {
-                            if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
-                                list4.Add(item);
+                            MenuID.Add(item.Menu_ID);
                         }
-                        return Ok(list4);
-                    }    
-                    return Ok(list3);
-                }
-                else
-                {
-                    foreach (var item in liststore)
+                    }
+                    var MenuID2 = new List<int>();
+                    foreach (var item in MenuID)
                     {
+                        MenuID2.Add(item);
+                        break;
+                    }
+                    foreach (var item in MenuID)
+                    {
+                        int dem = 0;
                         foreach (var item2 in MenuID2)
                         {
-                            if (item.MenuID == item2) list2.Add(item);
-                        }
 
+                            if (item == item2)
+                                dem++;
+                        }
+                        if (dem == 0) MenuID2.Add(item);
                     }
-                    return Ok(list2);
-                }
+                    if (MenuID2.Count == 0)
+                    {
+                        var list3 = new List<Store>();
+                        foreach (var item in liststore)
+                        {
+                            if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname))
+                                list3.Add(item);
+                        }
+                        if (list3.Count == 0)
+                        {
+                            var list4 = new List<Store>();
+                            foreach (var item in liststore)
+                            {
+                                if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
+                                    list4.Add(item);
+                            }
+                            return Ok(list4);
+                        }
+                        return Ok(list3);
+                    }
+                    else
+                    {
+                        foreach (var item in liststore)
+                        {
+                            foreach (var item2 in MenuID2)
+                            {
+                                if (item.MenuID == item2) list2.Add(item);
+                            }
+
+                        }
+                        return Ok(list2);
+                    }
+                }                
                 return Ok("Không có kết quả tìm kiếm");
             }
             catch {
