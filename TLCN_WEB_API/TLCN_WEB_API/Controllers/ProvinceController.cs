@@ -22,8 +22,7 @@ namespace TLCN_WEB_API.Controllers
     public class ProvinceController : ControllerBase
     {
         private static string key = "TLCN";
-        IFirebaseConfig config = new FirebaseConfig
-        {
+        IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
@@ -33,98 +32,88 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
 
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll()
-        {
+        public IActionResult GetAll(){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Province");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Province>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
             }
             return Ok(list);
         }
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id)
-        {
+        public async Task<IActionResult> GetByID(int id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Province");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Province>();
+
             //danh sách tìm kiếm
-
-            foreach (var item in data)
-            {
-
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Province>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.ProvinceID == id)
                     list2.Add(item);
             }
             return Ok(list2);
         }
 
-        [HttpPost("EditByID/{id:int}")]
+        [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id, [FromBody] Province province)
-        {
-            
-            try
-            {
-                AddbyidToFireBase(id, province);
-                return Ok(new[] { "sửa thành công" });
+        public IActionResult EditByID(int id,string token, [FromBody] Province province){            
+            try{
+                if (GetRole(token) == 1){
+                    AddbyidToFireBase(id, province);
+                    return Ok(new[] { "sửa thành công" });
+                }
+                else{
+                    return Ok("Bạn Không có quyền");
+                }
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Lỗi rồi" });
             }
         }
 
         [HttpPost("CreateProvince")]
-        public IActionResult RegisterProvince([FromBody] Province province)
-        {
+        public IActionResult RegisterProvince(string token, [FromBody] Province province){
             string err = "";
-            try
-            {
-
-                AddToFireBase(province);
-                err = "Đăng ký thành công";
+            try{
+                if(GetRole(token)==1){
+                    AddToFireBase(province);
+                    err = "Đăng ký thành công";
+                }
+                else{
+                    err = "Bạn Không có quyền";
+                }
             }
-            catch
-            {
+            catch{
                 err = "Lỗi rồi";
             }
             return Ok(new[] { err });
 
         }
 
-
-
         //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
         // vd 1 2 3 thì get id sẽ ra 4
         // vd 1 3 4 thì get id sẽ ra 2
-        private int GetID()
-        {
+        private int GetID(){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Province");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Province>();
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
             }
             int i = 1;
-            while (1 == 1)
-            {
+            while (1 == 1){
                 int dem = 0;
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.ProvinceID == i)
                         dem++;
                 }
@@ -135,27 +124,58 @@ namespace TLCN_WEB_API.Controllers
             return i;
         }
         // thêm dư liệu lên firebase
-        private void AddToFireBase(Province province)
-        {
+        private void AddToFireBase(Province province){
             client = new FireSharp.FirebaseClient(config);
             var data = province;
             data.ProvinceID = GetID();
             SetResponse setResponse = client.Set("Province/" + data.ProvinceID, data);
         }
 
-
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, Province province)
-        {
+        private void AddbyidToFireBase(int id, Province province){
             client = new FireSharp.FirebaseClient(config);
             var data = province;
             data.ProvinceID = id;
             SetResponse setResponse = client.Set("Province/" + data.ProvinceID, data);
         }
-        public static string Decrypt(string toDecrypt)
-        {
-            try
-            {
+
+        public int GetRole(string token){
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+
+            //danh sách tìm kiếm
+            foreach (var item in data){
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+
+            var list2 = new List<User>();
+            foreach (var item in list){
+                if (item.Email.ToString() == Decrypt(token))
+                    return item.UserTypeID;
+            }
+            return 0;
+        }
+        public int GetIDToken(string token){
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+
+            //danh sách tìm kiếm
+            foreach (var item in data){
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<User>();
+            foreach (var item in list){
+                if (item.Email.ToString() == Decrypt(token))
+                    return item.UserID;
+            }
+            return 0;
+        }
+        public static string Decrypt(string toDecrypt){
+            try{
                 bool useHashing = true;
                 byte[] keyArray;
                 byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
@@ -179,30 +199,10 @@ namespace TLCN_WEB_API.Controllers
                 return UTF8Encoding.UTF8.GetString(resultArray);
 
             }
-            catch
-            {
+            catch{
                 return "Loi roi";
             }
 
-        }
-        public int GetRole(string token)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("User");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<User>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
-            }
-            var list2 = new List<User>();
-            foreach (var item in list)
-            {
-                if (item.Email.ToString() == Decrypt(token))
-                    return item.UserTypeID;
-            }
-            return 0;
         }
     }
 

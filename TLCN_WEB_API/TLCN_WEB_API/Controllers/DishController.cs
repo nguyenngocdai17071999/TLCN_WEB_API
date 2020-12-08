@@ -23,8 +23,7 @@ namespace TLCN_WEB_API.Controllers
     public class DishController : ControllerBase
     {
         private static string key = "TLCN";
-        IFirebaseConfig config = new FirebaseConfig
-        {
+        IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
@@ -32,62 +31,53 @@ namespace TLCN_WEB_API.Controllers
         IFirebaseClient client;
 
         [HttpGet("GetAll")]
-
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll()
-        {
+        public IActionResult GetAll(){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Dish>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
             return Ok(list);
         }
+
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id)
-        {
+        public async Task<IActionResult> GetByID(int id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Dish>();
+
             //danh sách tìm kiếm
-
-            foreach (var item in data)
-            {
-
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Dish>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.Dish_ID == id)
                     list2.Add(item);
             }
             return Ok(list2);
         }
+
         [HttpGet("GetByIDMenu/{id:int}")]
         // phương thức get by id menu dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDMenu(int id)
-        {
+        public async Task<IActionResult> GetByIDMenu(int id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Dish>();
+
             //danh sách tìm kiếm
-
-            foreach (var item in data)
-            {
-
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Dish>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.Menu_ID == id)
                     list2.Add(item);
             }
@@ -96,84 +86,74 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("Search")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult Search(string dishname)
-        {
-            
-            try
-            {
-                if(dishname!=null)
-                {
+        public IActionResult Search(string dishname){            
+            try{
+                if(dishname!=null){
                     dishname = convertToUnSign3(dishname.ToLower());
+
                     //danh sach store
                     client = new FireSharp.FirebaseClient(config);
                     FirebaseResponse responsestore = client.Get("Store");
                     dynamic datastore = JsonConvert.DeserializeObject<dynamic>(responsestore.Body);
                     var liststore = new List<Store>();
+
                     //danh sách tìm kiếm
-                    foreach (var itemstore in datastore)
-                    {
+                    foreach (var itemstore in datastore){
                         liststore.Add(JsonConvert.DeserializeObject<Store>(((JProperty)itemstore).Value.ToString()));
                     }
+
                     //danh sach dish
                     client = new FireSharp.FirebaseClient(config);
                     FirebaseResponse responsedish = client.Get("Dishes");
                     dynamic datadish = JsonConvert.DeserializeObject<dynamic>(responsedish.Body);
                     var listdish = new List<Dish>();
+
                     //danh sách tìm kiếm
-                    foreach (var itemdish in datadish)
-                    {
+                    foreach (var itemdish in datadish){
                         listdish.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)itemdish).Value.ToString()));
                     }
+
                     //danh sach menu
                     client = new FireSharp.FirebaseClient(config);
                     FirebaseResponse responseMenu = client.Get("Menu");
                     dynamic datamenu = JsonConvert.DeserializeObject<dynamic>(responseMenu.Body);
                     var listMenu = new List<Menu>();
+
                     //danh sách tìm kiếm
-                    foreach (var itemMenu in datamenu)
-                    {
+                    foreach (var itemMenu in datamenu){
                         listMenu.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)itemMenu).Value.ToString()));
                     }
+
                     var list2 = new List<Store>();
                     var MenuID = new List<int>();
 
-                    foreach (var item in listdish)
-                    {
-                        if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname))
-                        {
+                    foreach (var item in listdish){
+                        if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname)){
                             MenuID.Add(item.Menu_ID);
                         }
                     }
                     var MenuID2 = new List<int>();
-                    foreach (var item in MenuID)
-                    {
+                    foreach (var item in MenuID){
                         MenuID2.Add(item);
                         break;
                     }
-                    foreach (var item in MenuID)
-                    {
+                    foreach (var item in MenuID){
                         int dem = 0;
-                        foreach (var item2 in MenuID2)
-                        {
-
+                        foreach (var item2 in MenuID2){
                             if (item == item2)
                                 dem++;
                         }
                         if (dem == 0) MenuID2.Add(item);
                     }
-                    if (MenuID2.Count == 0)
-                    {
+                    if (MenuID2.Count == 0){
                         var list3 = new List<Store>();
-                        foreach (var item in liststore)
-                        {
+                        foreach (var item in liststore){
                             if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname))
                                 list3.Add(item);
                         }
-                        if (list3.Count == 0)
-                        {
+                        if (list3.Count == 0){
                             var list4 = new List<Store>();
-                            foreach (var item in liststore)
-                            {
+                            foreach (var item in liststore){
                                 if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
                                     list4.Add(item);
                             }
@@ -183,13 +163,10 @@ namespace TLCN_WEB_API.Controllers
                     }
                     else
                     {
-                        foreach (var item in liststore)
-                        {
-                            foreach (var item2 in MenuID2)
-                            {
+                        foreach (var item in liststore){
+                            foreach (var item2 in MenuID2){
                                 if (item.MenuID == item2) list2.Add(item);
                             }
-
                         }
                         return Ok(list2);
                     }
@@ -204,22 +181,18 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDType/{id:int}")]
         // phương thức get by id menu dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDType(int id)
-        {
+        public async Task<IActionResult> GetByIDType(int id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Dish>();
+
             //danh sách tìm kiếm
-
-            foreach (var item in data)
-            {
-
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Dish>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.DishType_ID == id)
                     list2.Add(item);
             }
@@ -227,18 +200,13 @@ namespace TLCN_WEB_API.Controllers
         }
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id,string token, [FromBody] Dish dish)
-        {
-            if (GetRole(token) == 1)
-            {
-
-                try
-                {
+        public IActionResult EditByID(int id,string token, [FromBody] Dish dish){
+            if (GetRole(token) == 1){
+                try{
                     AddbyidToFireBase(id, dish);
                     return Ok(new[] { "sửa thành công" });
                 }
-                catch
-                {
+                catch{
                     return Ok(new[] { "Lỗi rồi" });
                 }
             }
@@ -246,49 +214,36 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [HttpPost("CreateDish")]
-        public IActionResult RegisterDish(string token, [FromBody] Dish dish)
-        {
-            if (GetRole(token) == 1)
-            {
-
+        public IActionResult RegisterDish(string token, [FromBody] Dish dish){
+            if (GetRole(token) == 1){
                 string err = "";
-                try
-                {
-
+                try{
                     AddToFireBase(dish);
                     err = "Đăng ký thành công";
                 }
-                catch
-                {
+                catch{
                     err = "Lỗi rồi";
                 }
                 return Ok(new[] { err });
-
             }
             return Ok("Bạn không có quyền");
         }
 
-
-
         //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
         // vd 1 2 3 thì get id sẽ ra 4
         // vd 1 3 4 thì get id sẽ ra 2
-        private int GetID()
-        {
+        private int GetID(){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Dish>();
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
             int i = 1;
-            while (1 == 1)
-            {
+            while (1 == 1){
                 int dem = 0;
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.Dish_ID == i)
                         dem++;
                 }
@@ -298,34 +253,30 @@ namespace TLCN_WEB_API.Controllers
             }
             return i;
         }
+
         // thêm dư liệu lên firebase
-        private void AddToFireBase(Dish dish)
-        {
+        private void AddToFireBase(Dish dish){
             client = new FireSharp.FirebaseClient(config);
             var data = dish;
             data.Dish_ID = GetID();
             SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
         }
 
-
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, Dish dish)
-        {
+        private void AddbyidToFireBase(int id, Dish dish){
             client = new FireSharp.FirebaseClient(config);
             var data = dish;
             data.Dish_ID = id;
             SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
         }
-        public static string Decrypt(string toDecrypt)
-        {
-            try
-            {
+
+        public static string Decrypt(string toDecrypt){
+            try{
                 bool useHashing = true;
                 byte[] keyArray;
                 byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
 
-                if (useHashing)
-                {
+                if (useHashing){
                     MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
                     keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
                 }
@@ -341,35 +292,30 @@ namespace TLCN_WEB_API.Controllers
                 byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
 
                 return UTF8Encoding.UTF8.GetString(resultArray);
-
             }
-            catch
-            {
+            catch{
                 return "Loi roi";
             }
-
         }
-        public int GetRole(string token)
-        {
+
+        public int GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<User>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<User>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
             return 0;
         }
-        public string convertToUnSign3(string s)
-        {
+
+        public string convertToUnSign3(string s){
             Regex regex = new Regex("\\p{IsCombiningDiacriticalMarks}+");
             string temp = s.Normalize(NormalizationForm.FormD);
             return regex.Replace(temp, String.Empty).Replace('\u0111', 'd').Replace('\u0110', 'D');
