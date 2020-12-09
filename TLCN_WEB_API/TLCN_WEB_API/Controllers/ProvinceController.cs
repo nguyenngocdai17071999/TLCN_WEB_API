@@ -34,24 +34,21 @@ namespace TLCN_WEB_API.Controllers
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Province");
+            FirebaseResponse response = client.Get("Provinces");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Province>();
             //danh sách tìm kiếm
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
-            }
-            foreach (var item in list)
-            {
-                AddToFireBase(item);
-            }
+            }   
+            
             return Ok(list);
         }
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
         public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Province");
+            FirebaseResponse response = client.Get("Provinces");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Province>();
 
@@ -110,7 +107,7 @@ namespace TLCN_WEB_API.Controllers
         // vd 1 3 4 thì get id sẽ ra 2
         private int GetID(){
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Province");
+            FirebaseResponse response = client.Get("Provinces");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Province>();
             foreach (var item in data){
@@ -133,9 +130,9 @@ namespace TLCN_WEB_API.Controllers
         private void AddToFireBase(Province province){
             client = new FireSharp.FirebaseClient(config);
             var data = province;
-            PushResponse response = client.Push("Province/", data);
-            data.ProvinceID = response.Result.name;
-            SetResponse setResponse = client.Set("Province/" + data.ProvinceID, data);
+            PushResponse response = client.Push("Provinces/", data);
+            data.ProvinceID = data.ProvinceID;
+            SetResponse setResponse = client.Set("Provinces/" + data.ProvinceID, data);
         }
 
         //thêm dữ liệu lên firebase theo id
@@ -143,7 +140,7 @@ namespace TLCN_WEB_API.Controllers
             client = new FireSharp.FirebaseClient(config);
             var data = province;
             data.ProvinceID = id;
-            SetResponse setResponse = client.Set("Province/" + data.ProvinceID, data);
+            SetResponse setResponse = client.Set("Provinces/" + data.ProvinceID, data);
         }
 
         public string GetRole(string token){

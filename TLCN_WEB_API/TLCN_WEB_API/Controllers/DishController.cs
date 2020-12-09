@@ -41,27 +41,6 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
-            foreach (var item in list)
-            {
-                item.DishType_ID = "-MO5Wv4k7a7uinfyjJ3_";
-                if (item.Menu_ID == 1.ToString()) item.Menu_ID = "-MO5Zzr3lkP4JyMDWlMB";
-                if (item.Menu_ID == 2.ToString()) item.Menu_ID = "-MO5_-8EkRDBaXKaf8I1";
-                if (item.Menu_ID == 3.ToString()) item.Menu_ID = "-MO5_-PrbERuXTtThvBz";
-                if (item.Menu_ID == 4.ToString()) item.Menu_ID = "-MO5_-hkA3gy-oHFetwx";
-                if (item.Menu_ID == 5.ToString()) item.Menu_ID = "-MO5_-y7xiYExLHQHr75";
-                if (item.Menu_ID == 6.ToString()) item.Menu_ID = "-MO5_0E3pGAqYNsgvfWs";
-                if (item.Menu_ID == 7.ToString()) item.Menu_ID = "-MO5_0VlqzT7EyaAN6Rl";
-                if (item.Menu_ID == 8.ToString()) item.Menu_ID = "-MO5_0l9vIhDKFd6jPJl";
-                if (item.Menu_ID == 9.ToString()) item.Menu_ID = "-MO5_110wXkvxTOEGaKH";
-                if (item.Menu_ID == 10.ToString()) item.Menu_ID = "-MO5_1HtJ1HDTevZx1R5";
-                if (item.Menu_ID == 11.ToString()) item.Menu_ID = "-MO5_1bRIDZiUswXcxFo";
-                if (item.Menu_ID == 12.ToString()) item.Menu_ID = "-MO5_1sApfzvOXzAJnjk";
-                if (item.Menu_ID == 13.ToString()) item.Menu_ID = "-MO5_27xZTHzHL18d5n9";
-                if (item.Menu_ID == 14.ToString()) item.Menu_ID = "-MO5_2OEtO3IGKocmqoA";
-                if (item.Menu_ID == 15.ToString()) item.Menu_ID = "-MO5_2dSpTjQHeX1kcmk";
-
-                AddToFireBase(item);
-            }
             return Ok(list);
         }
 

@@ -47,10 +47,6 @@ namespace TLCN_WEB_API.Controllers
                 foreach (var item in list){
                     item.Password = Decrypt(item.Password);
                 }
-                foreach (var item in list)
-                {
-                    AddToFireBase(item);
-                }
                 return Ok(list);
             }
             return Ok(new[] { "Bạn không có quyền" });

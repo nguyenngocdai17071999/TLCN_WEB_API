@@ -40,10 +40,6 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
             }
-            foreach (var item in list)
-            {
-                AddToFireBase(item);
-            }
             return Ok(list);
         }
 

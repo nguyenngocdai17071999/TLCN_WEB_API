@@ -41,9 +41,6 @@ namespace TLCN_WEB_API.Controllers
             {
                 list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
             }
-            //foreach(var item in list) {                
-            //    AddToFireBase(item);
-            //}
             return Ok(list);
         }
         [HttpGet("GetByID/{id:int}")]
