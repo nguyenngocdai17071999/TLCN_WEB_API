@@ -45,7 +45,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(string id){
+        public IActionResult GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("BusinessType");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);

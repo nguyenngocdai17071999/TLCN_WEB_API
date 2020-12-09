@@ -46,7 +46,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(string id){
+        public IActionResult GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -66,7 +66,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDMenu")]
         // phương thức get by id menu dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDMenu(string id){
+        public IActionResult GetByIDMenu(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -181,7 +181,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDType")]
         // phương thức get by id menu dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDType(string id){
+        public IActionResult GetByIDType(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);

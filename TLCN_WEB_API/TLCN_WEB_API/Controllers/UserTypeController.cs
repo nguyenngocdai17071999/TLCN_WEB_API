@@ -49,7 +49,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(string id, string token ) {
+        public IActionResult GetByID(string id, string token ) {
             if(GetRole(token)== "-MO5VBnzdGsuypsTzHaV")
             {
                 client = new FireSharp.FirebaseClient(config);
