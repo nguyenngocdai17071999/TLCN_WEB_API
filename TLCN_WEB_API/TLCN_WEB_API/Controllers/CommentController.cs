@@ -43,7 +43,7 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list);
         }
-        [HttpGet("GetByID/{id:int}")]
+        [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public async Task<IActionResult> GetByID(string id)
         {
@@ -67,7 +67,7 @@ namespace TLCN_WEB_API.Controllers
             return Ok(list2);
         }
 
-        [HttpPost("EditByID/{id:int}")]
+        [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, [FromBody] Comment comment)
         {

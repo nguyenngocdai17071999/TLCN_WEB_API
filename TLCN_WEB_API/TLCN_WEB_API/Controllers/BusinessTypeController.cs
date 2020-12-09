@@ -43,7 +43,7 @@ namespace TLCN_WEB_API.Controllers
             return Ok(list);
         }
 
-        [HttpGet("GetByID/{id:int}")]
+        [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);

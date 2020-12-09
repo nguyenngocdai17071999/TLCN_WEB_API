@@ -43,7 +43,7 @@ namespace TLCN_WEB_API.Controllers
             
             return Ok(list);
         }
-        [HttpGet("GetByID/{id:int}")]
+        [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
@@ -62,7 +62,7 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list2);
         }
-        [HttpGet("GetByIDProvince/{id:int}")]
+        [HttpGet("GetByIDProvince")]
         // phương thức get by id dữ liệu từ firebase 
         public async Task<IActionResult> GetByIDProvince(string id){
             client = new FireSharp.FirebaseClient(config);
@@ -82,7 +82,7 @@ namespace TLCN_WEB_API.Controllers
             return Ok(list2);
         }
 
-        [HttpGet("GetByIDBusinessType/{id:int}")]
+        [HttpGet("GetByIDBusinessType")]
         // phương thức get by id dữ liệu từ firebase 
         public async Task<IActionResult> GetByIDBusinessType(string id){
             client = new FireSharp.FirebaseClient(config);
@@ -102,7 +102,7 @@ namespace TLCN_WEB_API.Controllers
             return Ok(list2);
         }
 
-        [HttpPost("EditByID/{id:int}")]
+        [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, string token, [FromBody] Store store){
             if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
