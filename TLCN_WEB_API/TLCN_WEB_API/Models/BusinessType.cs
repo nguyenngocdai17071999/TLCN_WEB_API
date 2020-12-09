@@ -7,7 +7,7 @@ namespace TLCN_WEB_API.Models
 {
     public class BusinessType
     {
-        public int BusinessTypeID { get; set; }
+        public string BusinessTypeID { get; set; }
         public string BusinessTypeName { get; set; }
     }
 }

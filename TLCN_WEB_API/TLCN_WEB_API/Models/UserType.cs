@@ -7,7 +7,7 @@ namespace TLCN_WEB_API.Models
 {
     public class UserType
     {
-        public int UserTypeID { get; set; }
+        public string UserTypeID { get; set; }
         public string UserTypeName { get; set; }
     }
 }

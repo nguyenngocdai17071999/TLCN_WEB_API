@@ -41,12 +41,33 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
+            foreach (var item in list)
+            {
+                item.DishType_ID = "-MO5Wv4k7a7uinfyjJ3_";
+                if (item.Menu_ID == 1.ToString()) item.Menu_ID = "-MO5Zzr3lkP4JyMDWlMB";
+                if (item.Menu_ID == 2.ToString()) item.Menu_ID = "-MO5_-8EkRDBaXKaf8I1";
+                if (item.Menu_ID == 3.ToString()) item.Menu_ID = "-MO5_-PrbERuXTtThvBz";
+                if (item.Menu_ID == 4.ToString()) item.Menu_ID = "-MO5_-hkA3gy-oHFetwx";
+                if (item.Menu_ID == 5.ToString()) item.Menu_ID = "-MO5_-y7xiYExLHQHr75";
+                if (item.Menu_ID == 6.ToString()) item.Menu_ID = "-MO5_0E3pGAqYNsgvfWs";
+                if (item.Menu_ID == 7.ToString()) item.Menu_ID = "-MO5_0VlqzT7EyaAN6Rl";
+                if (item.Menu_ID == 8.ToString()) item.Menu_ID = "-MO5_0l9vIhDKFd6jPJl";
+                if (item.Menu_ID == 9.ToString()) item.Menu_ID = "-MO5_110wXkvxTOEGaKH";
+                if (item.Menu_ID == 10.ToString()) item.Menu_ID = "-MO5_1HtJ1HDTevZx1R5";
+                if (item.Menu_ID == 11.ToString()) item.Menu_ID = "-MO5_1bRIDZiUswXcxFo";
+                if (item.Menu_ID == 12.ToString()) item.Menu_ID = "-MO5_1sApfzvOXzAJnjk";
+                if (item.Menu_ID == 13.ToString()) item.Menu_ID = "-MO5_27xZTHzHL18d5n9";
+                if (item.Menu_ID == 14.ToString()) item.Menu_ID = "-MO5_2OEtO3IGKocmqoA";
+                if (item.Menu_ID == 15.ToString()) item.Menu_ID = "-MO5_2dSpTjQHeX1kcmk";
+
+                AddToFireBase(item);
+            }
             return Ok(list);
         }
 
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id){
+        public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -66,7 +87,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDMenu/{id:int}")]
         // phương thức get by id menu dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDMenu(int id){
+        public async Task<IActionResult> GetByIDMenu(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -125,14 +146,14 @@ namespace TLCN_WEB_API.Controllers
                     }
 
                     var list2 = new List<Store>();
-                    var MenuID = new List<int>();
+                    var MenuID = new List<string>();
 
                     foreach (var item in listdish){
                         if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname)){
                             MenuID.Add(item.Menu_ID);
                         }
                     }
-                    var MenuID2 = new List<int>();
+                    var MenuID2 = new List<string>();
                     foreach (var item in MenuID){
                         MenuID2.Add(item);
                         break;
@@ -181,7 +202,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDType/{id:int}")]
         // phương thức get by id menu dữ liệu từ firebase 
-        public async Task<IActionResult> GetByIDType(int id){
+        public async Task<IActionResult> GetByIDType(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Dishes");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -200,8 +221,9 @@ namespace TLCN_WEB_API.Controllers
         }
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id,string token, [FromBody] Dish dish){
-            if (GetRole(token) == 1){
+        public IActionResult EditByID(string id,string token, [FromBody] Dish dish){
+            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+            {
                 try{
                     AddbyidToFireBase(id, dish);
                     return Ok(new[] { "sửa thành công" });
@@ -215,7 +237,8 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("CreateDish")]
         public IActionResult RegisterDish(string token, [FromBody] Dish dish){
-            if (GetRole(token) == 1){
+            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+            {
                 string err = "";
                 try{
                     AddToFireBase(dish);
@@ -232,40 +255,42 @@ namespace TLCN_WEB_API.Controllers
         //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
         // vd 1 2 3 thì get id sẽ ra 4
         // vd 1 3 4 thì get id sẽ ra 2
-        private int GetID(){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Dishes");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Dish>();
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
-            }
-            int i = 1;
-            while (1 == 1){
-                int dem = 0;
-                foreach (var item in list){
-                    if (item.Dish_ID == i)
-                        dem++;
-                }
-                if (dem == 0)
-                    return i;
-                i++;
-            }
-            return i;
-        }
+        //private int GetID(){
+        //    client = new FireSharp.FirebaseClient(config);
+        //    FirebaseResponse response = client.Get("Dishes");
+        //    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        //    var list = new List<Dish>();
+        //    foreach (var item in data){
+        //        list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+        //    }
+        //    int i = 1;
+        //    while (1 == 1){
+        //        int dem = 0;
+        //        foreach (var item in list){
+        //            if (item.Dish_ID == i.ToString())
+        //                dem++;
+        //        }
+        //        if (dem == 0)
+        //            return i;
+        //        i++;
+        //    }
+        //    return i;
+        //}
 
         // thêm dư liệu lên firebase
         private void AddToFireBase(Dish dish){
             client = new FireSharp.FirebaseClient(config);
             var data = dish;
-            data.Dish_ID = GetID();
+            PushResponse response = client.Push("Dishes/", data);
+            data.Dish_ID = response.Result.name;
             SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
         }
 
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, Dish dish){
+        private void AddbyidToFireBase(string id, Dish dish){
             client = new FireSharp.FirebaseClient(config);
             var data = dish;
+
             data.Dish_ID = id;
             SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
         }
@@ -298,7 +323,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        public int GetRole(string token){
+        public string GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -312,7 +337,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
-            return 0;
+            return "";
         }
 
         public string convertToUnSign3(string s){

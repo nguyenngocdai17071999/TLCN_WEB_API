@@ -44,7 +44,7 @@ namespace TLCN_WEB_API.Controllers
         }
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id){
+        public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("DishType");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -64,9 +64,10 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id,string token, [FromBody] DishType dishType){
+        public IActionResult EditByID(string id,string token, [FromBody] DishType dishType){
             try{
-                if(GetRole(token)==1){
+                if(GetRole(token)== "-MO5VBnzdGsuypsTzHaV")
+                {
                     AddbyidToFireBase(id, dishType);
                     return Ok(new[] { "sửa thành công" });
                 }
@@ -83,7 +84,8 @@ namespace TLCN_WEB_API.Controllers
         public IActionResult RegisterDishType(string token,[FromBody] DishType dishType){
             string err = "";
             try{
-                if (GetRole(token) == 1){
+                if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+                {
                     AddToFireBase(dishType);
                     err = "Đăng ký thành công";
                 }
@@ -112,7 +114,7 @@ namespace TLCN_WEB_API.Controllers
             while (1 == 1){
                 int dem = 0;
                 foreach (var item in list){
-                    if (item.DishType_ID == i)
+                    if (item.DishType_ID == i.ToString())
                         dem++;
                 }
                 if (dem == 0)
@@ -126,19 +128,20 @@ namespace TLCN_WEB_API.Controllers
         private void AddToFireBase(DishType dishType){
             client = new FireSharp.FirebaseClient(config);
             var data = dishType;
-            data.DishType_ID = GetID();
+            PushResponse response = client.Push("DishType/", data);
+            data.DishType_ID = response.Result.name;
             SetResponse setResponse = client.Set("DishType/" + data.DishType_ID, data);
         }
 
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, DishType dishType){
+        private void AddbyidToFireBase(string id, DishType dishType){
             client = new FireSharp.FirebaseClient(config);
             var data = dishType;
             data.DishType_ID = id;
             SetResponse setResponse = client.Set("DishType/" + data.DishType_ID, data);
         }
 
-        public int GetRole(string token){
+        public string GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -152,10 +155,10 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
-            return 0;
+            return "";
         }
 
-        public int GetIDToken(string token){
+        public string GetIDToken(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -169,7 +172,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserID;
             }
-            return 0;
+            return "";
         }
 
         public static string Decrypt(string toDecrypt){

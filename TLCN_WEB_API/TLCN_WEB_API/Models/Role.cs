@@ -7,6 +7,6 @@ namespace TLCN_WEB_API.Models
 {
     public class Role
     {
-        public int UserTyleID { get; set; }
+        public string UserTyleID { get; set; }
     }
 }

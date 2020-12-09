@@ -40,12 +40,16 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
             }
+            foreach (var item in list)
+            {
+                AddToFireBase(item);
+            }
             return Ok(list);
         }
 
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id){
+        public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Menu");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -60,6 +64,10 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in list){
                 if (item.MenuID == id)
                     list2.Add(item);
+            }
+            foreach (var item in list)
+            {
+                AddToFireBase(item);
             }
             return Ok(list2);
         }
@@ -89,8 +97,9 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id,string token, [FromBody] Menu menu){
-            if (GetRole(token) == 1){
+        public IActionResult EditByID(string id,string token, [FromBody] Menu menu){
+            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+            {
                 try{
                     AddbyidToFireBase(id, menu);
                     return Ok(new[] { "sửa thành công" });
@@ -104,8 +113,9 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("CreateMenu")]
         public IActionResult RegisterMenu(string token, [FromBody] Menu menu){
-            int a = GetRole(token);
-            if (GetRole(token) == 1){
+            string a = GetRole(token);
+            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+            {
                 string err = "";
                 try{
                     AddToFireBase(menu);
@@ -134,7 +144,7 @@ namespace TLCN_WEB_API.Controllers
             while (1 == 1){
                 int dem = 0;
                 foreach (var item in list){
-                    if (item.MenuID == i)
+                    if (item.MenuID == i.ToString())
                         dem++;
                 }
                 if (dem == 0)
@@ -148,12 +158,13 @@ namespace TLCN_WEB_API.Controllers
         private void AddToFireBase(Menu menu){
             client = new FireSharp.FirebaseClient(config);
             var data = menu;
-            data.MenuID = GetID();
+            PushResponse response = client.Push("Menu/", data);
+            data.MenuID = response.Result.name;
             SetResponse setResponse = client.Set("Menu/" + data.MenuID, data);
         }
 
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, Menu menu){
+        private void AddbyidToFireBase(string id, Menu menu){
             client = new FireSharp.FirebaseClient(config);
             var data = menu;
             data.MenuID = id;
@@ -190,7 +201,7 @@ namespace TLCN_WEB_API.Controllers
 
         }
 
-        public int GetRole(string token){
+        public string GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -205,7 +216,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
-            return 0;
+            return "";
         }
     }
 }

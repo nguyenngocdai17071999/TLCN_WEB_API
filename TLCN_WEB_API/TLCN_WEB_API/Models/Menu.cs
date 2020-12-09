@@ -7,7 +7,7 @@ namespace TLCN_WEB_API.Models
 {
     public class Menu
     {
-        public int MenuID { get; set; }
+        public string MenuID { get; set; }
         public string MenuName { get; set; }
     }
 }

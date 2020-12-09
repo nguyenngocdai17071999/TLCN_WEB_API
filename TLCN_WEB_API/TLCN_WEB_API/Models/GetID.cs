@@ -7,6 +7,6 @@ namespace TLCN_WEB_API.Models
 {
     public class GetID
     {
-        public int ID { get; set; }
+        public string ID { get; set; }
     }
 }

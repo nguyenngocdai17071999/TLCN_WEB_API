@@ -41,11 +41,14 @@ namespace TLCN_WEB_API.Controllers
             {
                 list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
             }
+            //foreach(var item in list) {                
+            //    AddToFireBase(item);
+            //}
             return Ok(list);
         }
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id)
+        public async Task<IActionResult> GetByID(string id)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Comment");
@@ -69,7 +72,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("EditByID/{id:int}")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id, [FromBody] Comment comment)
+        public IActionResult EditByID(string id, [FromBody] Comment comment)
         {
 
             try
@@ -122,7 +125,7 @@ namespace TLCN_WEB_API.Controllers
                 int dem = 0;
                 foreach (var item in list)
                 {
-                    if (item.CommentID == i)
+                    if (item.CommentID == i.ToString())
                         dem++;
                 }
                 if (dem == 0)
@@ -136,13 +139,31 @@ namespace TLCN_WEB_API.Controllers
         {
             client = new FireSharp.FirebaseClient(config);
             var data = comment;
-            data.CommentID = GetID();
+            PushResponse response = client.Push("Comment/", data);
+
+            data.CommentID = response.Result.name;
+
             SetResponse setResponse = client.Set("Comment/" + data.CommentID, data);
         }
-
+        //public bool Insert(UserModels models)
+        //{
+        //    try
+        //    {
+        //        var data = models;
+        //        PushResponse response = dBContext.Client.Push("Users/", data);
+        //        data.UserID = response.Result.name;
+        //        SetResponse setResponse = dBContext.Client.Set("Users/" + data.UserID, data);
+        //    }
+        //    catch { }
+        //    if (CheckUserName(models.UserName) == true)
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, Comment comment)
+        private void AddbyidToFireBase(string id, Comment comment)
         {
             client = new FireSharp.FirebaseClient(config);
             var data = comment;

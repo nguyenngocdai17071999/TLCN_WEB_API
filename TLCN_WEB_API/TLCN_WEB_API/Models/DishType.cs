@@ -7,7 +7,7 @@ namespace TLCN_WEB_API.Models
 {
     public class DishType
     {
-        public int DishType_ID { get; set; }
+        public string DishType_ID { get; set; }
         public string DishyTypeName { get; set; }
     }
 }

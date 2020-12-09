@@ -32,7 +32,7 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(string token){
-            if (GetRole(token) == 1) {
+            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV") {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("UserType");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -49,8 +49,9 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id, string token ) {
-            if(GetRole(token)==1){
+        public async Task<IActionResult> GetByID(string id, string token ) {
+            if(GetRole(token)== "-MO5VBnzdGsuypsTzHaV")
+            {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("UserType");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -74,9 +75,9 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id,string token, [FromBody] UserType usertype){
+        public IActionResult EditByID(string id,string token, [FromBody] UserType usertype){
             try {
-                if(GetRole(token)==1) {
+                if(GetRole(token)== "-MO5VBnzdGsuypsTzHaV") {
                     AddbyidToFireBase(id, usertype);
                     return Ok(new[] { "ok" });
                 }
@@ -92,7 +93,8 @@ namespace TLCN_WEB_API.Controllers
         public IActionResult RegisterUser(string token, [FromBody] UserType userType){
             string err = "";
             try{
-                if (GetRole(token) == 1){
+                if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+                {
                     AddToFireBase(userType);
                     err = "Đăng ký thành công";
                 }
@@ -109,9 +111,10 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, UserType usertype){
+        private void AddbyidToFireBase(string id, UserType usertype){
             client = new FireSharp.FirebaseClient(config);
             var data = usertype;
+            //PushResponse response = client.Push("UserType/", data);
             data.UserTypeID = id;
             SetResponse setResponse = client.Set("UserType/" + data.UserTypeID, data);
         }
@@ -120,7 +123,8 @@ namespace TLCN_WEB_API.Controllers
         private void AddToFireBase(UserType userType){
             client = new FireSharp.FirebaseClient(config);
             var data = userType;
-            data.UserTypeID = GetID();
+            PushResponse response = client.Push("UserType/", data);
+            data.UserTypeID = response.Result.name;
             SetResponse setResponse = client.Set("UserType/" + data.UserTypeID, data);
         }
 
@@ -140,7 +144,7 @@ namespace TLCN_WEB_API.Controllers
             while (1 == 1){
                 int dem = 0;
                 foreach (var item in list){
-                    if (item.UserTypeID == i)
+                    if (item.UserTypeID == i.ToString())
                         dem++;
                 }
                 if (dem == 0)
@@ -150,7 +154,7 @@ namespace TLCN_WEB_API.Controllers
             return i;
         }
 
-        public int GetRole(string token){
+        public string GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -164,9 +168,9 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
-            return 0;
+            return "";
         }
-        public int GetIDToken(string token){
+        public string GetIDToken(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -180,7 +184,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserID;
             }
-            return 0;
+            return "";
         }
         public static string Decrypt(string toDecrypt){
             try{

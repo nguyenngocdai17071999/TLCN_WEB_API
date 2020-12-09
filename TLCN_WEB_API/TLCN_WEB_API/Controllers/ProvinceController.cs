@@ -41,11 +41,15 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
             }
+            foreach (var item in list)
+            {
+                AddToFireBase(item);
+            }
             return Ok(list);
         }
         [HttpGet("GetByID/{id:int}")]
         // phương thức get by id dữ liệu từ firebase 
-        public async Task<IActionResult> GetByID(int id){
+        public async Task<IActionResult> GetByID(string id){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Province");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -65,9 +69,10 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(int id,string token, [FromBody] Province province){            
+        public IActionResult EditByID(string id,string token, [FromBody] Province province){            
             try{
-                if (GetRole(token) == 1){
+                if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+                {
                     AddbyidToFireBase(id, province);
                     return Ok(new[] { "sửa thành công" });
                 }
@@ -84,7 +89,8 @@ namespace TLCN_WEB_API.Controllers
         public IActionResult RegisterProvince(string token, [FromBody] Province province){
             string err = "";
             try{
-                if(GetRole(token)==1){
+                if(GetRole(token)== "-MO5VBnzdGsuypsTzHaV")
+                {
                     AddToFireBase(province);
                     err = "Đăng ký thành công";
                 }
@@ -114,7 +120,7 @@ namespace TLCN_WEB_API.Controllers
             while (1 == 1){
                 int dem = 0;
                 foreach (var item in list){
-                    if (item.ProvinceID == i)
+                    if (item.ProvinceID == i.ToString())
                         dem++;
                 }
                 if (dem == 0)
@@ -127,19 +133,20 @@ namespace TLCN_WEB_API.Controllers
         private void AddToFireBase(Province province){
             client = new FireSharp.FirebaseClient(config);
             var data = province;
-            data.ProvinceID = GetID();
+            PushResponse response = client.Push("Province/", data);
+            data.ProvinceID = response.Result.name;
             SetResponse setResponse = client.Set("Province/" + data.ProvinceID, data);
         }
 
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, Province province){
+        private void AddbyidToFireBase(string id, Province province){
             client = new FireSharp.FirebaseClient(config);
             var data = province;
             data.ProvinceID = id;
             SetResponse setResponse = client.Set("Province/" + data.ProvinceID, data);
         }
 
-        public int GetRole(string token){
+        public string GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -155,9 +162,9 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
-            return 0;
+            return "";
         }
-        public int GetIDToken(string token){
+        public string GetIDToken(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -172,7 +179,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserID;
             }
-            return 0;
+            return "";
         }
         public static string Decrypt(string toDecrypt){
             try{

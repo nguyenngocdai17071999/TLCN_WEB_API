@@ -34,7 +34,8 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(string token){
-            if (GetRole(token)==1){
+            if (GetRole(token)== "-MO5VBnzdGsuypsTzHaV")
+            {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("User");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -45,6 +46,10 @@ namespace TLCN_WEB_API.Controllers
                 }
                 foreach (var item in list){
                     item.Password = Decrypt(item.Password);
+                }
+                foreach (var item in list)
+                {
+                    AddToFireBase(item);
                 }
                 return Ok(list);
             }
@@ -123,6 +128,7 @@ namespace TLCN_WEB_API.Controllers
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             foreach (var item in list){
+                string a = Decrypt(item.Password);
                 if (item.Email == user.UserName && item.Password == Encrypt(user.PassWord)){
                     err = "Đăng nhập thành công";
                     return Ok(Encrypt(item.Email.ToString()));
@@ -201,7 +207,7 @@ namespace TLCN_WEB_API.Controllers
             while (1 == 1){
                 int dem = 0;
                 foreach (var item in list){
-                    if (item.UserID == i)
+                    if (item.UserID == i.ToString())
                         dem++;
                 }
                 if (dem == 0)
@@ -215,12 +221,13 @@ namespace TLCN_WEB_API.Controllers
             client = new FireSharp.FirebaseClient(config);
             var data = user;
             //  PushResponse response = client.Push("User/", data);
-            data.UserID = GetID();
+            PushResponse response = client.Push("User/", data);
+            data.UserID = response.Result.name;
             data.Password = Encrypt(data.Password);
             SetResponse setResponse = client.Set("User/" + data.UserID, data);
         }
         // Edit password by id
-        private void EditPassBYID(int id, User user){
+        private void EditPassBYID(string id, User user){
             client = new FireSharp.FirebaseClient(config);
             var data = user;
             //  PushResponse response = client.Push("User/", data);
@@ -229,7 +236,7 @@ namespace TLCN_WEB_API.Controllers
             SetResponse setResponse = client.Set("User/" + data.UserID, data);
         }
         //thêm dữ liệu lên firebase theo id
-        private void AddbyidToFireBase(int id, User user){
+        private void AddbyidToFireBase(string id, User user){
             client = new FireSharp.FirebaseClient(config);
             var data = user;
             //  PushResponse response = client.Push("User/", data);
@@ -304,7 +311,7 @@ namespace TLCN_WEB_API.Controllers
             }
             return false;
         }
-        public int GetRole(string token){
+        public string GetRole(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -318,9 +325,9 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserTypeID;
             }
-            return 0;
+            return "";
         }
-        public int GetIDToken(string token){
+        public string GetIDToken(string token){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -334,7 +341,7 @@ namespace TLCN_WEB_API.Controllers
                 if (item.Email.ToString() == Decrypt(token))
                     return item.UserID;
             }
-            return 0;
+            return "";
         }
     }
 }
