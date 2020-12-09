@@ -137,8 +137,11 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [HttpPost("ForgetPass")]
-        public IActionResult ForgetPass([FromBody] User user){///sử dụng thuộc tính Email của models user json chỉ cần Email
-            if (kiemtraEmail(user.Email) == true){
+        public IActionResult ForgetPass(string Email){///sử dụng thuộc tính Email của models user json chỉ cần Email
+            if (kiemtraEmail(Email) == true){
+
+                //var list = new List<ForGetCode>();
+                ForGetCode dai = new ForGetCode();
                 Random a = new Random();
                 int code = a.Next(100000, 999999);
                 DateTime date = DateTime.Now;
@@ -146,7 +149,7 @@ namespace TLCN_WEB_API.Controllers
                 ////Gửi email
                 var messenge = new MimeMessage();
                 messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
-                messenge.To.Add(new MailboxAddress("naren", user.Email));
+                messenge.To.Add(new MailboxAddress("naren",Email));
                 messenge.Subject = "hello";
                 messenge.Body = new TextPart("plain"){
                     Text = "Code ResetPass cua ban la: " + code + ""
@@ -158,7 +161,9 @@ namespace TLCN_WEB_API.Controllers
                     client.Send(messenge);
                     client.Disconnect(true);
                 }
-                return Ok(new[] { "code: " + code + "", "date: " + date + "" });
+                dai.code = code;
+                dai.date = date;
+                return Ok(dai);
             }
             return Ok(new[] { "Không có Email" });
         }
