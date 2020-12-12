@@ -139,8 +139,6 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("ForgetPass")]
         public IActionResult ForgetPass(string Email){///sử dụng thuộc tính Email của models user json chỉ cần Email
             if (kiemtraEmail(Email) == true){
-
-                //var list = new List<ForGetCode>();
                 ForGetCode dai = new ForGetCode();
                 Random a = new Random();
                 int code = a.Next(100000, 999999);
@@ -149,7 +147,7 @@ namespace TLCN_WEB_API.Controllers
                 ////Gửi email
                 var messenge = new MimeMessage();
                 messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
-                messenge.To.Add(new MailboxAddress("naren",Email));
+                messenge.To.Add(new MailboxAddress("naren", Email));
                 messenge.Subject = "hello";
                 messenge.Body = new TextPart("plain"){
                     Text = "Code ResetPass cua ban la: " + code + ""
@@ -169,8 +167,8 @@ namespace TLCN_WEB_API.Controllers
         }
         //resetpass theo gmail
         [HttpPost("ResetPass")]
-        public IActionResult ResetPass([FromBody] User user){//Sử dụng thuốc tính Email và Password
-            if (kiemtraEmail(user.Email) == true){
+        public IActionResult ResetPass(string Email,string Password){//Sử dụng thuốc tính Email và Password
+            if (kiemtraEmail(Email) == true){
                 User resetPassUser = new User();
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("User");
@@ -181,12 +179,12 @@ namespace TLCN_WEB_API.Controllers
                     list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                 }
                 foreach (var item in list){
-                    if (item.Email == user.Email){
+                    if (item.Email == Email){
                         resetPassUser = item;
                         break;
                     }
                 }
-                resetPassUser.Password = user.Password;
+                resetPassUser.Password = Password;
                 EditPassBYID(resetPassUser.UserID, resetPassUser);
                 return Ok(new[] { "Đổi mật khẩu thành công" });
             }
