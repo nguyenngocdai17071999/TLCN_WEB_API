@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,17 +10,21 @@ using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TLCN_WEB_API.Models;
 
+
 namespace TLCN_WEB_API.Controllers
 {
-    [EnableCors]
+  //  [EnableCors]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -27,14 +33,25 @@ namespace TLCN_WEB_API.Controllers
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
-
+        private IConfiguration _config;
+        public UserController(IConfiguration config)
+        {
+            _config = config;
+        }
         private static string key = "TLCN";
         IFirebaseClient client;
 
+
+        [Authorize]
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll(string token){
-            if (GetRole(token)== "-MO5VBnzdGsuypsTzHaV")
+        public IActionResult GetAll(){
+
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            string Email = claim[1].Value;
+
+            if (GetRole(Email)== "-MO5VBnzdGsuypsTzHaV")
             {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("User");
@@ -52,11 +69,17 @@ namespace TLCN_WEB_API.Controllers
             return Ok(new[] { "Bạn không có quyền" });
         }
 
+        [Authorize]
         [HttpGet("GetRole")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult getRole(string token){
+        public IActionResult getRole(){
+
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            string Email = claim[1].Value;
+
             Role a = new Role();
-            a.UserTyleID = GetRole(token);
+            a.UserTyleID = GetRole(Email);
             return Ok(a);
         }
 
@@ -113,27 +136,40 @@ namespace TLCN_WEB_API.Controllers
         }
         //Hàm login
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] Login user){
-            //get list user
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("User");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<User>();
-            string err = "";
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+        public IActionResult Login([FromBody] Login userlogin){
+            ////get list user
+            //client = new FireSharp.FirebaseClient(config);
+            //FirebaseResponse response = client.Get("User");
+            //dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            //var list = new List<User>();
+            //string err = "";
+            //foreach (var item in data){
+            //    list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            //}
+            //foreach (var item in list){
+            //    string a = Decrypt(item.Password);
+            //    if (item.Email == user.UserName && item.Password == Encrypt(user.PassWord)){
+            //        err = "Đăng nhập thành công";
+            //        return Ok(Encrypt(item.Email.ToString()));
+            //    }
+            //    else{
+            //        err = "Đăng nhập thất bại";
+            //    }
+            //}
+            //return Ok(new[] { err });
+            UserModel login = new UserModel();
+            login.EmailAddress = userlogin.Email;
+            login.PassWord = userlogin.PassWord;
+            IActionResult response = Unauthorized();
+
+            var user = AuthenticationUser(login);
+            if (user != null)
+            {
+                var tokenStr = GenerateJSONWebToken(user);
+                response = Ok(new { token = tokenStr });
+
             }
-            foreach (var item in list){
-                string a = Decrypt(item.Password);
-                if (item.Email == user.UserName && item.Password == Encrypt(user.PassWord)){
-                    err = "Đăng nhập thành công";
-                    return Ok(Encrypt(item.Email.ToString()));
-                }
-                else{
-                    err = "Đăng nhập thất bại";
-                }
-            }
-            return Ok(new[] { err });
+            return response;
         }
 
         [HttpPost("ForgetPass")]
@@ -310,7 +346,7 @@ namespace TLCN_WEB_API.Controllers
             }
             return false;
         }
-        public string GetRole(string token){
+        public string GetRole(string Email){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -321,7 +357,7 @@ namespace TLCN_WEB_API.Controllers
             }
             var list2 = new List<User>();
             foreach (var item in list){
-                if (item.Email.ToString() == Decrypt(token))
+                if (item.Email.ToString() == Email)
                     return item.UserTypeID;
             }
             return "";
@@ -342,5 +378,54 @@ namespace TLCN_WEB_API.Controllers
             }
             return "";
         }
+
+        private UserModel AuthenticationUser(UserModel login)
+        {
+            //get list user
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            //layas thongo tin taif khoan dang nhap
+            UserModel user = null;
+            foreach(var item in list)
+            {
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
+                {
+                    user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
+                }
+            }
+            return user;
+        }
+
+
+        //thuc hien tao token
+        private string GenerateJSONWebToken(UserModel userinfo)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[] {
+                new Claim(JwtRegisteredClaimNames.Sub,DateTime.Now.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email,userinfo.EmailAddress),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Issuer"],
+                claims,
+                expires: DateTime.Now.AddMinutes(120),
+                signingCredentials: credentials);
+            var encodetoken = new JwtSecurityTokenHandler().WriteToken(token);
+            return encodetoken;
+
+        }
+
     }
 }

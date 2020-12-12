@@ -1,8 +1,8 @@
 {
   "runtimeOptions": {
     "additionalProbingPaths": [
-      "C:\\Users\\tanph\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\tanph\\.nuget\\packages"
+      "C:\\Users\\Dai\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Dai\\.nuget\\packages"
     ]
   }
 }
