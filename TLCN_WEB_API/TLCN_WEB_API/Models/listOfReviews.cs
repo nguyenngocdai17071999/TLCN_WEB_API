@@ -12,6 +12,5 @@ namespace TLCN_WEB_API.Models
         public string StoreID { get; set; }
         public string UserID { get; set; } 
 
-
     }
 }
