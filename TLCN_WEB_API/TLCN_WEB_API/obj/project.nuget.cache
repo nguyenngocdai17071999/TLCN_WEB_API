@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "jK/9mY3p5oYewQiWfjtKC97dmA9qhX7uo6ROtJ6FnHM7Fu+6AfGdcTdfJsFVmmv9N1CTTc26hswzZ8n7nwfmlQ==",
+  "dgSpecHash": "ajmlGpeqw3cAIVdEzuOQastlAXNMNRzNdFLHlntpQOpYZnS/ussXvgeHSCB3tnxTCfBsuooCz5HchaBT63DiNA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Dai\\Documents\\GitHub\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API\\TLCN_WEB_API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Dai\\.nuget\\packages\\firebase.auth\\1.0.0\\firebase.auth.1.0.0.nupkg.sha512",
     "C:\\Users\\Dai\\.nuget\\packages\\firebasestorage.net\\1.0.3\\firebasestorage.net.1.0.3.nupkg.sha512",
     "C:\\Users\\Dai\\.nuget\\packages\\firesharp\\2.0.4\\firesharp.2.0.4.nupkg.sha512",
+    "C:\\Users\\Dai\\.nuget\\packages\\googlemaps.locationservices\\1.2.0.5\\googlemaps.locationservices.1.2.0.5.nupkg.sha512",
     "C:\\Users\\Dai\\.nuget\\packages\\httppostedfilehelper\\1.2.0\\httppostedfilehelper.1.2.0.nupkg.sha512",
     "C:\\Users\\Dai\\.nuget\\packages\\mailkit\\2.9.0\\mailkit.2.9.0.nupkg.sha512",
     "C:\\Users\\Dai\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\3.1.10\\microsoft.aspnetcore.authentication.jwtbearer.3.1.10.nupkg.sha512",

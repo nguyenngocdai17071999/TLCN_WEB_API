@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,7 +33,7 @@ namespace TLCN_WEB_API.Controllers
         };
 
         private IConfiguration _config;
-        public UserController(IConfiguration config)
+        public StoreController(IConfiguration config)
         {
             _config = config;
         }
@@ -51,6 +53,7 @@ namespace TLCN_WEB_API.Controllers
             
             return Ok(list);
         }
+
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
@@ -70,6 +73,7 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(list2);
         }
+
         [HttpGet("GetByIDProvince")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByIDProvince(string id){
@@ -110,37 +114,59 @@ namespace TLCN_WEB_API.Controllers
             return Ok(list2);
         }
 
+        [Authorize]
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(string id, string token, [FromBody] Store store){
-            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+        public IActionResult EditByID(string id, [FromBody] Store store){
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            string Email = claim[1].Value;
+            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
             {
-                try{
-                    AddbyidToFireBase(id, store);
-                    return Ok(new[] { "sửa thành công" });
+                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                {
+                    try
+                    {
+                        AddbyidToFireBase(id, store);
+                        return Ok(new[] { "sửa thành công" });
+                    }
+                    catch
+                    {
+                        return Ok(new[] { "Lỗi rồi" });
+                    }
                 }
-                catch{
-                    return Ok(new[] { "Lỗi rồi" });
-                }
+                return Ok(new[] { "Bạn không có quyền" });
             }
-            return Ok(new[] { "Bạn không có quyền" });
+            else return Ok(new[] { "Bạn cần đăng nhập" });           
         }
 
+        [Authorize]
         [HttpPost("CreateStore")]
-        public IActionResult RegisterStore(string token, [FromBody] Store store){
-            if (GetRole(token) == "-MO5VBnzdGsuypsTzHaV")
+        public IActionResult RegisterStore( [FromBody] Store store){
+
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IList<Claim> claim = identity.Claims.ToList();
+            string Email = claim[1].Value;
+            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
             {
-                string err = "";
-                try{                
-                     AddToFireBase(store);
-                     err = "Đăng ký thành công";               
+                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                {
+                    string err = "";
+                    try
+                    {
+                        AddToFireBase(store);
+                        err = "Đăng ký thành công";
+                    }
+                    catch
+                    {
+                        err = "Lỗi rồi";
+                    }
+                    return Ok(new[] { err });
                 }
-                catch{
-                    err = "Lỗi rồi";
-                }
-                return Ok(new[] { err });
+                return Ok(new[] { "Bạn không có quyền" });
             }
-            return Ok(new[] { "Bạn không có quyền" });
+            else return Ok(new[] { "Bạn cần đăng nhập" });
+            
         }
 
         //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
@@ -211,7 +237,7 @@ namespace TLCN_WEB_API.Controllers
                 return "Loi roi";
             }
         }
-        public string GetRole(string token){
+        public string GetRole(string Email){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -222,7 +248,7 @@ namespace TLCN_WEB_API.Controllers
             }
             var list2 = new List<User>();
             foreach (var item in list){
-                if (item.Email.ToString() == Decrypt(token))
+                if (item.Email.ToString() == Email)
                     return item.UserTypeID;
             }
             return "";
@@ -251,6 +277,32 @@ namespace TLCN_WEB_API.Controllers
                 }
             }
             return user;
+        }
+
+        // mã hóa dữ liệu MD5
+        public static string Encrypt(string toEncrypt)
+        {
+            bool useHashing = true;
+            byte[] keyArray;
+            byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
+
+            if (useHashing)
+            {
+                MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
+                keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
+            }
+            else
+                keyArray = UTF8Encoding.UTF8.GetBytes(key);
+
+            TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
+            tdes.Key = keyArray;
+            tdes.Mode = CipherMode.ECB;
+            tdes.Padding = PaddingMode.PKCS7;
+
+            ICryptoTransform cTransform = tdes.CreateEncryptor();
+            byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+
+            return Convert.ToBase64String(resultArray, 0, resultArray.Length);
         }
 
         //thuc hien tao token

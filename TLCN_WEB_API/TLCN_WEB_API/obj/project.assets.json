@@ -43,6 +43,15 @@
           "lib/portable-net45+sl5+wp8+win8/FireSharp.dll": {}
         }
       },
+      "GoogleMaps.LocationServices/1.2.0.5": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/GoogleMaps.LocationServices.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/GoogleMaps.LocationServices.dll": {}
+        }
+      },
       "HttpPostedFileHelper/1.2.0": {
         "type": "package",
         "dependencies": {
@@ -1869,6 +1878,18 @@
         "firesharp.2.0.4.nupkg.sha512",
         "firesharp.nuspec",
         "lib/portable-net45+sl5+wp8+win8/FireSharp.dll"
+      ]
+    },
+    "GoogleMaps.LocationServices/1.2.0.5": {
+      "sha512": "0j3RL5+acxYgQNz72JdXJ1nUKxMGaY+6UvrOIOxZfp0qpJOUmo/ivCAm53atbnuy0z3vrZK+j9mZifh35UBqag==",
+      "type": "package",
+      "path": "googlemaps.locationservices/1.2.0.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "googlemaps.locationservices.1.2.0.5.nupkg.sha512",
+        "googlemaps.locationservices.nuspec",
+        "lib/netstandard2.0/GoogleMaps.LocationServices.dll"
       ]
     },
     "HttpPostedFileHelper/1.2.0": {
@@ -6675,6 +6696,7 @@
       "FireSharp >= 2.0.4",
       "Firebase.Auth >= 1.0.0",
       "FirebaseStorage.net >= 1.0.3",
+      "GoogleMaps.LocationServices >= 1.2.0.5",
       "HttpPostedFileHelper >= 1.2.0",
       "MailKit >= 2.9.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 3.1.10",
@@ -6730,6 +6752,10 @@
           "FirebaseStorage.net": {
             "target": "Package",
             "version": "[1.0.3, )"
+          },
+          "GoogleMaps.LocationServices": {
+            "target": "Package",
+            "version": "[1.2.0.5, )"
           },
           "HttpPostedFileHelper": {
             "target": "Package",
