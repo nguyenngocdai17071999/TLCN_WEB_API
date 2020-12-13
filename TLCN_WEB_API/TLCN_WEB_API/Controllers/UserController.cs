@@ -24,7 +24,7 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-  //  [EnableCors]
+
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -162,6 +162,9 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(new[] { err });
         }
+
+
+
         //Hàm login
         [HttpPost("Login")]
         public IActionResult Login([FromBody] Login userlogin){           

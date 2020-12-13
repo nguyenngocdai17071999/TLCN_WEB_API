@@ -27,7 +27,6 @@
           "FireSharp": "2.0.4",
           "Firebase.Auth": "1.0.0",
           "FirebaseStorage.net": "1.0.3",
-          "Geocoding.net": "3.6.1",
           "GoogleMaps.LocationServices": "1.2.0.5",
           "HttpPostedFileHelper": "1.2.0",
           "MailKit": "2.9.0",
@@ -369,17 +368,6 @@
         },
         "compile": {
           "lib/portable-net45+sl5+wp8+win8/FireSharp.dll": {}
-        }
-      },
-      "Geocoding.net/3.6.1": {
-        "runtime": {
-          "lib/net40/Geocoding.dll": {
-            "assemblyVersion": "3.6.0.0",
-            "fileVersion": "3.6.0.141"
-          }
-        },
-        "compile": {
-          "lib/net40/Geocoding.dll": {}
         }
       },
       "GoogleMaps.LocationServices/1.2.0.5": {
@@ -3294,13 +3282,6 @@
       "sha512": "sha512-laSHpVUBG6iCTUixmpeUmYxie2zbziOBM+LU0v2A0ETE9dUyBA+8aY63xql/o8LXj+kFybBLYUKBUrLCZWaq+A==",
       "path": "firesharp/2.0.4",
       "hashPath": "firesharp.2.0.4.nupkg.sha512"
-    },
-    "Geocoding.net/3.6.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-cVLthPqEF8vR9BZK4W7zTIhv8kx2XJkhiWVfxTkzHE2z6i9FzDOyiCqJTaChdV1FXP3XN4JAmTLPN7UYOtCq7w==",
-      "path": "geocoding.net/3.6.1",
-      "hashPath": "geocoding.net.3.6.1.nupkg.sha512"
     },
     "GoogleMaps.LocationServices/1.2.0.5": {
       "type": "package",

@@ -29,14 +29,7 @@ namespace TLCN_WEB_API
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowCredentials()
-                        .AllowAnyHeader());
-            });
+            services.AddCors();
             services.AddControllers();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -65,14 +58,17 @@ namespace TLCN_WEB_API
 
             app.UseHttpsRedirection();
 
+
+            app.UseCors(x => x
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .SetIsOriginAllowed(origin => true) // allow any origin
+                            .AllowCredentials()); // allow credentials
+
             app.UseRouting();
 
             app.UseAuthentication();
 
-            //app.UseCors(builder => builder.AllowAnyOrigin()
-            //                  .AllowAnyMethod()
-            //                  .AllowCredentials()
-            //                  .AllowAnyHeader());
 
             app.UseAuthorization();
 

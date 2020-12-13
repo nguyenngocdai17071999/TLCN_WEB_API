@@ -8,7 +8,6 @@
     <PackageReference Include="Firebase.Auth" Version="1.0.0" />
     <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
     <PackageReference Include="FireSharp" Version="2.0.4" />
-    <PackageReference Include="Geocoding.net" Version="3.6.1" />
     <PackageReference Include="GoogleMaps.LocationServices" Version="1.2.0.5" />
     <PackageReference Include="HttpPostedFileHelper" Version="1.2.0" />
     <PackageReference Include="MailKit" Version="2.9.0" />
