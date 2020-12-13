@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ using FireSharp.Response;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TLCN_WEB_API.Models;
@@ -27,6 +30,11 @@ namespace TLCN_WEB_API.Controllers
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
 
+        private IConfiguration _config;
+        public UserController(IConfiguration config)
+        {
+            _config = config;
+        }
         IFirebaseClient client;
 
         [HttpGet("GetAll")]
@@ -218,6 +226,64 @@ namespace TLCN_WEB_API.Controllers
                     return item.UserTypeID;
             }
             return "";
+        }
+
+        private UserModel AuthenticationUser(UserModel login)
+        {
+            //get list user
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            //layas thongo tin taif khoan dang nhap
+            UserModel user = null;
+            foreach (var item in list)
+            {
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
+                {
+                    user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
+                }
+            }
+            return user;
+        }
+
+        //thuc hien tao token
+        private string GenerateJSONWebToken(UserModel userinfo)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[] {
+                new Claim(JwtRegisteredClaimNames.Sub,DateTime.Now.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email,userinfo.EmailAddress),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Issuer"],
+                claims,
+                expires: DateTime.Now.AddMinutes(120),
+                signingCredentials: credentials);
+            var encodetoken = new JwtSecurityTokenHandler().WriteToken(token);
+            return encodetoken;
+        }
+
+        public bool kiemtrathoigianlogin(DateTime date)
+        {
+            int sophut1 = date.Minute;
+            int sophut2 = DateTime.Now.Minute;
+            if (sophut2 < sophut1)
+                sophut2 = sophut2 + 60;
+            int ketqua = sophut2 - sophut1;
+            if (ketqua < 30) return true;
+            return false;
+
         }
     }
 }
