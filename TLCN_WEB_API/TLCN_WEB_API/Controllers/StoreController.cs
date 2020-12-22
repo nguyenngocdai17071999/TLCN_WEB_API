@@ -54,6 +54,60 @@ namespace TLCN_WEB_API.Controllers
             return Ok(list);
         }
 
+
+        private void AddToFireBasebydis(LatLongStore latLongStore)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = latLongStore;
+            //PushResponse response = client.Push("LatLongStore/", data);
+            data.IDStore = latLongStore.IDStore;
+            SetResponse setResponse = client.Set("LatLongStore/" + data.IDStore, data);
+        }
+
+        [HttpPost("CreateLatLong")]
+        public IActionResult CreateDIS(LatLongStore latLongStore) {
+            AddToFireBasebydis(latLongStore);
+            return Ok("OK");
+        }
+
+
+        [HttpGet("GetALLDistance")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult GetDistanceByIDall(string ID)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("LatLongStore");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<LatLongStore>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
+            }
+            return Ok(list);
+        }
+
+        [HttpGet("GetDistance")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult GetDistanceByID(string ID)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("LatLongStore");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<LatLongStore>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
+            }
+            foreach(var item in list)
+            {
+                if (item.IDStore == ID)
+                    return Ok(Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long)));
+            }    
+            return Ok(list);
+        }
+
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
@@ -326,16 +380,41 @@ namespace TLCN_WEB_API.Controllers
             return encodetoken;
         }
 
-        public bool kiemtrathoigianlogin(DateTime date)
-        {
-            int sophut1 = date.Minute;
-            int sophut2 = DateTime.Now.Minute;
-            if (sophut2 < sophut1)
-                sophut2 = sophut2 + 60;
-            int ketqua = sophut2 - sophut1;
-            if (ketqua < 30) return true;
-            return false;
 
-        }
+            public static double Calculate(double sLatitude, double sLongitude, double eLatitude,
+                                    double eLongitude)
+            {
+            
+                var radiansOverDegrees = (Math.PI / 180.0);
+
+                var sLatitudeRadians = sLatitude * radiansOverDegrees;
+                var sLongitudeRadians = sLongitude * radiansOverDegrees;
+                var eLatitudeRadians = eLatitude * radiansOverDegrees;
+                var eLongitudeRadians = eLongitude * radiansOverDegrees;
+
+                var dLongitude = eLongitudeRadians - sLongitudeRadians;
+                var dLatitude = eLatitudeRadians - sLatitudeRadians;
+
+                var result1 = Math.Pow(Math.Sin(dLatitude / 2.0), 2.0) +
+                              Math.Cos(sLatitudeRadians) * Math.Cos(eLatitudeRadians) *
+                              Math.Pow(Math.Sin(dLongitude / 2.0), 2.0);
+
+                // Using 3956 as the number of miles around the earth
+                var result2 = 3956.0 * 2.0 *
+                              Math.Atan2(Math.Sqrt(result1), Math.Sqrt(1.0 - result1));
+
+                return Math.Round(result2, 2); 
+            }
+
+            public bool kiemtrathoigianlogin(DateTime date)
+            {
+                int sophut1 = date.Minute;
+                int sophut2 = DateTime.Now.Minute;
+                if (sophut2 < sophut1)
+                    sophut2 = sophut2 + 60;
+                int ketqua = sophut2 - sophut1;
+                if (ketqua < 30) return true;
+                return false;
+            }
     }
 }

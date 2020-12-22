@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,6 +12,7 @@ using System.Threading.Tasks;
 using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
+using GoogleMaps.LocationServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -43,7 +47,9 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll(){
+        public IActionResult GetAll(){           
+
+
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
             string Email = claim[1].Value;
@@ -67,8 +73,11 @@ namespace TLCN_WEB_API.Controllers
                 }
                 return Ok("Bạn không có quyền");
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });            
+            else return Ok(new[] { "Bạn cần đăng nhập" });
+
         }
+
+      
 
         [Authorize]
         [HttpGet("GetByID")]

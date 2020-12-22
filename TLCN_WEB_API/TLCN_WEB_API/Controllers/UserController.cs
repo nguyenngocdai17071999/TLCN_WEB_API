@@ -92,7 +92,7 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(){
+        public IActionResult GetByID(string id){
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             IList<Claim> claim = identity.Claims.ToList();
@@ -110,11 +110,23 @@ namespace TLCN_WEB_API.Controllers
                     list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<User>();
-                foreach (var item in list)
+                if(id!=null)
                 {
-                    if (item.Email.ToString() == Email)
-                        list2.Add(item);
+                    foreach (var item in list)
+                    {
+                        if (item.UserID.ToString() == id)
+                            list2.Add(item);
+                    }
                 }
+                else
+                {
+                    foreach (var item in list)
+                    {
+                        if (item.Email.ToString() == Email)
+                            list2.Add(item);
+                    }
+                }
+
                 foreach (var item in list2)
                 {
                     item.Password = Decrypt(item.Password);
@@ -122,6 +134,31 @@ namespace TLCN_WEB_API.Controllers
                 return Ok(list2);
             }
             else return Ok(new[] { "Bạn cần đăng nhập" });
+        }
+
+        [HttpGet("GetByIDNotToken")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDnottoken(string id)
+        {
+
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("User");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<User>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<User>();
+               
+                foreach (var item in list)
+                {
+                    if (item.UserID.ToString() == id)
+                        list2.Add(item);
+                }             
+
+                return Ok(list2);
         }
 
         [Authorize]
