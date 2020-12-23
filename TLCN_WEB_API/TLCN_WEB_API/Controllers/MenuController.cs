@@ -43,40 +43,58 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Menu");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Menu>();
-            //danh sách tìm kiếm
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Menu");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Menu>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
+                }
+                return Ok(list);
             }
-            return Ok(list);
+            catch
+            {
+                return Ok("Error");
+            }
+
         }
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Menu");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Menu>();
-            //danh sách tìm kiếm
-
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
-            }
-
-            var list2 = new List<Menu>();
-            foreach (var item in list){
-                if (item.MenuID == id)
-                    list2.Add(item);
-            }
-            foreach (var item in list)
+            try
             {
-                AddToFireBase(item);
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Menu");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Menu>();
+                //danh sách tìm kiếm
+
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
+                }
+
+                var list2 = new List<Menu>();
+                foreach (var item in list)
+                {
+                    if (item.MenuID == id)
+                        list2.Add(item);
+                }
+                foreach (var item in list)
+                {
+                    AddToFireBase(item);
+                }
+                return Ok(list2);
             }
-            return Ok(list2);
+            catch {
+                return Ok("Error");
+            }
+
         }
         //[HttpGet("GetByIDStore/{id:int}")]
         //// phương thức get by id dữ liệu từ firebase 
@@ -106,58 +124,67 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, [FromBody] Menu menu){
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+            try
             {
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    try
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
                     {
-                        AddbyidToFireBase(id, menu);
-                        return Ok(new[] { "sửa thành công" });
+                        try
+                        {
+                            AddbyidToFireBase(id, menu);
+                            return Ok(new[] { "sửa thành công" });
+                        }
+                        catch
+                        {
+                            return Ok(new[] { "Lỗi rồi" });
+                        }
                     }
-                    catch
-                    {
-                        return Ok(new[] { "Lỗi rồi" });
-                    }
+                    return Ok(new[] { "Bạn không có quyền" });
                 }
-                return Ok(new[] { "Bạn không có quyền" });
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-
-           
+            catch
+            {
+                return Ok("Error");
+            }   
         }
 
         [Authorize]
         [HttpPost("CreateMenu")]
         public IActionResult RegisterMenu( [FromBody] Menu menu){
-
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+            try
             {
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    string err = "";
-                    try
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
                     {
-                        AddToFireBase(menu);
-                        err = "Đăng ký thành công";
+                        string err = "";
+                        try
+                        {
+                            AddToFireBase(menu);
+                            err = "Đăng ký thành công";
+                        }
+                        catch
+                        {
+                            err = "Lỗi rồi";
+                        }
+                        return Ok(new[] { err });
                     }
-                    catch
-                    {
-                        err = "Lỗi rồi";
-                    }
-                    return Ok(new[] { err });
+                    return Ok(new[] { "Bạn không có quyền" });
                 }
-                return Ok(new[] { "Bạn không có quyền" });
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-
-            
+            catch
+            {
+                return Ok("Error");
+            }
         }
 
         //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.

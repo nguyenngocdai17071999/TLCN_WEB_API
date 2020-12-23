@@ -46,11 +46,79 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true) {
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                    {
+                        client = new FireSharp.FirebaseClient(config);
+                        FirebaseResponse response = client.Get("User");
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                        var list = new List<User>();
+                        //danh sách tìm kiếm
+                        foreach (var item in data)
+                        {
+                            list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+                        }
+                        foreach (var item in list)
+                        {
+                            item.Password = Decrypt(item.Password);
+                        }
+                        return Ok(list);
+                    }
+                    return Ok(new[] { "Bạn không có quyền" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }            
+        }
+
+        [Authorize]
+        [HttpGet("GetRole")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult getRole(){
+
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    Role a = new Role();
+                    a.UserTyleID = GetRole(Email);
+                    return Ok(a);
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+           
+        }
+
+        [Authorize]
+        [HttpGet("GetByID")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByID(string id){
+
+
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
                     client = new FireSharp.FirebaseClient(config);
                     FirebaseResponse response = client.Get("User");
@@ -61,86 +129,46 @@ namespace TLCN_WEB_API.Controllers
                     {
                         list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                     }
-                    foreach (var item in list)
+                    var list2 = new List<User>();
+                    if (id != null)
+                    {
+                        foreach (var item in list)
+                        {
+                            if (item.UserID.ToString() == id)
+                                list2.Add(item);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in list)
+                        {
+                            if (item.Email.ToString() == Email)
+                                list2.Add(item);
+                        }
+                    }
+
+                    foreach (var item in list2)
                     {
                         item.Password = Decrypt(item.Password);
                     }
-                    return Ok(list);
+                    return Ok(list2);
                 }
-                return Ok(new[] { "Bạn không có quyền" });
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-        }
-
-        [Authorize]
-        [HttpGet("GetRole")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult getRole(){
-
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+            catch
             {
-                Role a = new Role();
-                a.UserTyleID = GetRole(Email);
-                return Ok(a);
+                return Ok("Error");
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-        }
 
-        [Authorize]
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id){
-
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-            {
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("User");
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<User>();
-                //danh sách tìm kiếm
-                foreach (var item in data)
-                {
-                    list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
-                }
-                var list2 = new List<User>();
-                if(id!=null)
-                {
-                    foreach (var item in list)
-                    {
-                        if (item.UserID.ToString() == id)
-                            list2.Add(item);
-                    }
-                }
-                else
-                {
-                    foreach (var item in list)
-                    {
-                        if (item.Email.ToString() == Email)
-                            list2.Add(item);
-                    }
-                }
-
-                foreach (var item in list2)
-                {
-                    item.Password = Decrypt(item.Password);
-                }
-                return Ok(list2);
-            }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
+           
         }
 
         [HttpGet("GetByIDNotToken")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByIDnottoken(string id)
         {
-
+            try
+            {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("User");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -151,16 +179,20 @@ namespace TLCN_WEB_API.Controllers
                     list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<User>();
-               
+
                 foreach (var item in list)
                 {
                     if (item.UserID.ToString() == id)
                         list2.Add(item);
-                }             
+                }
 
 
 
                 return Ok(list2);
+            }
+            catch {
+                return Ok("Error");
+            }
         }
 
 
@@ -190,7 +222,7 @@ namespace TLCN_WEB_API.Controllers
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
             catch{
-                return Ok(new[] { "Lỗi rồi" });
+                return Ok(new[] { "Error" });
             }
         }
 
@@ -207,7 +239,7 @@ namespace TLCN_WEB_API.Controllers
                 }
             }
             catch{
-                err = "Lỗi rồi";
+                err = "Error";
             }
             return Ok(new[] { err });
         }
@@ -216,76 +248,106 @@ namespace TLCN_WEB_API.Controllers
 
         //Hàm login
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] Login userlogin){           
-            UserModel login = new UserModel();
-            login.EmailAddress = userlogin.Email;
-            login.PassWord = userlogin.PassWord;
-            IActionResult response = Unauthorized();
-
-            var user = AuthenticationUser(login);
-            if (user != null)
+        public IActionResult Login([FromBody] Login userlogin){ 
+            try
             {
-                var tokenStr = GenerateJSONWebToken(user);
-                response = Ok(new { token = tokenStr });
+                UserModel login = new UserModel();
+                login.EmailAddress = userlogin.Email;
+                login.PassWord = userlogin.PassWord;
+                IActionResult response = Unauthorized();
 
+                var user = AuthenticationUser(login);
+                if (user != null)
+                {
+                    var tokenStr = GenerateJSONWebToken(user);
+                    response = Ok(new { token = tokenStr });
+
+                }
+                return response;
             }
-            return response;
+            catch
+            {
+                return Ok("Error");
+            }
+           
         }
 
         [HttpPost("ForgetPass")]
         public IActionResult ForgetPass(string Email){///sử dụng thuộc tính Email của models user json chỉ cần Email
-            if (kiemtraEmail(Email) == true){
-                ForGetCode dai = new ForGetCode();
-                Random a = new Random();
-                int code = a.Next(100000, 999999);
-                DateTime date = DateTime.Now;
+            try
+            {
+                if (kiemtraEmail(Email) == true)
+                {
+                    ForGetCode dai = new ForGetCode();
+                    Random a = new Random();
+                    int code = a.Next(100000, 999999);
+                    DateTime date = DateTime.Now;
 
-                ////Gửi email
-                var messenge = new MimeMessage();
-                messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
-                messenge.To.Add(new MailboxAddress("naren", Email));
-                messenge.Subject = "hello";
-                messenge.Body = new TextPart("plain"){
-                    Text = "Code ResetPass cua ban la: " + code + ""
-                };
+                    ////Gửi email
+                    var messenge = new MimeMessage();
+                    messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
+                    messenge.To.Add(new MailboxAddress("naren", Email));
+                    messenge.Subject = "hello";
+                    messenge.Body = new TextPart("plain")
+                    {
+                        Text = "Code ResetPass cua ban la: " + code + ""
+                    };
 
-                using (var client = new SmtpClient()){
-                    client.Connect("smtp.gmail.com", 587, false);
-                    client.Authenticate("nguyenngocdai17071999@gmail.com", "conyeume");
-                    client.Send(messenge);
-                    client.Disconnect(true);
+                    using (var client = new SmtpClient())
+                    {
+                        client.Connect("smtp.gmail.com", 587, false);
+                        client.Authenticate("nguyenngocdai17071999@gmail.com", "conyeume");
+                        client.Send(messenge);
+                        client.Disconnect(true);
+                    }
+                    dai.code = code;
+                    dai.date = date;
+                    return Ok(dai);
                 }
-                dai.code = code;
-                dai.date = date;
-                return Ok(dai);
+                return Ok(new[] { "Không có Email" });
             }
-            return Ok(new[] { "Không có Email" });
+            catch
+            {
+                return Ok("Error");
+            }
+            
         }
 
         //resetpass theo gmail
         [HttpPost("ResetPass")]
         public IActionResult ResetPass(string Email,string Password){//Sử dụng thuốc tính Email và Password
-            if (kiemtraEmail(Email) == true){
-                User resetPassUser = new User();
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("User");
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<User>();
-                string err = "";
-                foreach (var item in data){
-                    list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
-                }
-                foreach (var item in list){
-                    if (item.Email == Email){
-                        resetPassUser = item;
-                        break;
+            try
+            {
+                if (kiemtraEmail(Email) == true)
+                {
+                    User resetPassUser = new User();
+                    client = new FireSharp.FirebaseClient(config);
+                    FirebaseResponse response = client.Get("User");
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                    var list = new List<User>();
+                    string err = "";
+                    foreach (var item in data)
+                    {
+                        list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                     }
+                    foreach (var item in list)
+                    {
+                        if (item.Email == Email)
+                        {
+                            resetPassUser = item;
+                            break;
+                        }
+                    }
+                    resetPassUser.Password = Password;
+                    EditPassBYID(resetPassUser.UserID, resetPassUser);
+                    return Ok(new[] { "Đổi mật khẩu thành công" });
                 }
-                resetPassUser.Password = Password;
-                EditPassBYID(resetPassUser.UserID, resetPassUser);
-                return Ok(new[] { "Đổi mật khẩu thành công" });
+                return Ok(new[] { "Không có Email" });
             }
-            return Ok(new[] { "Không có Email" });
+            catch
+            {
+                return Ok("Error");
+            }            
         }
 
         //tim ra ID tự động của user bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
@@ -495,7 +557,6 @@ namespace TLCN_WEB_API.Controllers
             int ketqua = sophut2 - sophut1;
             if (ketqua < 30) return true;
             return false;
-
         }
 
     }

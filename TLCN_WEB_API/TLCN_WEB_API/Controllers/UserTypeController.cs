@@ -47,70 +47,72 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll(){           
-
-
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+        public IActionResult GetAll() {
+            try
             {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
 
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    client = new FireSharp.FirebaseClient(config);
-                    FirebaseResponse response = client.Get("UserType");
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                    var list = new List<UserType>();
-                    //danh sách tìm kiếm
-                    //var list2 = new List<User>();
-                    foreach (var item in data)
+
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
                     {
-                        list.Add(JsonConvert.DeserializeObject<UserType>(((JProperty)item).Value.ToString()));
+                        client = new FireSharp.FirebaseClient(config);
+                        FirebaseResponse response = client.Get("UserType");
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                        var list = new List<UserType>();
+                        //danh sách tìm kiếm
+                        //var list2 = new List<User>();
+                        foreach (var item in data)
+                        {
+                            list.Add(JsonConvert.DeserializeObject<UserType>(((JProperty)item).Value.ToString()));
+                        }
+                        return Ok(list);
                     }
-                    return Ok(list);
+                    return Ok("Bạn không có quyền");
                 }
-                return Ok("Bạn không có quyền");
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-
-        }
-
-      
+            catch {
+                return Ok("Error");
+            } 
+        }      
 
         [Authorize]
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id) {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
+                        client = new FireSharp.FirebaseClient(config);
+                        FirebaseResponse response = client.Get("UserType");
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                        var list = new List<UserType>();
+                        //danh sách tìm kiếm
+                        foreach (var item in data){
 
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                {
-                    client = new FireSharp.FirebaseClient(config);
-                    FirebaseResponse response = client.Get("UserType");
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                    var list = new List<UserType>();
-                    //danh sách tìm kiếm
-                    foreach (var item in data)
-                    {
-
-                        list.Add(JsonConvert.DeserializeObject<UserType>(((JProperty)item).Value.ToString()));
+                            list.Add(JsonConvert.DeserializeObject<UserType>(((JProperty)item).Value.ToString()));
+                        }
+                        var list2 = new List<UserType>();
+                        foreach (var item in list){
+                            if (item.UserTypeID == id)
+                                list2.Add(item);
+                        }
+                        return Ok(list2);
                     }
-                    var list2 = new List<UserType>();
-                    foreach (var item in list)
-                    {
-                        if (item.UserTypeID == id)
-                            list2.Add(item);
-                    }
-                    return Ok(list2);
+                    return Ok("Bạn không có quyền");
                 }
-                return Ok("Bạn không có quyền");
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
+            catch{
+                return Ok("Error");
+            }            
         }
 
         [Authorize]
@@ -134,7 +136,7 @@ namespace TLCN_WEB_API.Controllers
                 else return Ok(new[] { "Bạn cần đăng nhập" });                
             }
             catch {
-                return Ok(new[] { "not ok" });
+                return Ok(new[] { "Error" });
             }
         }
 
@@ -162,7 +164,7 @@ namespace TLCN_WEB_API.Controllers
                 else return Ok(new[] { "Bạn cần đăng nhập" });    
             }
             catch{
-                err = "Lỗi rồi";
+                err = "Error";
             }
             return Ok(new[] { err });
         }

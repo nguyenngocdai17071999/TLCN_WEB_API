@@ -43,35 +43,52 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("BusinessType");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<BusinessType>();
-            //danh sách tìm kiếm
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("BusinessType");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<BusinessType>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
+                }
+                return Ok(list);
             }
-            return Ok(list);
+            catch
+            {
+                return Ok("Error");
+            }
         }
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("BusinessType");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<BusinessType>();
-            //danh sách tìm kiếm
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("BusinessType");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<BusinessType>();
+                //danh sách tìm kiếm
 
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<BusinessType>();
+                foreach (var item in list)
+                {
+                    if (item.BusinessTypeID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
             }
-            var list2 = new List<BusinessType>();
-            foreach (var item in list){
-                if (item.BusinessTypeID == id)
-                    list2.Add(item);
+            catch
+            {
+                return Ok("Error");
             }
-            return Ok(list2);
         }
 
         [Authorize]
@@ -99,7 +116,7 @@ namespace TLCN_WEB_API.Controllers
                
             }
             catch{
-                return Ok(new[] { "Lỗi rồi" });
+                return Ok(new[] { "Error" });
             }
         }
 
@@ -130,7 +147,7 @@ namespace TLCN_WEB_API.Controllers
               
             }
             catch{
-                err = "Lỗi rồi";
+                err = "Error";
             }
             return Ok(new[] { err });
         }

@@ -43,61 +43,90 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Dishes");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Dish>();
-            //danh sách tìm kiếm
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Dishes");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Dish>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                }
+                return Ok(list);
             }
-            return Ok(list);
+            catch
+            {
+                return Ok("Error");
+            }
+
         }
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Dishes");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Dish>();
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Dishes");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Dish>();
 
-            //danh sách tìm kiếm
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<Dish>();
+                foreach (var item in list)
+                {
+                    if (item.Dish_ID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
             }
-            var list2 = new List<Dish>();
-            foreach (var item in list){
-                if (item.Dish_ID == id)
-                    list2.Add(item);
+            catch
+            {
+                return Ok("Error");
             }
-            return Ok(list2);
+
         }
 
         [HttpGet("GetByIDMenu")]
         // phương thức get by id menu dữ liệu từ firebase 
         public IActionResult GetByIDMenu(string id){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Dishes");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Dish>();
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Dishes");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Dish>();
 
-            //danh sách tìm kiếm
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<Dish>();
+                foreach (var item in list)
+                {
+                    if (item.Menu_ID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
             }
-            var list2 = new List<Dish>();
-            foreach (var item in list){
-                if (item.Menu_ID == id)
-                    list2.Add(item);
+            catch
+            {
+                return Ok("Error");
             }
-            return Ok(list2);
+
         }
 
         [HttpGet("Search")]
         //phương thức get dữ liệu từ firebase
         public IActionResult Search(string dishname){            
-            //try{
+            try{
                 if(dishname!=null){
                     dishname = convertToUnSign3(dishname.ToLower());
 
@@ -184,90 +213,108 @@ namespace TLCN_WEB_API.Controllers
                     }
                 }                
                 return Ok("Không có kết quả tìm kiếm");
-          //  }
-            //catch {
-               // return Ok("");
-           // }
+            }
+            catch {
+                return Ok("Error");
+            }
             
         }
 
         [HttpGet("GetByIDType")]
         // phương thức get by id menu dữ liệu từ firebase 
         public IActionResult GetByIDType(string id){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Dishes");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Dish>();
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Dishes");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Dish>();
 
-            //danh sách tìm kiếm
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<Dish>();
+                foreach (var item in list)
+                {
+                    if (item.DishType_ID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
             }
-            var list2 = new List<Dish>();
-            foreach (var item in list){
-                if (item.DishType_ID == id)
-                    list2.Add(item);
+            catch
+            {
+                return Ok("Error");
             }
-            return Ok(list2);
+            
         }
 
         [Authorize]
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, [FromBody] Dish dish){
-
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+            try
             {
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    try
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
                     {
-                        AddbyidToFireBase(id, dish);
-                        return Ok(new[] { "sửa thành công" });
+                        try
+                        {
+                            AddbyidToFireBase(id, dish);
+                            return Ok(new[] { "sửa thành công" });
+                        }
+                        catch
+                        {
+                            return Ok(new[] { "Lỗi rồi" });
+                        }
                     }
-                    catch
-                    {
-                        return Ok(new[] { "Lỗi rồi" });
-                    }
+                    return Ok(new[] { "Bạn không có quyền" });
                 }
-                return Ok(new[] { "Bạn không có quyền" });
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-
-           
+            catch
+            {
+                return Ok("Error");
+            }
         }
 
         [Authorize]
         [HttpPost("CreateDish")]
         public IActionResult RegisterDish( [FromBody] Dish dish){
-
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            string Email = claim[1].Value;
-            if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+            try
             {
-                if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    string err = "";
-                    try
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
                     {
-                        AddToFireBase(dish);
-                        err = "Đăng ký thành công";
+                        string err = "";
+                        try
+                        {
+                            AddToFireBase(dish);
+                            err = "Đăng ký thành công";
+                        }
+                        catch
+                        {
+                            err = "Lỗi rồi";
+                        }
+                        return Ok(new[] { err });
                     }
-                    catch
-                    {
-                        err = "Lỗi rồi";
-                    }
-                    return Ok(new[] { err });
+                    return Ok("Bạn không có quyền");
                 }
-                return Ok("Bạn không có quyền");
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            else return Ok(new[] { "Bạn cần đăng nhập" });
-
-          
+            catch
+            {
+                return Ok("Error");
+            }
         }
 
         //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
