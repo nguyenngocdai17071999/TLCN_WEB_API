@@ -170,6 +170,36 @@ namespace TLCN_WEB_API.Controllers
            
         }
 
+        [HttpGet("GetByIDOwner")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDOwner(string id)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Store");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Store>();
+
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<Store>();
+                foreach (var item in list)
+                {
+                    if (item.UserID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
