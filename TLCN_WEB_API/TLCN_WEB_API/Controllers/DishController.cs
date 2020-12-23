@@ -97,7 +97,7 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("Search")]
         //phương thức get dữ liệu từ firebase
         public IActionResult Search(string dishname){            
-            try{
+            //try{
                 if(dishname!=null){
                     dishname = convertToUnSign3(dishname.ToLower());
 
@@ -167,9 +167,11 @@ namespace TLCN_WEB_API.Controllers
                                 if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
                                     list4.Add(item);
                             }
-                            return Ok(list4);
+                           
+                            return Ok(gantoi(list4));
+                            
                         }
-                        return Ok(list3);
+                        return Ok(gantoi(list3));
                     }
                     else
                     {
@@ -178,14 +180,14 @@ namespace TLCN_WEB_API.Controllers
                                 if (item.MenuID == item2) list2.Add(item);
                             }
                         }
-                        return Ok(list2);
+                        return Ok(gantoi(list2));
                     }
                 }                
                 return Ok("Không có kết quả tìm kiếm");
-            }
-            catch {
-                return Ok("Không có kết quả tìm kiếm");
-            }
+          //  }
+            //catch {
+               // return Ok("");
+           // }
             
         }
 
@@ -443,6 +445,93 @@ namespace TLCN_WEB_API.Controllers
 
         }
 
+        //sap xep theo khoang cach gan toi
+        public List<GanToi> gantoi(List<Store> store)
+        {
+            
+
+            var ListGanToi = new List<GanToi>();
+
+            for (int i=0;i<store.Count;i++)
+            {
+                ListGanToi.Add(new GanToi(store[i].StoreID,
+                             store[i].StoreAddress,
+                             store[i].StoreName,
+                             store[i].StorePicture,
+                             store[i].OpenTime,
+                             store[i].CLoseTime,
+                             store[i].UserID,
+                             store[i].ProvinceID,
+                             store[i].MenuID,
+                             store[i].BusinessTypeID,
+                             store[i].RatePoint,
+                             tinhtoankhoangcach(store[i].StoreID).ToString()));              
+            }
+
+            GanToi a = new GanToi();
+
+            for (int i = 0; i < ListGanToi.Count; i++)
+            {
+                for (int j = i + 1; j < ListGanToi.Count; j++)
+                {
+                    if (Convert.ToDouble(ListGanToi[j].khoangcach) < Convert.ToDouble(ListGanToi[i].khoangcach))
+                    {
+                        //cach trao doi gia tri
+                        a = ListGanToi[i];
+                        ListGanToi[i] = ListGanToi[j];
+                        ListGanToi[j] = a;
+                    }
+                }
+            }
+
+            return ListGanToi;
+
+        }
+
+        public double tinhtoankhoangcach(string idStore)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("LatLongStore");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<LatLongStore>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<LatLongStore>();
+            foreach(var item in list)
+            {
+                if (item.IDStore == idStore)
+                    return Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long));
+            }
+            return 0;
+        }
+
+        public static double Calculate(double sLatitude, double sLongitude, double eLatitude,
+                        double eLongitude)
+        {
+
+            var radiansOverDegrees = (Math.PI / 180.0);
+
+            var sLatitudeRadians = sLatitude * radiansOverDegrees;
+            var sLongitudeRadians = sLongitude * radiansOverDegrees;
+            var eLatitudeRadians = eLatitude * radiansOverDegrees;
+            var eLongitudeRadians = eLongitude * radiansOverDegrees;
+
+            var dLongitude = eLongitudeRadians - sLongitudeRadians;
+            var dLatitude = eLatitudeRadians - sLatitudeRadians;
+
+            var result1 = Math.Pow(Math.Sin(dLatitude / 2.0), 2.0) +
+                          Math.Cos(sLatitudeRadians) * Math.Cos(eLatitudeRadians) *
+                          Math.Pow(Math.Sin(dLongitude / 2.0), 2.0);
+
+            // Using 3956 as the number of miles around the earth
+            var result2 = 3956.0 * 2.0 *
+                          Math.Atan2(Math.Sqrt(result1), Math.Sqrt(1.0 - result1));
+
+            return Math.Round(result2, 2);
+        }
         public string convertToUnSign3(string s){
             Regex regex = new Regex("\\p{IsCombiningDiacriticalMarks}+");
             string temp = s.Normalize(NormalizationForm.FormD);

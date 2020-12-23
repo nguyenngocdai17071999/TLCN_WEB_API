@@ -50,10 +50,28 @@ namespace TLCN_WEB_API.Controllers
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
-            
+ 
+
             return Ok(list);
         }
 
+        [HttpGet("GetAllGanToi")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult GetAllGanToi()
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Store");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Store>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+            }
+
+
+            return Ok(gantoi(list));
+        }
 
         private void AddToFireBasebydis(LatLongStore latLongStore)
         {
@@ -62,6 +80,9 @@ namespace TLCN_WEB_API.Controllers
             //PushResponse response = client.Push("LatLongStore/", data);
             data.IDStore = latLongStore.IDStore;
             SetResponse setResponse = client.Set("LatLongStore/" + data.IDStore, data);
+
+
+
         }
 
         [HttpPost("CreateLatLong")]
@@ -332,6 +353,71 @@ namespace TLCN_WEB_API.Controllers
             }
             return user;
         }
+
+        //sap xep theo khoang cach gan toi
+        public List<GanToi> gantoi(List<Store> store)
+        {
+
+
+            var ListGanToi = new List<GanToi>();
+
+            for (int i = 0; i < store.Count; i++)
+            {
+                ListGanToi.Add(new GanToi(store[i].StoreID,
+                             store[i].StoreAddress,
+                             store[i].StoreName,
+                             store[i].StorePicture,
+                             store[i].OpenTime,
+                             store[i].CLoseTime,
+                             store[i].UserID,
+                             store[i].ProvinceID,
+                             store[i].MenuID,
+                             store[i].BusinessTypeID,
+                             store[i].RatePoint,
+                             tinhtoankhoangcach(store[i].StoreID).ToString()));
+            }
+
+            GanToi a = new GanToi();
+
+            for (int i = 0; i < ListGanToi.Count; i++)
+            {
+                for (int j = i + 1; j < ListGanToi.Count; j++)
+                {
+                    if (Convert.ToDouble(ListGanToi[j].khoangcach) < Convert.ToDouble(ListGanToi[i].khoangcach))
+                    {
+                        //cach trao doi gia tri
+                        a = ListGanToi[i];
+                        ListGanToi[i] = ListGanToi[j];
+                        ListGanToi[j] = a;
+                    }
+                }
+            }
+
+            return ListGanToi;
+
+        }
+
+        public double tinhtoankhoangcach(string idStore)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("LatLongStore");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<LatLongStore>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<LatLongStore>();
+            foreach (var item in list)
+            {
+                if (item.IDStore == idStore)
+                    return Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long));
+            }
+            return 0;
+        }
+
+
 
         // mã hóa dữ liệu MD5
         public static string Encrypt(string toEncrypt)

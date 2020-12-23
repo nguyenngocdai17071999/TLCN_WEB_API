@@ -158,13 +158,16 @@ namespace TLCN_WEB_API.Controllers
                         list2.Add(item);
                 }             
 
+
+
                 return Ok(list2);
         }
+
 
         [Authorize]
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID( [FromBody] User user){
+        public IActionResult EditByID(string id, [FromBody] User user){
             try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
@@ -172,8 +175,17 @@ namespace TLCN_WEB_API.Controllers
 
                 if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    AddbyidToFireBase(GetIDToken(Email), user);
-                    return Ok(new[] { "Sửa thành công" });
+                    if (id != null)
+                    {
+                        AddbyidToFireBase(id, user);
+                        return Ok(new[] { "Sửa thành công" });
+                    }
+                    else
+                    {
+                        AddbyidToFireBase(GetIDToken(Email), user);
+                        return Ok(new[] { "Sửa thành công" });
+                    }
+                 
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
@@ -321,13 +333,12 @@ namespace TLCN_WEB_API.Controllers
 
         //thêm dữ liệu lên firebase theo id
         private void AddbyidToFireBase(string id, User user){
-            if (id == user.UserID) {
                 client = new FireSharp.FirebaseClient(config);
                 var data = user;
                 data.UserID = id;
                 data.Password = Encrypt(data.Password);
                 SetResponse setResponse = client.Set("User/" + data.UserID, data);
-            }
+            
         }
         // mã hóa dữ liệu MD5
         public static string Encrypt(string toEncrypt){
