@@ -7,7 +7,9 @@ namespace TLCN_WEB_API.Models
 {
     public class UserCommentInfo
     {
-        private string userID;
+        public UserCommentInfo()
+        {
+        }
 
         public UserCommentInfo(string userName, string picture, string email)
         {
