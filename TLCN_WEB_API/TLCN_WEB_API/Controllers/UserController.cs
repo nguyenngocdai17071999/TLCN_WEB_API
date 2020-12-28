@@ -183,15 +183,17 @@ namespace TLCN_WEB_API.Controllers
                         list2.Add(item);
                 }
 
-                UserCommentInfo userCommentInfo = new UserCommentInfo();
+                var list3 = new List<UserCommentInfo>();
+
                 foreach(var item in list2)
                 {
-                    userCommentInfo.UserName = item.UserName;
-                    userCommentInfo.Email = item.Email;
-                    userCommentInfo.Picture = item.Picture;
+                    list3.Add(new UserCommentInfo(item.UserName,
+                             item.Picture,
+                            item.UserID
+                             ));
                 }
 
-                return Ok(userCommentInfo);
+                return Ok(list3);
             }
             catch {
                 return Ok("Error");
