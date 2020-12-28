@@ -90,6 +90,39 @@ namespace TLCN_WEB_API.Controllers
 
         }
 
+        [HttpGet("GetAllGanToiProvince")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult GetAllGanToi(string id)
+        {
+
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Store");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Store>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<Store>();
+                foreach (var item in list)
+                {
+                    if (item.ProvinceID == id)
+                        list2.Add(item);
+                }    
+                return Ok(gantoi(list2));
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+
+        }
+
+
         private void AddToFireBasebydis(LatLongStore latLongStore)
         {
             client = new FireSharp.FirebaseClient(config);
