@@ -187,10 +187,11 @@ namespace TLCN_WEB_API.Controllers
 
                 foreach(var item in list2)
                 {
-                    list3.Add(new UserCommentInfo(item.UserName,
-                             item.Picture,
-                             item.Email
-                             ));
+                    UserCommentInfo a = new UserCommentInfo();
+                    a.Email = item.Email;
+                    a.Picture = item.Picture;
+                    a.UserName = item.UserName;
+                    list3.Add(a);
                 }
 
                 return Ok(list3);
