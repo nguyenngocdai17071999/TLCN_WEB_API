@@ -147,10 +147,7 @@ namespace TLCN_WEB_API.Controllers
                         }
                     }
 
-                    foreach (var item in list2)
-                    {
-                        item.Password = Decrypt(item.Password);
-                    }
+
                     return Ok(list2);
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
@@ -186,15 +183,32 @@ namespace TLCN_WEB_API.Controllers
                         list2.Add(item);
                 }
 
+                UserCommentInfo userCommentInfo = new UserCommentInfo();
+                foreach(var item in list2)
+                {
+                    userCommentInfo.UserName = item.UserName;
+                    userCommentInfo.Email = item.Email;
+                    userCommentInfo.Picture = item.Picture;
+                }
 
-
-                return Ok(list2);
+                return Ok(userCommentInfo);
             }
             catch {
                 return Ok("Error");
             }
         }
 
+        [HttpGet("mahoa")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult mahoa(string id)
+        {
+
+                var a = Encrypt("123456789");
+                return Ok(a);
+            
+
+
+        }
 
         [Authorize]
         [HttpPost("EditByID")]
@@ -207,13 +221,17 @@ namespace TLCN_WEB_API.Controllers
 
                 if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
+
+
                     if (id != null)
                     {
+
                         AddbyidToFireBase(id, user);
                         return Ok(new[] { "Sửa thành công" });
                     }
                     else
                     {
+
                         AddbyidToFireBase(GetIDToken(Email), user);
                         return Ok(new[] { "Sửa thành công" });
                     }
@@ -395,11 +413,43 @@ namespace TLCN_WEB_API.Controllers
 
         //thêm dữ liệu lên firebase theo id
         private void AddbyidToFireBase(string id, User user){
-                client = new FireSharp.FirebaseClient(config);
-                var data = user;
-                data.UserID = id;
-                data.Password = Encrypt(data.Password);
-                SetResponse setResponse = client.Set("User/" + data.UserID, data);
+
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<User>();
+
+            foreach (var item in list)
+            {
+                if (item.UserID.ToString() == id)
+                    list2.Add(item);
+            }
+
+            foreach(var item in list2)
+            {
+                if (user.UserID == null) user.UserID = item.UserID;
+                if (user.UserName == null) user.UserName = item.UserName;
+                if (user.Phone == null) user.Phone = item.Phone;
+                if (user.Address == null) user.Address = item.Address;
+                if (user.Password == null) user.Password = item.Password;
+                if (user.Email == null) user.Email = item.Email;
+                if (user.Picture == null) user.Picture = item.Picture;
+                if (user.Sex == null) user.Sex = item.Sex;
+                if (user.Birthday == null) user.Birthday = item.Birthday;
+                if (user.UserTypeID == null) user.UserTypeID = item.UserTypeID;
+            }    
+
+            client = new FireSharp.FirebaseClient(config);
+                var data2 = user;
+                data2.UserID = id;
+                //data2.Password = Encrypt(data2.Password);
+                SetResponse setResponse = client.Set("User/" + data2.UserID, data2);
             
         }
         // mã hóa dữ liệu MD5
@@ -502,8 +552,7 @@ namespace TLCN_WEB_API.Controllers
             return "";
         }
 
-        private UserModel AuthenticationUser(UserModel login)
-        {
+        private UserModel AuthenticationUser(UserModel login){
             //get list user
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
@@ -511,16 +560,13 @@ namespace TLCN_WEB_API.Controllers
             var list = new List<User>();
             string err = "";
 
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             //layas thongo tin taif khoan dang nhap
             UserModel user = null;
-            foreach(var item in list)
-            {
-                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
-                {
+            foreach(var item in list){
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)){
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
                 }
             }
