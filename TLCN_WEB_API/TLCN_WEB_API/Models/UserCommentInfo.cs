@@ -9,11 +9,11 @@ namespace TLCN_WEB_API.Models
     {
         private string userID;
 
-        public UserCommentInfo(string userName, string picture, string userID)
+        public UserCommentInfo(string userName, string picture, string email)
         {
             UserName = userName;
             Picture = picture;
-            this.userID = userID;
+            Email = email;
         }
 
         public string UserName { get; set; }

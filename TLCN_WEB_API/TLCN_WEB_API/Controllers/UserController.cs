@@ -189,7 +189,7 @@ namespace TLCN_WEB_API.Controllers
                 {
                     list3.Add(new UserCommentInfo(item.UserName,
                              item.Picture,
-                            item.UserID
+                            item.Email
                              ));
                 }
 
