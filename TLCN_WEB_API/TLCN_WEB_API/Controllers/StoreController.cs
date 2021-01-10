@@ -45,14 +45,15 @@ namespace TLCN_WEB_API.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Store");
+                FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<Store>();
+                var list = new List<GanToi>();
                 //danh sách tìm kiếm
                 foreach (var item in data)
                 {
-                    list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+                    list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
+                
 
 
                 return Ok(list);
@@ -64,6 +65,8 @@ namespace TLCN_WEB_API.Controllers
            
         }
 
+
+
         [HttpGet("GetAllGanToi")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAllGanToi()
@@ -72,13 +75,13 @@ namespace TLCN_WEB_API.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Store");
+                FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<Store>();
+                var list = new List<GanToi>();
                 //danh sách tìm kiếm
                 foreach (var item in data)
                 {
-                    list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+                    list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 return Ok(gantoi(list));
             }
@@ -98,15 +101,15 @@ namespace TLCN_WEB_API.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Store");
+                FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<Store>();
+                var list = new List<GanToi>();
                 //danh sách tìm kiếm
                 foreach (var item in data)
                 {
-                    list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+                    list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
-                var list2 = new List<Store>();
+                var list2 = new List<GanToi>();
                 foreach (var item in list)
                 {
                     if (item.ProvinceID == id)
@@ -264,7 +267,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDProvince")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDProvince(string id){
+        public IActionResult GetByIDProvince(string id,string id2){
             try
             {
                 client = new FireSharp.FirebaseClient(config);
@@ -283,6 +286,17 @@ namespace TLCN_WEB_API.Controllers
                     if (item.ProvinceID == id)
                         list2.Add(item);
                 }
+                if(id2!=null)
+                {
+                    foreach (var item in list2)
+                    {
+                        item.ProvinceID = id2;
+                        AddbyidToFireBase(item.StoreID, item);
+                    }
+                }
+
+
+
                 return Ok(list2);
             }
             catch
@@ -532,7 +546,55 @@ namespace TLCN_WEB_API.Controllers
                     }
                 }
             }
+
             return ListGanToi;
+        }
+
+        public List<GanToi> gantoi(List<GanToi> store)
+        {
+            var ListGanToi = new List<GanToi>();
+            for (int i = 0; i < store.Count; i++)
+            {
+                ListGanToi.Add(new GanToi(store[i].StoreID,
+                             store[i].StoreAddress,
+                             store[i].StoreName,
+                             store[i].StorePicture,
+                             store[i].OpenTime,
+                             store[i].CLoseTime,
+                             store[i].UserID,
+                             store[i].ProvinceID,
+                             store[i].MenuID,
+                             store[i].BusinessTypeID,
+                             store[i].RatePoint,
+                             store[i].khoangcach));
+            }
+            GanToi a = new GanToi();
+            for (int i = 0; i < ListGanToi.Count; i++)
+            {
+                for (int j = i + 1; j < ListGanToi.Count; j++)
+                {
+                    if (Convert.ToDouble(ListGanToi[j].khoangcach) < Convert.ToDouble(ListGanToi[i].khoangcach))
+                    {
+                        //cach trao doi gia tri
+                        a = ListGanToi[i];
+                        ListGanToi[i] = ListGanToi[j];
+                        ListGanToi[j] = a;
+                    }
+                }
+            }
+
+           
+
+            return ListGanToi;
+        }
+
+        private void AddToFireBasemoi(GanToi store)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = store;
+           // PushResponse response = client.Push("Stores/", data);
+            //data.StoreID = response.Result.name;
+            SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
 
         public double tinhtoankhoangcach(string idStore)

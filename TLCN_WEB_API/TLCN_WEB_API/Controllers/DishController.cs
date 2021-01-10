@@ -132,13 +132,13 @@ namespace TLCN_WEB_API.Controllers
 
                     //danh sach store
                     client = new FireSharp.FirebaseClient(config);
-                    FirebaseResponse responsestore = client.Get("Store");
+                    FirebaseResponse responsestore = client.Get("Stores");
                     dynamic datastore = JsonConvert.DeserializeObject<dynamic>(responsestore.Body);
-                    var liststore = new List<Store>();
+                    var liststore = new List<GanToi>();
 
                     //danh sách tìm kiếm
                     foreach (var itemstore in datastore){
-                        liststore.Add(JsonConvert.DeserializeObject<Store>(((JProperty)itemstore).Value.ToString()));
+                        liststore.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)itemstore).Value.ToString()));
                     }
 
                     //danh sach dish
@@ -163,7 +163,7 @@ namespace TLCN_WEB_API.Controllers
                         listMenu.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)itemMenu).Value.ToString()));
                     }
 
-                    var list2 = new List<Store>();
+                    var list2 = new List<GanToi>();
                     var MenuID = new List<string>();
 
                     foreach (var item in listdish){
@@ -185,13 +185,13 @@ namespace TLCN_WEB_API.Controllers
                         if (dem == 0) MenuID2.Add(item);
                     }
                     if (MenuID2.Count == 0){
-                        var list3 = new List<Store>();
+                        var list3 = new List<GanToi>();
                         foreach (var item in liststore){
                             if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname))
                                 list3.Add(item);
                         }
                         if (list3.Count == 0){
-                            var list4 = new List<Store>();
+                            var list4 = new List<GanToi>();
                             foreach (var item in liststore){
                                 if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
                                     list4.Add(item);
@@ -493,7 +493,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //sap xep theo khoang cach gan toi
-        public List<GanToi> gantoi(List<Store> store)
+        public List<GanToi> gantoi(List<GanToi> store)
         {
             
 
@@ -512,7 +512,7 @@ namespace TLCN_WEB_API.Controllers
                              store[i].MenuID,
                              store[i].BusinessTypeID,
                              store[i].RatePoint,
-                             tinhtoankhoangcach(store[i].StoreID).ToString()));              
+                             store[i].khoangcach));              
             }
 
             GanToi a = new GanToi();
