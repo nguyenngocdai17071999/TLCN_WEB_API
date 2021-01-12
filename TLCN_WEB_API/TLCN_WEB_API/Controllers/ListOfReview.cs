@@ -140,16 +140,10 @@ namespace TLCN_WEB_API.Controllers
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
                 if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
-                        AddToFireBase(list);
-                        err = "Đăng ký thành công";
-                    }
-                    else
-                    {
-                        err = "Bạn Không có quyền";
-                    }
+                {                    
+                    AddToFireBase(list);
+                    err = "Đăng ký thành công";
+                    
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
 

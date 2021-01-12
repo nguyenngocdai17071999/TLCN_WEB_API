@@ -281,6 +281,8 @@ namespace TLCN_WEB_API.Controllers
                 var user = AuthenticationUser(login);
                 if (user != null)
                 {
+                    if (user.Status == "2")
+                        return Ok("Error");
                     var tokenStr = GenerateJSONWebToken(user);
                     response = Ok(new { token = tokenStr });
 
@@ -293,6 +295,59 @@ namespace TLCN_WEB_API.Controllers
             }
            
         }
+
+        //Hàm login
+        [Authorize]
+        [HttpPost("BlockAccount")]
+        public IActionResult BlockAccount(string id, string status)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                    {
+                        client = new FireSharp.FirebaseClient(config);
+                        FirebaseResponse response = client.Get("User");
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                        var list = new List<User>();
+                        //danh sách tìm kiếm
+                        foreach (var item in data)
+                        {
+                            list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+                        }
+                        var list2 = new List<User>();
+                        foreach (var item in list)
+                        {
+
+                            if (item.UserID == id)
+                                list2.Add(item);
+                        }
+                        foreach(var item in list2)
+                        {
+                            item.Status = status;
+                            AddbyidToFireBase(item.UserID, item);
+                        }    
+                        return Ok("Thay đổi thành công");
+                    }
+                    return Ok(new[] { "Bạn không có quyền" });
+
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+
+        }
+
+
 
         [HttpPost("ForgetPass")]
         public IActionResult ForgetPass(string Email){///sử dụng thuộc tính Email của models user json chỉ cần Email
@@ -571,7 +626,7 @@ namespace TLCN_WEB_API.Controllers
             UserModel user = null;
             foreach(var item in list){
                 if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)){
-                    user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
+                    user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password),Status=item.Status };
                 }
             }
             return user;

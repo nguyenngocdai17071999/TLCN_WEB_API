@@ -13,7 +13,7 @@ namespace TLCN_WEB_API.Models
         {
         }
 
-        public GanToi(string storeID, string storeAddress, string storeName, string storePicture, string openTime, string cLoseTime, string userID, string provinceID, string menuID, string businessTypeID, string ratePoint, string v)
+        public GanToi(string storeID, string storeAddress, string storeName, string storePicture, string openTime, string cLoseTime, string userID, string provinceID, string menuID, string businessTypeID, string ratePoint, string khoangcach, string status)
         {
             StoreID = storeID;
             StoreAddress = storeAddress;
@@ -26,23 +26,8 @@ namespace TLCN_WEB_API.Models
             MenuID = menuID;
             BusinessTypeID = businessTypeID;
             RatePoint = ratePoint;
-            khoangcach = v;
-        }
-
-        public GanToi(string storeID, string storeAddress, string storeName, string storePicture, string openTime, string cLoseTime, string userID, string provinceID, string menuID, string businessTypeID, string ratePoint,string khoangCach, string v)
-        {
-            StoreID = storeID;
-            StoreAddress = storeAddress;
-            StoreName = storeName;
-            StorePicture = storePicture;
-            OpenTime = openTime;
-            CLoseTime = cLoseTime;
-            UserID = userID;
-            ProvinceID = provinceID;
-            MenuID = menuID;
-            BusinessTypeID = businessTypeID;
-            RatePoint = ratePoint;
-            khoangcach = v;
+            this.khoangcach = khoangcach;
+            Status = status;
         }
 
         public string StoreID { get; set; }
@@ -57,5 +42,6 @@ namespace TLCN_WEB_API.Models
         public string BusinessTypeID { get; set; }
         public string RatePoint { get; set; }
         public string khoangcach { get; set; }
+        public string Status { get; set; }
     }
 }

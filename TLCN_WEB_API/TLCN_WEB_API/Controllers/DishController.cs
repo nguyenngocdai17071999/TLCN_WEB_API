@@ -197,10 +197,10 @@ namespace TLCN_WEB_API.Controllers
                                     list4.Add(item);
                             }
                            
-                            return Ok(gantoi(list4));
+                            return Ok(Check(gantoi(list4)));
                             
                         }
-                        return Ok(gantoi(list3));
+                        return Ok(Check(gantoi(list3)));
                     }
                     else
                     {
@@ -209,7 +209,7 @@ namespace TLCN_WEB_API.Controllers
                                 if (item.MenuID == item2) list2.Add(item);
                             }
                         }
-                        return Ok(gantoi(list2));
+                        return Ok(Check(gantoi(list2)));
                     }
                 }                
                 return Ok("Không có kết quả tìm kiếm");
@@ -512,7 +512,8 @@ namespace TLCN_WEB_API.Controllers
                              store[i].MenuID,
                              store[i].BusinessTypeID,
                              store[i].RatePoint,
-                             store[i].khoangcach));              
+                             store[i].khoangcach,
+                             store[i].Status));              
             }
 
             GanToi a = new GanToi();
@@ -584,5 +585,17 @@ namespace TLCN_WEB_API.Controllers
             string temp = s.Normalize(NormalizationForm.FormD);
             return regex.Replace(temp, String.Empty).Replace('\u0111', 'd').Replace('\u0110', 'D');
         }
+
+        private List<GanToi> Check(List<GanToi> store)
+        {
+            var list = new List<GanToi>();
+            for (int i = 0; i < store.Count; i++)
+            {
+                if (store[i].Status == "1")
+                    list.Add(store[i]);
+            }
+            return list;
+        }
+
     }
 }
