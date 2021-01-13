@@ -33,8 +33,7 @@ namespace TLCN_WEB_API.Controllers
         };
 
         private IConfiguration _config;
-        public StoreController(IConfiguration config)
-        {
+        public StoreController(IConfiguration config){
             _config = config;
         }
         IFirebaseClient client;
@@ -42,195 +41,147 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
-                }               
-
-
+                }
                 return Ok(Check(list));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-           
-        }
-
-        
+            }           
+        }        
 
         [HttpGet("GetAllGanToi")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllGanToi()
-        {
-
-            try
-            {
+        public IActionResult GetAllGanToi(){
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 return Ok(Check(gantoi(list)));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
-
         }
 
         [HttpGet("GetAllGanToiProvince")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllGanToi(string id)
-        {
-
-            try
-            {
+        public IActionResult GetAllGanToi(string id){
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<GanToi>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.ProvinceID == id)
                         list2.Add(item);
                 }    
                 return Ok(Check(gantoi(list2)));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
-
         }
 
-
-        private void AddToFireBasebydis(LatLongStore latLongStore)
-        {
+        private void AddToFireBasebydis(LatLongStore latLongStore){
             client = new FireSharp.FirebaseClient(config);
             var data = latLongStore;
             //PushResponse response = client.Push("LatLongStore/", data);
             data.IDStore = latLongStore.IDStore;
             SetResponse setResponse = client.Set("LatLongStore/" + data.IDStore, data);
-
-
-
         }
 
         [HttpPost("CreateLatLong")]
-        public IActionResult CreateDIS(LatLongStore latLongStore) {
-            try
-            {
+        public IActionResult CreateDIS(LatLongStore latLongStore){
+            try{
                 AddToFireBasebydis(latLongStore);
                 return Ok("OK");
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
-
 
         [HttpGet("GetALLDistance")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetDistanceByIDall(string ID)
-        {
-            try
-            {
+        public IActionResult GetDistanceByIDall(string ID){
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("LatLongStore");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<LatLongStore>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
                 }
                 return Ok(list);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
 
         [HttpGet("GetDistance")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetDistanceByID(string ID)
-        {
-            try
-            {
+        public IActionResult GetDistanceByID(string ID){
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("LatLongStore");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<LatLongStore>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
                 }
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.IDStore == ID)
                         return Ok(Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long)));
                 }
                 return Ok(list);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-           
+            }           
         }
 
         [HttpGet("GetByIDOwner")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDOwner(string id)
-        {
-            try
-            {
+        public IActionResult GetByIDOwner(string id){
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
 
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<GanToi>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.UserID == id)
                         list2.Add(item);
                 }
                 return Ok(Check(list2));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
@@ -238,28 +189,24 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
 
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<GanToi>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.StoreID == id)
                         list2.Add(item);
                 }
                 return Ok(Check(list2));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
@@ -267,39 +214,30 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetByIDProvince")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByIDProvince(string id,string id2){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
 
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<GanToi>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.ProvinceID == id)
                         list2.Add(item);
                 }
-                if(id2!=null)
-                {
-                    foreach (var item in list2)
-                    {
+                if(id2!=null){
+                    foreach (var item in list2){
                         item.ProvinceID = id2;
                         AddbyidToFireBase(item.StoreID, item);
                     }
-                }
-
-
-
+                }                
                 return Ok(Check(list2));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }            
         }
@@ -307,28 +245,24 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetByIDBusinessType")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByIDBusinessType(string id){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Stores");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<GanToi>();
                 //danh sách tìm kiếm
 
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<GanToi>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.BusinessTypeID == id)
                         list2.Add(item);
                 }
                 return Ok(Check(list2));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }           
         }
@@ -337,22 +271,17 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, [FromBody] GanToi store){
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
-                        try
-                        {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
+                        try{
                             AddbyidToFireBase(id, store);
                             return Ok(new[] { "sửa thành công" });
                         }
-                        catch
-                        {
+                        catch{
                             return Ok(new[] { "Lỗi rồi" });
                         }
                     }
@@ -360,34 +289,26 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-                 
+            }                 
         }
 
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult deleteByID(string id)
-        {
-            try
-            {
+        public IActionResult deleteByID(string id){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw")
-                    {
-                        try
-                        {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw"){
+                        try{
                             Delete(id);
                             return Ok(new[] { "Xóa thành công" });
                         }
-                        catch
-                        {
+                        catch{
                             return Ok(new[] { "Lỗi rồi" });
                         }
                     }
@@ -395,54 +316,42 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
 
         [Authorize]
         [HttpPost("BlockStore")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult BlockStore(string id, string status)
-        {
-            try
-            {
+        public IActionResult BlockStore(string id, string status){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
-                        try
-                        {
-
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
+                        try{
                             client = new FireSharp.FirebaseClient(config);
                             FirebaseResponse response = client.Get("Stores");
                             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                             var list = new List<GanToi>();
                             //danh sách tìm kiếm
-                            foreach (var item in data)
-                            {
+                            foreach (var item in data){
                                 list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
                             }
                             var list2 = new List<GanToi>();
-                            foreach (var item in list)
-                            {
+                            foreach (var item in list){
                                 if (item.StoreID == id)
                                     list2.Add(item);
                             }
-                            foreach (var item in list2)
-                            {
+                            foreach (var item in list2){
                                 item.Status = status;
                                 AddbyidToFireBase(item.StoreID, item);
                             }
                             return Ok(new[] { "sửa thành công" });
                         }
-                        catch
-                        {
+                        catch{
                             return Ok(new[] { "Lỗi rồi" });
                         }
                     }
@@ -450,34 +359,26 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
-
 
         [Authorize]
         [HttpPost("CreateStore")]
         public IActionResult RegisterStore( [FromBody] GanToi store){
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         string err = "";
-                        try
-                        {
+                        try{
                             AddToFireBase(store);
                             err = "Đăng ký thành công";
                         }
-                        catch
-                        {
+                        catch{
                             err = "Lỗi rồi";
                         }
                         return Ok(new[] { err });
@@ -486,8 +387,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }           
             
@@ -534,8 +434,7 @@ namespace TLCN_WEB_API.Controllers
             data.StoreID = id;
             SetResponse setResponse = client.Set("Store/" + data.StoreID, data);
         }
-        private void AddbyidToFireBase(string id, GanToi store)
-        {
+        private void AddbyidToFireBase(string id, GanToi store){
             client = new FireSharp.FirebaseClient(config);
             var data = store;
             data.StoreID = id;
@@ -547,17 +446,14 @@ namespace TLCN_WEB_API.Controllers
             var list = new List<GanToi>();
             var list2 = new List<GanToi>();
             //danh sách tìm kiếm
-            foreach (var item in data2)
-            {
+            foreach (var item in data2){
                 list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
             }
-            foreach(var item in list)
-            {
+            foreach(var item in list){
                 if (item.StoreID == id)
                     list2.Add(item);
             }    
-            foreach(var item in list2)
-            {
+            foreach(var item in list2){
                 if (data.StoreID == null) data.StoreID = item.StoreID;
                 if (data.StoreAddress == null) data.StoreAddress = item.StoreAddress;
                 if (data.StoreName == null) data.StoreName = item.StoreName;
@@ -572,17 +468,13 @@ namespace TLCN_WEB_API.Controllers
                 if (data.khoangcach == null) data.khoangcach = item.khoangcach;
                 if (data.Status == null) data.Status = item.Status;
             }    
-
             SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
 
-        private void Delete(string id)
-        {
+        private void Delete(string id){
             client = new FireSharp.FirebaseClient(config);
             var data = new Store();
-           // data.StoreID = id;
-
-           
+           // data.StoreID = id;         
 
             SetResponse setResponse = client.Set("Stores/" + id, data);
         }
@@ -631,8 +523,7 @@ namespace TLCN_WEB_API.Controllers
             return "";
         }
 
-        private UserModel AuthenticationUser(UserModel login)
-        {
+        private UserModel AuthenticationUser(UserModel login){
             //get list user
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
@@ -640,16 +531,13 @@ namespace TLCN_WEB_API.Controllers
             var list = new List<User>();
             string err = "";
 
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             //layas thongo tin taif khoan dang nhap
             UserModel user = null;
-            foreach (var item in list)
-            {
-                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
-                {
+            foreach (var item in list){
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)){
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
                 }
             }
@@ -693,11 +581,9 @@ namespace TLCN_WEB_API.Controllers
         //    return ListGanToi;
         //}
 
-        public List<GanToi> gantoi(List<GanToi> store)
-        {
+        public List<GanToi> gantoi(List<GanToi> store){
             var ListGanToi = new List<GanToi>();
-            for (int i = 0; i < store.Count; i++)
-            {
+            for (int i = 0; i < store.Count; i++){
                 ListGanToi.Add(new GanToi(store[i].StoreID,
                              store[i].StoreAddress,
                              store[i].StoreName,
@@ -713,58 +599,46 @@ namespace TLCN_WEB_API.Controllers
                              store[i].Status));
             }
             GanToi a = new GanToi();
-            for (int i = 0; i < ListGanToi.Count; i++)
-            {
-                for (int j = i + 1; j < ListGanToi.Count; j++)
-                {
-                    if (Convert.ToDouble(ListGanToi[j].khoangcach) < Convert.ToDouble(ListGanToi[i].khoangcach))
-                    {
+            for (int i = 0; i < ListGanToi.Count; i++){
+                for (int j = i + 1; j < ListGanToi.Count; j++){
+                    if (Convert.ToDouble(ListGanToi[j].khoangcach) < Convert.ToDouble(ListGanToi[i].khoangcach)){
                         //cach trao doi gia tri
                         a = ListGanToi[i];
                         ListGanToi[i] = ListGanToi[j];
                         ListGanToi[j] = a;
                     }
                 }
-            }
-
-           
-
+            }    
             return ListGanToi;
         }
 
-        private void AddToFireBasemoi(GanToi store)
-        {
+        private void AddToFireBasemoi(GanToi store){
             client = new FireSharp.FirebaseClient(config);
             var data = store;
-           // PushResponse response = client.Push("Stores/", data);
+            // PushResponse response = client.Push("Stores/", data);
             //data.StoreID = response.Result.name;
             SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
-        private List<GanToi> Check(List<GanToi> store)
-        {
+        private List<GanToi> Check(List<GanToi> store){
             var list = new List<GanToi>();
-            for(int i=0; i<store.Count;i++)
-            {
+            for(int i=0; i<store.Count;i++){
                 if (store[i].Status == "1")
                     list.Add(store[i]);
             }    
             return list;
         }
 
-        public double tinhtoankhoangcach(string idStore)
-        {
+        public double tinhtoankhoangcach(string idStore){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("LatLongStore");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<LatLongStore>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<LatLongStore>();
-            foreach (var item in list)
-            {
+            foreach (var item in list) {
                 if (item.IDStore == idStore)
                     return Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long));
             }
@@ -772,14 +646,12 @@ namespace TLCN_WEB_API.Controllers
         }
 
         // mã hóa dữ liệu MD5
-        public static string Encrypt(string toEncrypt)
-        {
+        public static string Encrypt(string toEncrypt){
             bool useHashing = true;
             byte[] keyArray;
             byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
 
-            if (useHashing)
-            {
+            if (useHashing){
                 MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
                 keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
             }
@@ -798,8 +670,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //thuc hien tao token
-        private string GenerateJSONWebToken(UserModel userinfo)
-        {
+        private string GenerateJSONWebToken(UserModel userinfo){
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
@@ -819,12 +690,9 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-            public static double Calculate(double sLatitude, double sLongitude, double eLatitude,
-                                    double eLongitude)
-            {
+            public static double Calculate(double sLatitude, double sLongitude, double eLatitude,double eLongitude){
             
                 var radiansOverDegrees = (Math.PI / 180.0);
-
                 var sLatitudeRadians = sLatitude * radiansOverDegrees;
                 var sLongitudeRadians = sLongitude * radiansOverDegrees;
                 var eLatitudeRadians = eLatitude * radiansOverDegrees;
@@ -844,8 +712,7 @@ namespace TLCN_WEB_API.Controllers
                 return Math.Round(result2, 2); 
             }
 
-            public bool kiemtrathoigianlogin(DateTime date)
-            {
+            public bool kiemtrathoigianlogin(DateTime date){
                 int sophut1 = date.Minute;
                 int sophut2 = DateTime.Now.Minute;
                 if (sophut2 < sophut1)

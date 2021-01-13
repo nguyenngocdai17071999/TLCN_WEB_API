@@ -44,21 +44,18 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("BusinessType");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<BusinessType>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
                 }
                 return Ok(list);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
@@ -66,28 +63,24 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("BusinessType");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<BusinessType>();
-                //danh sách tìm kiếm
 
-                foreach (var item in data)
-                {
+                //danh sách tìm kiếm
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<BusinessType>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.BusinessTypeID == id)
                         list2.Add(item);
                 }
                 return Ok(list2);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
@@ -100,21 +93,16 @@ namespace TLCN_WEB_API.Controllers
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         AddbyidToFireBase(id, businessType);
                         return Ok(new[] { "sửa thành công" });
                     }
-                    else
-                    {
+                    else{
                         return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
-                else return Ok(new[] { "Bạn cần đăng nhập" });
-
-               
+                else return Ok(new[] { "Bạn cần đăng nhập" });               
             }
             catch{
                 return Ok(new[] { "Error" });
@@ -124,31 +112,23 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByID(string id)
-        {
-            try
-            {
+        public IActionResult DeleteByID(string id){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         Delete(id);
                         return Ok(new[] { "Xóa thành công" });
                     }
-                    else
-                    {
+                    else{
                         return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
-
-
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
@@ -157,58 +137,26 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("CreateBusinessType")]
         public IActionResult RegisterBusinessType([FromBody] BusinessType businessType){
-
             string err = "";
             try{
-
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         AddToFireBase(businessType);
                         err = "Đăng ký thành công";
                     }
-                    else
-                    {
+                    else{
                         err = "Bạn Không có quyền";
                     }
                 }
-                else return Ok(new[] { "Bạn cần đăng nhập" });
-
-              
+                else return Ok(new[] { "Bạn cần đăng nhập" });              
             }
             catch{
                 err = "Error";
             }
             return Ok(new[] { err });
-        }
-
-        //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
-        // vd 1 2 3 thì get id sẽ ra 4
-        // vd 1 3 4 thì get id sẽ ra 2
-        private int GetID(){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("BusinessType");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<BusinessType>();
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
-            }
-            int i = 1;
-            while (1 == 1){
-                int dem = 0;
-                foreach (var item in list){
-                    if (item.BusinessTypeID == i.ToString())
-                        dem++;
-                }
-                if (dem == 0)
-                    return i;
-                i++;
-            }
-            return i;
         }
 
         // thêm dư liệu lên firebase
@@ -228,15 +176,13 @@ namespace TLCN_WEB_API.Controllers
             data.BusinessTypeID = id;
             SetResponse setResponse = client.Set("BusinessType/" + data.BusinessTypeID, data);
         }
-        private void Delete(string id)
-        {
+        private void Delete(string id){
             client = new FireSharp.FirebaseClient(config);
             var data = new BusinessType();            
             SetResponse setResponse = client.Set("BusinessType/" + id, data);
         }
 
-        public string GetRole(string Email)
-        {
+        public string GetRole(string Email){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -255,8 +201,7 @@ namespace TLCN_WEB_API.Controllers
             return "";
         }
 
-        private UserModel AuthenticationUser(UserModel login)
-        {
+        private UserModel AuthenticationUser(UserModel login){
             //get list user
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
@@ -264,16 +209,13 @@ namespace TLCN_WEB_API.Controllers
             var list = new List<User>();
             string err = "";
 
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             //layas thongo tin taif khoan dang nhap
             UserModel user = null;
-            foreach (var item in list)
-            {
-                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
-                {
+            foreach (var item in list){
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)){
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
                 }
             }
@@ -281,14 +223,12 @@ namespace TLCN_WEB_API.Controllers
         }
 
         // mã hóa dữ liệu MD5
-        public static string Encrypt(string toEncrypt)
-        {
+        public static string Encrypt(string toEncrypt){
             bool useHashing = true;
             byte[] keyArray;
             byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
 
-            if (useHashing)
-            {
+            if (useHashing){
                 MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
                 keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
             }
@@ -307,8 +247,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //thuc hien tao token
-        private string GenerateJSONWebToken(UserModel userinfo)
-        {
+        private string GenerateJSONWebToken(UserModel userinfo){
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
@@ -327,8 +266,7 @@ namespace TLCN_WEB_API.Controllers
             return encodetoken;
         }
 
-        public bool kiemtrathoigianlogin(DateTime date)
-        {
+        public bool kiemtrathoigianlogin(DateTime date){
             int sophut1 = date.Minute;
             int sophut2 = DateTime.Now.Minute;
             if (sophut2 < sophut1)

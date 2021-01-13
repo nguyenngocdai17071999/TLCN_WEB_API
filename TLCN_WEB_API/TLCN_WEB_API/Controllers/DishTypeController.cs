@@ -32,8 +32,7 @@ namespace TLCN_WEB_API.Controllers
         };
 
         private IConfiguration _config;
-        public DishTypeController(IConfiguration config)
-        {
+        public DishTypeController(IConfiguration config){
             _config = config;
         }
         private static string key = "TLCN";
@@ -42,50 +41,42 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("DishType");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<DishType>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<DishType>(((JProperty)item).Value.ToString()));
                 }
                 return Ok(list);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-           
+            }           
         }
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("DishType");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<DishType>();
                 //danh sách tìm kiếm
 
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<DishType>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<DishType>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.DishType_ID == id)
                         list2.Add(item);
                 }
                 return Ok(list2);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
 
@@ -96,14 +87,11 @@ namespace TLCN_WEB_API.Controllers
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, [FromBody] DishType dishType){
             try{
-
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         AddbyidToFireBase(id, dishType);
                         return Ok(new[] { "sửa thành công" });
                     }
@@ -112,9 +100,7 @@ namespace TLCN_WEB_API.Controllers
                         return Ok("Bạn không có quyền");
                     }
                 }
-                else return Ok(new[] { "Bạn cần đăng nhập" });
-
-                
+                else return Ok(new[] { "Bạn cần đăng nhập" });                
             }
             catch{
                 return Ok(new[] { "Error" });
@@ -124,32 +110,23 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult deleteByID(string id)
-        {
-            try
-            {
-
+        public IActionResult deleteByID(string id){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true) {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         Delete(id);
                         return Ok(new[] { "Xóa thành công" });
                     }
-                    else
-                    {
+                    else{
                         return Ok("Bạn không có quyền");
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
-
-
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
@@ -159,25 +136,19 @@ namespace TLCN_WEB_API.Controllers
         public IActionResult RegisterDishType([FromBody] DishType dishType){
             string err = "";
             try{
-
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         AddToFireBase(dishType);
                         err = "Đăng ký thành công";
                     }
-                    else
-                    {
+                    else{
                         err = "Bạn không có quyền";
                     }
                 }
-                else return Ok(new[] { "Bạn cần đăng nhập" });
-
-                
+                else return Ok(new[] { "Bạn cần đăng nhập" });                
             }
             catch{
                 err = "Error";
@@ -226,35 +197,30 @@ namespace TLCN_WEB_API.Controllers
             data.DishType_ID = id;
             SetResponse setResponse = client.Set("DishType/" + data.DishType_ID, data);
         }
-        private void Delete(string id)
-        {
+        private void Delete(string id){
             client = new FireSharp.FirebaseClient(config);
             var data = new DishType();
             // data.DishType_ID = id;
             SetResponse setResponse = client.Set("DishType/" + id, data);
         }
-        public string GetRole(string Email)
-        {
+        public string GetRole(string Email){
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<User>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<User>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.Email.ToString() == Email)
                     return item.UserTypeID;
             }
             return "";
         }
 
-        private UserModel AuthenticationUser(UserModel login)
-        {
+        private UserModel AuthenticationUser(UserModel login){
             //get list user
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
@@ -262,16 +228,13 @@ namespace TLCN_WEB_API.Controllers
             var list = new List<User>();
             string err = "";
 
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             //layas thongo tin taif khoan dang nhap
             UserModel user = null;
-            foreach (var item in list)
-            {
-                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
-                {
+            foreach (var item in list){
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)){
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
                 }
             }
@@ -285,8 +248,7 @@ namespace TLCN_WEB_API.Controllers
             byte[] keyArray;
             byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
 
-            if (useHashing)
-            {
+            if (useHashing){
                 MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
                 keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
             }
@@ -305,8 +267,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //thuc hien tao token
-        private string GenerateJSONWebToken(UserModel userinfo)
-        {
+        private string GenerateJSONWebToken(UserModel userinfo){
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
@@ -325,8 +286,7 @@ namespace TLCN_WEB_API.Controllers
             return encodetoken;
         }
 
-        public bool kiemtrathoigianlogin(DateTime date)
-        {
+        public bool kiemtrathoigianlogin(DateTime date){
             int sophut1 = date.Minute;
             int sophut2 = DateTime.Now.Minute;
             if (sophut2 < sophut1)
@@ -334,7 +294,6 @@ namespace TLCN_WEB_API.Controllers
             int ketqua = sophut2 - sophut1;
             if (ketqua < 30) return true;
             return false;
-
         }
 
         public string GetIDToken(string token){
@@ -360,8 +319,7 @@ namespace TLCN_WEB_API.Controllers
                 byte[] keyArray;
                 byte[] toEncryptArray = Convert.FromBase64String(toDecrypt);
 
-                if (useHashing)
-                {
+                if (useHashing){
                     MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
                     keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
                 }

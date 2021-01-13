@@ -33,8 +33,7 @@ namespace TLCN_WEB_API.Controllers
         };
 
         private IConfiguration _config;
-        public MenuController(IConfiguration config)
-        {
+        public MenuController(IConfiguration config){
             _config = config;
         }
 
@@ -43,50 +42,42 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Menu");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<Menu>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
                 }
                 return Ok(list);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-            try
-            {
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Menu");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<Menu>();
                 //danh sách tìm kiếm
 
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<Menu>(((JProperty)item).Value.ToString()));
                 }
 
                 var list2 = new List<Menu>();
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.MenuID == id)
                         list2.Add(item);
                 }
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     AddToFireBase(item);
                 }
                 return Ok(list2);
@@ -124,22 +115,17 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult EditByID(string id, [FromBody] Menu menu){
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
-                        try
-                        {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
+                        try{
                             AddbyidToFireBase(id, menu);
                             return Ok(new[] { "sửa thành công" });
                         }
-                        catch
-                        {
+                        catch{
                             return Ok(new[] { "Lỗi rồi" });
                         }
                     }
@@ -147,8 +133,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }   
         }
@@ -156,24 +141,18 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult deleteByID(string id)
-        {
-            try
-            {
+        public IActionResult deleteByID(string id){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw")
-                    {
-                        try
-                        {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw"){
+                        try{
                             Delete(id);
                             return Ok(new[] { "Xóa thành công" });
                         }
-                        catch
-                        {
+                        catch{
                             return Ok(new[] { "Lỗi rồi" });
                         }
                     }
@@ -181,8 +160,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
@@ -190,23 +168,18 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("CreateMenu")]
         public IActionResult RegisterMenu( [FromBody] Menu menu){
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         string err = "";
-                        try
-                        {
+                        try{
                             AddToFireBase(menu);
                             err = "Đăng ký thành công";
                         }
-                        catch
-                        {
+                        catch{
                             err = "Lỗi rồi";
                         }
                         return Ok(new[] { err });
@@ -215,8 +188,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
@@ -263,8 +235,7 @@ namespace TLCN_WEB_API.Controllers
             SetResponse setResponse = client.Set("Menu/" + data.MenuID, data);
         }
 
-        private void Delete(string id)
-        {
+        private void Delete(string id){
             client = new FireSharp.FirebaseClient(config);
             var data = new Menu();
            // data.MenuID = id;
@@ -293,7 +264,6 @@ namespace TLCN_WEB_API.Controllers
                 byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
 
                 return UTF8Encoding.UTF8.GetString(resultArray);
-
             }
             catch{
                 return "Loi roi";
@@ -308,21 +278,18 @@ namespace TLCN_WEB_API.Controllers
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<User>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<User>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.Email.ToString() == Email)
                     return item.UserTypeID;
             }
             return "";
         }
 
-        private UserModel AuthenticationUser(UserModel login)
-        {
+        private UserModel AuthenticationUser(UserModel login){
             //get list user
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
@@ -330,16 +297,13 @@ namespace TLCN_WEB_API.Controllers
             var list = new List<User>();
             string err = "";
 
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             //layas thongo tin taif khoan dang nhap
             UserModel user = null;
-            foreach (var item in list)
-            {
-                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
-                {
+            foreach (var item in list){
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)){
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password) };
                 }
             }
@@ -347,14 +311,12 @@ namespace TLCN_WEB_API.Controllers
         }
 
         // mã hóa dữ liệu MD5
-        public static string Encrypt(string toEncrypt)
-        {
+        public static string Encrypt(string toEncrypt){
             bool useHashing = true;
             byte[] keyArray;
             byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
 
-            if (useHashing)
-            {
+            if (useHashing){
                 MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
                 keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
             }
@@ -373,8 +335,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //thuc hien tao token
-        private string GenerateJSONWebToken(UserModel userinfo)
-        {
+        private string GenerateJSONWebToken(UserModel userinfo){
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
@@ -393,8 +354,7 @@ namespace TLCN_WEB_API.Controllers
             return encodetoken;
         }
 
-        public bool kiemtrathoigianlogin(DateTime date)
-        {
+        public bool kiemtrathoigianlogin(DateTime date){
             int sophut1 = date.Minute;
             int sophut2 = DateTime.Now.Minute;
             if (sophut2 < sophut1)

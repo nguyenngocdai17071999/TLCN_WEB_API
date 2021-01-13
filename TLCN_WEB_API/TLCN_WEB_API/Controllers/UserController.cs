@@ -34,8 +34,7 @@ namespace TLCN_WEB_API.Controllers
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
         private IConfiguration _config;
-        public UserController(IConfiguration config)
-        {
+        public UserController(IConfiguration config){
             _config = config;
         }
         private static string key = "TLCN";
@@ -46,26 +45,21 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         client = new FireSharp.FirebaseClient(config);
                         FirebaseResponse response = client.Get("User");
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                         var list = new List<User>();
                         //danh sách tìm kiếm
-                        foreach (var item in data)
-                        {
+                        foreach (var item in data){
                             list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                         }
-                        foreach (var item in list)
-                        {
+                        foreach (var item in list){
                             item.Password = Decrypt(item.Password);
                         }
                         return Ok(list);
@@ -74,8 +68,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }            
         }
@@ -84,117 +77,89 @@ namespace TLCN_WEB_API.Controllers
         [HttpGet("GetRole")]
         //phương thức get dữ liệu từ firebase
         public IActionResult getRole(){
-
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
                     Role a = new Role();
                     a.UserTyleID = GetRole(Email);
                     return Ok(a);
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-
-           
+            }           
         }
 
         [Authorize]
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
-
-
-            try
-            {
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
 
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
                     client = new FireSharp.FirebaseClient(config);
                     FirebaseResponse response = client.Get("User");
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                     var list = new List<User>();
                     //danh sách tìm kiếm
-                    foreach (var item in data)
-                    {
+                    foreach (var item in data){
                         list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                     }
                     var list2 = new List<User>();
-                    if (id != null)
-                    {
-                        foreach (var item in list)
-                        {
+                    if (id != null){
+                        foreach (var item in list){
                             if (item.UserID.ToString() == id)
                                 list2.Add(item);
                         }
                     }
-                    else
-                    {
-                        foreach (var item in list)
-                        {
+                    else{
+                        foreach (var item in list){
                             if (item.Email.ToString() == Email)
                                 list2.Add(item);
                         }
                     }
-
-
                     return Ok(list2);
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-
-           
+            }           
         }
-
 
         [HttpGet("GetByIDNotToken")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDnottoken(string id)
-        {
-            try
-            {
+        public IActionResult GetByIDnottoken(string id){
+            try{
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("User");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<User>();
                 //danh sách tìm kiếm
-                foreach (var item in data)
-                {
+                foreach (var item in data){
                     list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                 }
                 var list2 = new List<User>();
 
-                foreach (var item in list)
-                {
+                foreach (var item in list){
                     if (item.UserID.ToString() == id)
                         list2.Add(item);
                 }
 
                 var list3 = new List<UserCommentInfo>();
-
-                foreach(var item in list2)
-                {
+                foreach(var item in list2){
                     UserCommentInfo a = new UserCommentInfo();
                     a.Email = item.Email;
                     a.Picture = item.Picture;
                     a.UserName = item.UserName;
                     list3.Add(a);
                 }
-
                 return Ok(list3);
             }
             catch {
@@ -204,14 +169,9 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("mahoa")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult mahoa(string id)
-        {
-
+        public IActionResult mahoa(string id){
                 var a = Encrypt("123456789");
-                return Ok(a);
-            
-
-
+                return Ok(a); 
         }
 
         [Authorize]
@@ -222,24 +182,15 @@ namespace TLCN_WEB_API.Controllers
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-
-
-                    if (id != null)
-                    {
-
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (id != null){
                         AddbyidToFireBase(id, user);
                         return Ok(new[] { "Sửa thành công" });
                     }
-                    else
-                    {
-
+                    else{
                         AddbyidToFireBase(GetIDToken(Email), user);
                         return Ok(new[] { "Sửa thành công" });
-                    }
-                 
+                    }                 
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
@@ -251,28 +202,22 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByID(string id)
-        {
-            try
-            {
+        public IActionResult DeleteByID(string id){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
 
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" )
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" ){
                         Delete(id);
                         return Ok(new[] { "Xóa thành công" });
                     }
                     return Ok(new[] { "Bạn không có quyền" });
-
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
@@ -295,95 +240,72 @@ namespace TLCN_WEB_API.Controllers
             return Ok(new[] { err });
         }
 
-
-
         //Hàm login
         [HttpPost("Login")]
         public IActionResult Login([FromBody] Login userlogin){ 
-            try
-            {
+            try{
                 UserModel login = new UserModel();
                 login.EmailAddress = userlogin.Email;
                 login.PassWord = userlogin.PassWord;
                 IActionResult response = Unauthorized();
 
                 var user = AuthenticationUser(login);
-                if (user != null)
-                {
+                if (user != null){
                     if (user.Status == "2")
                         return Ok("Error");
                     var tokenStr = GenerateJSONWebToken(user);
                     response = Ok(new { token = tokenStr });
-
                 }
                 return response;
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-           
+            }           
         }
 
         //Hàm login
         [Authorize]
         [HttpPost("BlockAccount")]
-        public IActionResult BlockAccount(string id, string status)
-        {
-            try
-            {
+        public IActionResult BlockAccount(string id, string status){
+            try{
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
 
-                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
-                    {
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
                         client = new FireSharp.FirebaseClient(config);
                         FirebaseResponse response = client.Get("User");
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                         var list = new List<User>();
                         //danh sách tìm kiếm
-                        foreach (var item in data)
-                        {
+                        foreach (var item in data){
                             list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                         }
                         var list2 = new List<User>();
-                        foreach (var item in list)
-                        {
-
+                        foreach (var item in list){
                             if (item.UserID == id)
                                 list2.Add(item);
                         }
-                        foreach(var item in list2)
-                        {
+                        foreach(var item in list2){
                             item.Status = status;
                             AddbyidToFireBase(item.UserID, item);
                         }    
                         return Ok("Thay đổi thành công");
                     }
                     return Ok(new[] { "Bạn không có quyền" });
-
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
-
         }
-
-
 
         [HttpPost("ForgetPass")]
         public IActionResult ForgetPass(string Email){///sử dụng thuộc tính Email của models user json chỉ cần Email
-            try
-            {
-                if (kiemtraEmail(Email) == true)
-                {
+            try{
+                if (kiemtraEmail(Email) == true){
                     ForGetCode dai = new ForGetCode();
                     Random a = new Random();
                     int code = a.Next(100000, 999999);
@@ -394,13 +316,11 @@ namespace TLCN_WEB_API.Controllers
                     messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
                     messenge.To.Add(new MailboxAddress("naren", Email));
                     messenge.Subject = "hello";
-                    messenge.Body = new TextPart("plain")
-                    {
+                    messenge.Body = new TextPart("plain"){
                         Text = "Code ResetPass cua ban la: " + code + ""
                     };
 
-                    using (var client = new SmtpClient())
-                    {
+                    using (var client = new SmtpClient()){
                         client.Connect("smtp.gmail.com", 587, false);
                         client.Authenticate("nguyenngocdai17071999@gmail.com", "conyeume");
                         client.Send(messenge);
@@ -412,34 +332,27 @@ namespace TLCN_WEB_API.Controllers
                 }
                 return Ok(new[] { "Không có Email" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
-            }
-            
+            }            
         }
 
         //resetpass theo gmail
         [HttpPost("ResetPass")]
         public IActionResult ResetPass(string Email,string Password){//Sử dụng thuốc tính Email và Password
-            try
-            {
-                if (kiemtraEmail(Email) == true)
-                {
+            try{
+                if (kiemtraEmail(Email) == true){
                     User resetPassUser = new User();
                     client = new FireSharp.FirebaseClient(config);
                     FirebaseResponse response = client.Get("User");
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                     var list = new List<User>();
                     string err = "";
-                    foreach (var item in data)
-                    {
+                    foreach (var item in data){
                         list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
                     }
-                    foreach (var item in list)
-                    {
-                        if (item.Email == Email)
-                        {
+                    foreach (var item in list){
+                        if (item.Email == Email){
                             resetPassUser = item;
                             break;
                         }
@@ -450,8 +363,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 return Ok(new[] { "Không có Email" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }            
         }
@@ -501,26 +413,22 @@ namespace TLCN_WEB_API.Controllers
 
         //thêm dữ liệu lên firebase theo id
         private void AddbyidToFireBase(string id, User user){
-
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<User>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<User>();
 
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.UserID.ToString() == id)
                     list2.Add(item);
             }
 
-            foreach(var item in list2)
-            {
+            foreach(var item in list2){
                 if (user.UserID == null) user.UserID = item.UserID;
                 if (user.UserName == null) user.UserName = item.UserName;
                 if (user.Phone == null) user.Phone = item.Phone;
@@ -537,20 +445,15 @@ namespace TLCN_WEB_API.Controllers
                 var data2 = user;
                 data2.UserID = id;
                 //data2.Password = Encrypt(data2.Password);
-                SetResponse setResponse = client.Set("User/" + data2.UserID, data2);
-            
+                SetResponse setResponse = client.Set("User/" + data2.UserID, data2);            
         }
 
-        private void Delete(string id)
-        {
-
-            client = new FireSharp.FirebaseClient(config);
-            
+        private void Delete(string id){
+            client = new FireSharp.FirebaseClient(config);            
             var data2 = new User();
             //data2.UserID = id;
             //data2.Password = Encrypt(data2.Password);
             SetResponse setResponse = client.Set("User/" + id, data2);
-
         }
 
         // mã hóa dữ liệu MD5
