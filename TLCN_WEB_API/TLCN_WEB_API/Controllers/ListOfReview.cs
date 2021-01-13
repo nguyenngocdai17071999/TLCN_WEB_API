@@ -84,6 +84,37 @@ namespace TLCN_WEB_API.Controllers
 
         }
 
+        [HttpGet("GetByIDComment")]
+        // phương thức get by id store dữ liệu từ firebase 
+        public IActionResult GetByIDcomment(string id)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("listOfReviews");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<listOfReviews>();
+                //danh sách tìm kiếm
+
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<listOfReviews>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<listOfReviews>();
+                foreach (var item in list)
+                {
+                    if (item.CommentID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+        }
+
         [Authorize]
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
