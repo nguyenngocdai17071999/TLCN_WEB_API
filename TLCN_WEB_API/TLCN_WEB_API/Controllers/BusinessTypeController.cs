@@ -40,6 +40,7 @@ namespace TLCN_WEB_API.Controllers
         private static string key = "TLCN";
         IFirebaseClient client;
 
+        
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
@@ -121,6 +122,39 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByID")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult DeleteByID(string id)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                    {
+                        Delete(id);
+                        return Ok(new[] { "Xóa thành công" });
+                    }
+                    else
+                    {
+                        return Ok(new[] { "Bạn Không có quyền" });
+                    }
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+
+
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+        }
+
+
+        [Authorize]
         [HttpPost("CreateBusinessType")]
         public IActionResult RegisterBusinessType([FromBody] BusinessType businessType){
 
@@ -193,6 +227,12 @@ namespace TLCN_WEB_API.Controllers
             PushResponse response = client.Push("BusinessType/", data);
             data.BusinessTypeID = id;
             SetResponse setResponse = client.Set("BusinessType/" + data.BusinessTypeID, data);
+        }
+        private void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new BusinessType();            
+            SetResponse setResponse = client.Set("BusinessType/" + id, data);
         }
 
         public string GetRole(string Email)

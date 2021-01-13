@@ -11,6 +11,7 @@ namespace TLCN_WEB_API.Models
         public string ReViewID { get; set; }
         public string StoreID { get; set; }
         public string UserID { get; set; } 
+        public string CommentID { get; set; }
 
     }
 }

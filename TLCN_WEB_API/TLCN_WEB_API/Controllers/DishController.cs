@@ -284,6 +284,41 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByID")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult DeleteByID(string id)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw")
+                    {
+                        try
+                        {
+                            Delete(id);
+                            return Ok(new[] { "Xóa thành công" });
+                        }
+                        catch
+                        {
+                            return Ok(new[] { "Lỗi rồi" });
+                        }
+                    }
+                    return Ok(new[] { "Bạn không có quyền" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+
+        [Authorize]
         [HttpPost("CreateDish")]
         public IActionResult RegisterDish( [FromBody] Dish dish){
             try
@@ -358,6 +393,15 @@ namespace TLCN_WEB_API.Controllers
 
             data.Dish_ID = id;
             SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
+        }
+
+        private void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new Dish();
+
+            //data.Dish_ID = id;
+            SetResponse setResponse = client.Set("Dishes/" + id, data);
         }
 
         public static string Decrypt(string toDecrypt){

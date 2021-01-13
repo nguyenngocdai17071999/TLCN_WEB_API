@@ -120,6 +120,35 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByID")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult deleteByID(string idcomment, string idusercomment, string idStore)
+        {
+
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if(GetIDUser(Email)==idusercomment|| GetIDUser(Email) ==idchuquan(idStore))
+                    {
+                        Delete(idcomment);
+                        return Ok(new[] { "Xóa thành công" });
+                    }
+                    return Ok(new[] { "Bạn không được xóa" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+        }
+
+        [Authorize]
         [HttpPost("CreateComment")]
         public IActionResult RegisterComment([FromBody] Comment comment)
         {
@@ -131,8 +160,8 @@ namespace TLCN_WEB_API.Controllers
                 string Email = claim[1].Value;
                 if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    AddToFireBase(comment);
-                    err = "Đăng ký thành công";
+                    string Idcomment = AddToFireBase(comment);
+                    err = Idcomment;
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
                 
@@ -147,36 +176,9 @@ namespace TLCN_WEB_API.Controllers
 
 
 
-        //tim ra ID tự động bằng cách tăng dần từ 1 nếu đã có số rồi thì lấy số tiếp theo cho đến hết chuổi thì lấy số cuối cùng.
-        // vd 1 2 3 thì get id sẽ ra 4
-        // vd 1 3 4 thì get id sẽ ra 2
-        private int GetID()
-        {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Comment");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Comment>();
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
-            }
-            int i = 1;
-            while (1 == 1)
-            {
-                int dem = 0;
-                foreach (var item in list)
-                {
-                    if (item.CommentID == i.ToString())
-                        dem++;
-                }
-                if (dem == 0)
-                    return i;
-                i++;
-            }
-            return i;
-        }
+        
         // thêm dư liệu lên firebase
-        private void AddToFireBase(Comment comment)
+        private string AddToFireBase(Comment comment)
         {
             client = new FireSharp.FirebaseClient(config);
             var data = comment;
@@ -185,6 +187,7 @@ namespace TLCN_WEB_API.Controllers
             data.CommentID = response.Result.name;
 
             SetResponse setResponse = client.Set("Comment/" + data.CommentID, data);
+            return data.CommentID;
         }
 
         public string GetRole(string Email)
@@ -203,6 +206,46 @@ namespace TLCN_WEB_API.Controllers
             {
                 if (item.Email.ToString() == Email)
                     return item.UserTypeID;
+            }
+            return "";
+        }
+
+        public string GetIDUser(string Email)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<User>();
+            foreach (var item in list)
+            {
+                if (item.Email.ToString() == Email)
+                    return item.UserID;
+            }
+            return "";
+        }
+
+        public string idchuquan(string idstore)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Stores");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<GanToi>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<GanToi>();
+            foreach (var item in list)
+            {
+                if (item.StoreID.ToString() == idstore)
+                    return item.UserID;
             }
             return "";
         }
@@ -298,6 +341,14 @@ namespace TLCN_WEB_API.Controllers
             var data = comment;
             data.CommentID = id;
             SetResponse setResponse = client.Set("Comment/" + data.CommentID, data);
+        }
+
+        private void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new Comment();
+           // data.CommentID = id;
+            SetResponse setResponse = client.Set("Comment/" + id, data);
         }
 
         public static string Decrypt(string toDecrypt)

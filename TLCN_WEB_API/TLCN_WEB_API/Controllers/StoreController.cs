@@ -368,6 +368,41 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByID")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult deleteByID(string id)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw")
+                    {
+                        try
+                        {
+                            Delete(id);
+                            return Ok(new[] { "Xóa thành công" });
+                        }
+                        catch
+                        {
+                            return Ok(new[] { "Lỗi rồi" });
+                        }
+                    }
+                    return Ok(new[] { "Bạn không có quyền" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+        }
+
+        [Authorize]
         [HttpPost("BlockStore")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult BlockStore(string id, string status)
@@ -539,6 +574,17 @@ namespace TLCN_WEB_API.Controllers
             }    
 
             SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
+        }
+
+        private void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new Store();
+           // data.StoreID = id;
+
+           
+
+            SetResponse setResponse = client.Set("Stores/" + id, data);
         }
 
         public static string Decrypt(string toDecrypt){

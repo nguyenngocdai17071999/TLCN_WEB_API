@@ -124,6 +124,39 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByID")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult DeleteByID(string id)
+        {
+            try
+            {
+
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV")
+                    {
+                        Delete(id);
+                        return Ok(new[] { "Xóa thành công" });
+                    }
+                    else
+                    {
+                        return Ok("Bạn Không có quyền");
+                    }
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+
+
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+        }
+
+        [Authorize]
         [HttpPost("CreateProvince")]
         public IActionResult RegisterProvince([FromBody] Province province){
             string err = "";
@@ -194,6 +227,14 @@ namespace TLCN_WEB_API.Controllers
             var data = province;
             data.ProvinceID = id;
             SetResponse setResponse = client.Set("Provinces/" + data.ProvinceID, data);
+        }
+
+        private void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new Province();
+          //  data.ProvinceID = id;
+            SetResponse setResponse = client.Set("Provinces/" + id, data);
         }
 
         public string GetRole(string Email)

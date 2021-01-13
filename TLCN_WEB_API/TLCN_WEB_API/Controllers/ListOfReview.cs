@@ -129,6 +129,39 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByID")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult deleteByID(string id)
+        {
+
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw")
+                    {
+                        Delete(id);
+                        return Ok(new[] { "sửa thành công" });
+                    }
+                    else
+                    {
+                        return Ok(new[] { "Bạn Không có quyền" });
+                    }
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+
+        }
+
+        [Authorize]
         [HttpPost("CreateListOfReviews")]
         public IActionResult RegisterBusinessType( [FromBody] listOfReviews list)
         {
@@ -174,6 +207,15 @@ namespace TLCN_WEB_API.Controllers
             PushResponse response = client.Push("listOfReviews/", data);
             data.ReViewID = id;
             SetResponse setResponse = client.Set("listOfReviews/" + data.ReViewID, data);
+        }
+
+        private void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new listOfReviews();
+            //PushResponse response = client.Push("listOfReviews/", data);
+            //data.ReViewID = id;
+            SetResponse setResponse = client.Set("listOfReviews/" + id, data);
         }
 
         public string GetRole(string Email)
