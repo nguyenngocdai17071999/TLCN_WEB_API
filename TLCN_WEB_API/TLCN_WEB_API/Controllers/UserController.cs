@@ -94,6 +94,29 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpGet("CheckLogin")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult CheckLogin()
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    
+                    return Ok("Đang login");
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [Authorize]
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
