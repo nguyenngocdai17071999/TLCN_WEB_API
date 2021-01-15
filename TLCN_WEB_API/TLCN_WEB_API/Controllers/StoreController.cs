@@ -359,7 +359,8 @@ namespace TLCN_WEB_API.Controllers
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
                 if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV"){
+                    if (GetRole(Email) == "-MO5VBnzdGsuypsTzHaV" || GetRole(Email) == "-MO5VWchsca2XwktyNAw")
+                    {
                         try{
                             AddbyidToFireBase(id, store);
                             return Ok(new[] { "sửa thành công" });
@@ -375,6 +376,48 @@ namespace TLCN_WEB_API.Controllers
             catch{
                 return Ok("Error");
             }                 
+        }
+
+
+        [HttpPost("UpdateRatePoint")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult UpdateRatePoint(string id, string RatePoint)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                if (kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    client = new FireSharp.FirebaseClient(config);
+                    FirebaseResponse response = client.Get("Stores");
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                    var list = new List<GanToi>();
+                    //danh sách tìm kiếm
+                    foreach (var item in data)
+                    {
+                        list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
+                    }
+                    var list2 = new List<GanToi>();
+                    foreach (var item in list)
+                    {
+                        if (item.StoreID == id)
+                            list2.Add(item);
+                    }
+                    foreach (var item in list2)
+                    {
+                        item.RatePoint = RatePoint;
+                        AddbyidToFireBase(item.StoreID, item);
+                    }
+                    return Ok("Cập nhật thành công");
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
         }
 
         [Authorize]
