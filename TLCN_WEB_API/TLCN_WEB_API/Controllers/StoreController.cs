@@ -55,7 +55,30 @@ namespace TLCN_WEB_API.Controllers
             catch{
                 return Ok("Error");
             }           
-        }        
+        }
+
+        [HttpGet("GetAllManage")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult GetAllmanage()
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Stores");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<GanToi>();
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
+                }
+                return Ok(list);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
 
         [HttpGet("GetAllGanToi")]
         //phương thức get dữ liệu từ firebase
@@ -115,6 +138,36 @@ namespace TLCN_WEB_API.Controllers
                 return Ok("OK");
             }
             catch{
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("GetByIDLatLong")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDLatLong(string id)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("LatLongStore");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<LatLongStore>();
+
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<LatLongStore>();
+                foreach (var item in list)
+                {
+                    if (item.IDStore == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
+            }
+            catch
+            {
                 return Ok("Error");
             }
         }
@@ -207,6 +260,36 @@ namespace TLCN_WEB_API.Controllers
                 return Ok(Check(list2));
             }
             catch{
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("GetByIDManage")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDManage(string id)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Stores");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<GanToi>();
+
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<GanToi>(((JProperty)item).Value.ToString()));
+                }
+                var list2 = new List<GanToi>();
+                foreach (var item in list)
+                {
+                    if (item.StoreID == id)
+                        list2.Add(item);
+                }
+                return Ok(list2);
+            }
+            catch
+            {
                 return Ok("Error");
             }
         }
