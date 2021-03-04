@@ -67,7 +67,6 @@ D:\Năm 4\demo\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\TLCN_WEB_API.pd
 D:\Năm 4\demo\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\TLCN_WEB_API.genruntimeconfig.cache
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\appsettings.Development.json
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\appsettings.json
-C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\TLCN_WEB_API.exe
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\TLCN_WEB_API.deps.json
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\TLCN_WEB_API.runtimeconfig.json
@@ -214,3 +213,4 @@ C:\Users\tanph\Documents\GitHub\TLCN_WEB_API_ver12\TLCN_WEB_API\TLCN_WEB_API\obj
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\GoogleMaps.LocationServices.dll
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\TLCN_WEB_API.csproj.CoreCompileInputs.cache
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\TLCN_WEB_API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\scopedcss\bundle\TLCN_WEB_API.styles.css
