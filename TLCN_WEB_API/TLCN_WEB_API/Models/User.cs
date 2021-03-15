@@ -39,7 +39,7 @@ namespace TLCN_WEB_API.Models
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
-        private IConfiguration _config;
+        public IConfiguration _config;
         public User(IConfiguration config)
         {
             _config = config;
@@ -425,7 +425,7 @@ namespace TLCN_WEB_API.Models
         //thuc hien tao token
         public string GenerateJSONWebToken(UserModel userinfo)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("AshProgHelpSecretKey"));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
                 new Claim(JwtRegisteredClaimNames.Sub,DateTime.Now.ToString()),
@@ -434,8 +434,8 @@ namespace TLCN_WEB_API.Models
             };
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Issuer"],
+                issuer: "ashproghelp.com",
+                audience: "ashproghelp.com",
                 claims,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials);
