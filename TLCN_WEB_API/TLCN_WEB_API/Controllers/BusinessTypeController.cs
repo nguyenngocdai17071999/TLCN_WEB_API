@@ -45,15 +45,8 @@ namespace TLCN_WEB_API.Controllers
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll(){
             try{
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("BusinessType");
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<BusinessType>();
-                //danh sách tìm kiếm
-                foreach (var item in data){
-                    list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
-                }
-                return Ok(list);
+                BusinessType danhsach = new BusinessType();
+                return Ok(danhsach.getAll());
             }
             catch{
                 return Ok("Error");
@@ -64,21 +57,8 @@ namespace TLCN_WEB_API.Controllers
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
             try{
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("BusinessType");
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<BusinessType>();
-
-                //danh sách tìm kiếm
-                foreach (var item in data){
-                    list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
-                }
-                var list2 = new List<BusinessType>();
-                foreach (var item in list){
-                    if (item.BusinessTypeID == id)
-                        list2.Add(item);
-                }
-                return Ok(list2);
+                BusinessType danhsach = new BusinessType();
+                return Ok(danhsach.getByID(id));
             }
             catch{
                 return Ok("Error");
@@ -274,7 +254,6 @@ namespace TLCN_WEB_API.Controllers
             int ketqua = sophut2 - sophut1;
             if (ketqua < 30) return true;
             return false;
-
         }
 
         public string GetIDToken(string token){
