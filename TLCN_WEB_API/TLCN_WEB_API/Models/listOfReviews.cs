@@ -33,6 +33,11 @@ namespace TLCN_WEB_API.Models
 
         public listOfReviews()
         {
+            RatePoint = "";
+            ReViewID = "";
+            StoreID = "";
+            UserID = "";
+            CommentID = "";
         }
 
         private static string key = "TLCN";

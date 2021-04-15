@@ -36,6 +36,13 @@ namespace TLCN_WEB_API.Models
 
         public Comment()
         {
+            CommentID = "";
+            Content = "";
+            Date = "";
+            Image = "";
+            UserID = "";
+            StoreID = "";
+            ParentComment_ID = "";
         }
 
         IFirebaseClient client;

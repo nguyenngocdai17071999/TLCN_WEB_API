@@ -33,8 +33,8 @@ namespace TLCN_WEB_API.Models
         public string Status { get; set; }
         public string idFacebook { get; set; }
         public string idGoogle { get; set; }
-        public int numberVerify { get; set; }
-        public DateTime dateCodeVerify { get; set; }
+        public string numberVerify { get; set; }
+        public string dateCodeVerify { get; set; }
 
 
         private static string key = "TLCN";
@@ -55,7 +55,21 @@ namespace TLCN_WEB_API.Models
 
         public User()
         {
-
+            UserID = "";
+            UserName = "";
+            Phone = "";
+            Address = "";
+            Password = "";
+            Email = "";
+            Picture = "";
+            Sex = "";
+            Birthday = "";
+            UserTypeID = "";
+            Status = "";
+            idFacebook = "";
+            idGoogle = "";
+            numberVerify = "";
+            dateCodeVerify = "";
         }
 
         public List<User> getAll(){
@@ -288,14 +302,20 @@ namespace TLCN_WEB_API.Models
         }
         public bool kiemtrathoigianlogin(DateTime date)
         {
-            int sophut1 = date.Minute;
-            int sophut2 = DateTime.Now.Minute;
-            if (sophut2 < sophut1)
-                sophut2 = sophut2 + 60;
-            int ketqua = sophut2 - sophut1;
-            if (ketqua < 30) return true;
-            return false;
+            TimeSpan Time = DateTime.Now - date;
+            if (Time.Days > 1) return false;
+            if (Time.Minutes > 2) return false;
+            return true;
         }
+
+        public bool kiemtrathoigianforget(DateTime date)
+        {
+            TimeSpan Time = DateTime.Now - date;
+            if (Time.Days != 0) return false;
+            if (Time.Minutes > 5) return false;
+            return true;
+        }
+
         public static string Decrypt(string toDecrypt)
         {
             try
@@ -391,6 +411,47 @@ namespace TLCN_WEB_API.Models
             }
             return false;
         }
+
+        public bool kiemtraCode(int code, string email)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            foreach (var item in list)
+            {
+                if (item.Email == email)
+                    if (item.numberVerify == code.ToString())
+                        return true;
+            }
+            return false;
+        }
+
+        public bool kiemtraDateCode(string email)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            foreach (var item in list)
+            {
+                if (item.Email == email)
+                    if (kiemtraDateCode(item.dateCodeVerify)==true)
+                        return true;
+            }
+            return false;
+        }
+
         public void Delete(string id)
         {
             client = new FireSharp.FirebaseClient(config);
@@ -399,6 +460,7 @@ namespace TLCN_WEB_API.Models
             //data2.Password = Encrypt(data2.Password);
             SetResponse setResponse = client.Set("User/" + id, data2);
         }
+
         // Edit password by id
         public void EditPassBYID(string id, User user)
         {
@@ -409,9 +471,6 @@ namespace TLCN_WEB_API.Models
             data.Password = Encrypt(data.Password);
             SetResponse setResponse = client.Set("User/" + data.UserID, data);
         }
-
-
-
 
         public UserModel AuthenticationUser(UserModel login)
         {
@@ -576,8 +635,8 @@ namespace TLCN_WEB_API.Models
             {
                 if (item.Email == email )
                 {
-                    item.numberVerify = code;
-                    item.dateCodeVerify = date;
+                    item.numberVerify = code.ToString();
+                    item.dateCodeVerify = date.ToString();
                     UpdateToFireBase(item);
                 }
             }

@@ -29,6 +29,8 @@ namespace TLCN_WEB_API.Models
 
         public UserType()
         {
+            UserTypeID = "";
+            UserTypeName = "";
         }
 
         private static string key = "TLCN";

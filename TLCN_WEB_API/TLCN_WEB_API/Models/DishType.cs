@@ -30,6 +30,8 @@ namespace TLCN_WEB_API.Models
 
         public DishType()
         {
+            DishType_ID = "";
+            DishyTypeName = "";
         }
 
         public List<DishType> getById(string id) {

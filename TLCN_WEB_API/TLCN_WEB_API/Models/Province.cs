@@ -31,6 +31,8 @@ namespace TLCN_WEB_API.Models
 
         public Province()
         {
+            ProvinceID = "";
+            ProvinceName = "";
         }
 
         IFirebaseClient client;

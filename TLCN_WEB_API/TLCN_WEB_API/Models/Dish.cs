@@ -39,6 +39,12 @@ namespace TLCN_WEB_API.Models
 
         public Dish()
         {
+            Dish_ID = "";
+            DishName = "";
+            DishPrice = "";
+            DishPicture = "";
+            DishType_ID = "";
+            Menu_ID = "";            
         }
 
         public List<Dish> getAll() {

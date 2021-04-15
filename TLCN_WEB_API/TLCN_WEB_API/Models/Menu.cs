@@ -31,6 +31,8 @@ namespace TLCN_WEB_API.Models
         }
         public Menu()
         {
+            MenuID = "";
+            MenuName = "";
         }
 
         IFirebaseClient client;

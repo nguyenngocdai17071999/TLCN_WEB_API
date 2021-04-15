@@ -294,29 +294,7 @@ namespace TLCN_WEB_API.Controllers
             try{
                 User infoUser = new User();
                 if (infoUser.kiemtraEmail(Email) == true){
-                    ForGetCode dai = new ForGetCode();
-                    Random a = new Random();
-                    int code = a.Next(100000, 999999);
-                    DateTime date = DateTime.Now;
-
-                    ////Gửi email
-                    var messenge = new MimeMessage();
-                    messenge.From.Add(new MailboxAddress("Test Project", infoUser.nameEmailSend));
-                    messenge.To.Add(new MailboxAddress("naren", Email));
-                    messenge.Subject = "hello";
-                    messenge.Body = new TextPart("plain"){
-                        Text = "Code ResetPass cua ban la: " + code + ""
-                    };
-
-                    using (var client = new SmtpClient()){
-                        client.Connect("smtp.gmail.com", 587, false);
-                        client.Authenticate(infoUser.nameEmailSend, infoUser.passEmailSend);
-                        client.Send(messenge);
-                        client.Disconnect(true);
-                    }
-                    dai.code = code;
-                    dai.date = date;
-                    return Ok(dai);
+                    infoUser.updateCodeForget(Email);
                 }
                 return Ok(new[] { "Không có Email" });
             }
@@ -327,12 +305,17 @@ namespace TLCN_WEB_API.Controllers
 
         //resetpass theo gmail
         [HttpPost("ResetPass")]
-        public IActionResult ResetPass(string Email,string Password){//Sử dụng thuốc tính Email và Password
+        public IActionResult ResetPass(string Email,string Password, int code){//Sử dụng thuốc tính Email và Password
             try{
                 User infoUser = new User();
                 if (infoUser.kiemtraEmail(Email) == true){
-                    infoUser.resetPass(Email, Password);
-                    return Ok(new[] { "Đổi mật khẩu thành công" });
+                    if(infoUser.kiemtraCode(code,Email) == true)
+                    {
+                        infoUser.resetPass(Email, Password);
+                        return Ok(new[] { "Đổi mật khẩu thành công" });
+                    }    
+                    else
+                        return Ok(new[] { "Mã code sai" });
                 }
                 return Ok(new[] { "Không có Email" });
             }
