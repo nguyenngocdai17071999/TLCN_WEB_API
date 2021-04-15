@@ -17,6 +17,7 @@ namespace TLCN_WEB_API.Models
         public string MenuName { get; set; }
         string columnName = "Menu";
         private static string key = "TLCN";
+
         IFirebaseConfig config = new FirebaseConfig
         {
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",

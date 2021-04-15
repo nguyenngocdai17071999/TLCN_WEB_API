@@ -276,7 +276,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("BlockStore")]
+        [HttpPost("ChangeStatusStore")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult BlockStore(string id, string status){
             try{
@@ -305,6 +305,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
+
         [Authorize]
         [HttpPost("CreateStore")]
         public IActionResult RegisterStore( [FromBody] Store store){
@@ -319,6 +320,7 @@ namespace TLCN_WEB_API.Controllers
                         string err = "";
                         try{
                             Store store2 = new Store();
+                            store.Status = "3";
                             store2.AddToFireBase(store);
                             err = "Đăng ký thành công";
                         }

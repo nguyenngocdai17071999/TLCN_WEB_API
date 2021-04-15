@@ -1,8 +1,10 @@
 ﻿using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -29,6 +31,12 @@ namespace TLCN_WEB_API.Models
         public string Birthday { get; set; }
         public string UserTypeID { get; set; }
         public string Status { get; set; }
+        public string idFacebook { get; set; }
+        public string idGoogle { get; set; }
+        public int numberVerify { get; set; }
+        public DateTime dateCodeVerify { get; set; }
+
+
         private static string key = "TLCN";
         string columnName = "User";
         public string nameEmailSend = "nguyenngocdai17071999@gmail.com";
@@ -47,6 +55,7 @@ namespace TLCN_WEB_API.Models
 
         public User()
         {
+
         }
 
         public List<User> getAll(){
@@ -329,6 +338,14 @@ namespace TLCN_WEB_API.Models
             data.Password = Encrypt(data.Password);
             SetResponse setResponse = client.Set("User/" + data.UserID, data);
         }
+
+        public void UpdateToFireBase(User user)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = user;
+            SetResponse setResponse = client.Set("User/" + data.UserID, data);
+        }
+
         // mã hóa dữ liệu MD5
         public static string Encrypt(string toEncrypt)
         {
@@ -421,6 +438,79 @@ namespace TLCN_WEB_API.Models
             return user;
         }
 
+        public UserModel AuthenticationUserFaceBook(UserModel login)
+        {
+            //get list user
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            //layas thongo tin taif khoan dang nhap
+            UserModel user = null;
+            foreach (var item in list)
+            {
+                if (item.Email == login.EmailAddress && item.idFacebook == login.idFacebook)
+                {
+                    user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
+                }
+            }
+            if(user==null)
+            {
+                foreach (var item in list)
+                {
+                    if (item.Email == login.EmailAddress)
+                    {
+                        user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
+                        item.idFacebook = login.idFacebook;
+                        UpdateToFireBase(item);
+                    }
+                }                
+            }                
+            return user;
+        }
+
+        public UserModel AuthenticationUserGoogle(UserModel login)
+        {
+            //get list user
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            //layas thongo tin taif khoan dang nhap
+            UserModel user = null;
+            foreach (var item in list)
+            {
+                if (item.Email == login.EmailAddress && item.idGoogle == login.idGoogle)
+                {
+                    user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
+                }
+            }
+            if (user == null)
+            {
+                foreach (var item in list)
+                {
+                    if (item.Email == login.EmailAddress)
+                    {
+                        user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
+                        item.idGoogle = login.idGoogle;
+                        UpdateToFireBase(item);
+                    }
+                }
+            }
+            return user;
+        }
 
         //thuc hien tao token
         public string GenerateJSONWebToken(UserModel userinfo)
@@ -442,7 +532,55 @@ namespace TLCN_WEB_API.Models
             var encodetoken = new JwtSecurityTokenHandler().WriteToken(token);
             return encodetoken;
         }
+
+        public void updateCodeForget(string email)
+        {
+            User infoUser = new User();
+            UserModel user = null;
+            ForGetCode dai = new ForGetCode();
+            Random a = new Random();
+            int code = a.Next(100000, 999999);
+            DateTime date = DateTime.Now;
+
+            ////Gửi email
+            var messenge = new MimeMessage();
+            messenge.From.Add(new MailboxAddress("Test Project", infoUser.nameEmailSend));
+            messenge.To.Add(new MailboxAddress("naren", Email));
+            messenge.Subject = "hello";
+            messenge.Body = new TextPart("plain")
+            {
+                Text = "Code ResetPass cua ban la: " + code + ""
+            };
+
+            using (var client = new SmtpClient())
+            {
+                client.Connect("smtp.gmail.com", 587, false);
+                client.Authenticate(infoUser.nameEmailSend, infoUser.passEmailSend);
+                client.Send(messenge);
+                client.Disconnect(true);
+            }
+            dai.code = code;
+            dai.date = date;
+            // get list user
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("User");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            string err = "";
+
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            foreach (var item in list)
+            {
+                if (item.Email == email )
+                {
+                    item.numberVerify = code;
+                    item.dateCodeVerify = date;
+                    UpdateToFireBase(item);
+                }
+            }
+        }
     }
-
-
 }

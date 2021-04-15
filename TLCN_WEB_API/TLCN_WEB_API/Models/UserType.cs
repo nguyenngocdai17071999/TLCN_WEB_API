@@ -93,7 +93,5 @@ namespace TLCN_WEB_API.Models
             data.UserTypeID = response.Result.name;
             SetResponse setResponse = client.Set("UserType/" + data.UserTypeID, data);
         }
-
-
     }
 }

@@ -11,5 +11,7 @@ namespace TLCN_WEB_API.Models
         public string PassWord { get; set; }
         public string EmailAddress { get; set; }
         public string Status { get; set; }
+        public string idFacebook { get; set; }
+        public string idGoogle { get; set; }
     }
 }

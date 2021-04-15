@@ -210,6 +210,62 @@ namespace TLCN_WEB_API.Controllers
         }
 
         //Hàm login
+        [HttpPost("LoginFaceBook")]
+        public IActionResult LoginFaceBook(string idFacebook, string email)
+        {
+            try
+            {
+                User infoUser = new User();
+                UserModel login = new UserModel();
+                login.EmailAddress = email;
+                login.idFacebook = idFacebook;
+                IActionResult response = Unauthorized();
+
+                var user = infoUser.AuthenticationUserFaceBook(login);
+                if (user != null)
+                {
+                    if (user.Status == "2")
+                        return Ok("Error");
+                    var tokenStr = infoUser.GenerateJSONWebToken(user);
+                    response = Ok(new { token = tokenStr });
+                }
+                return response;
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        //Hàm login
+        [HttpPost("LoginGoogle")]
+        public IActionResult LoginGoogle(string idGoogle, string email)
+        {
+            try
+            {
+                User infoUser = new User();
+                UserModel login = new UserModel();
+                login.EmailAddress = email;
+                login.idGoogle = idGoogle;
+                IActionResult response = Unauthorized();
+
+                var user = infoUser.AuthenticationUserGoogle(login);
+                if (user != null)
+                {
+                    if (user.Status == "2")
+                        return Ok("Error");
+                    var tokenStr = infoUser.GenerateJSONWebToken(user);
+                    response = Ok(new { token = tokenStr });
+                }
+                return response;
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        //Hàm login
         [Authorize]
         [HttpPost("BlockAccount")]
         public IActionResult BlockAccount(string id, string status){
