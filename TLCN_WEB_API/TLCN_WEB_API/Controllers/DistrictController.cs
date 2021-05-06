@@ -21,59 +21,68 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-    //[EnableCors("MyPolicy")]
     [Route("api/[controller]")]
     [ApiController]
-    public class DishTypeController : ControllerBase
-    {     
+    public class DistrictController : Controller
+    {
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll(){
-            try{
-                DishType dishType = new DishType();
-                return Ok(dishType.getAll());
+        public IActionResult GetAll()
+        {
+            try
+            {
+                District danhsach = new District();
+                return Ok(danhsach.getAll());
             }
-            catch{
+            catch
+            {
                 return Ok("Error");
-            }           
+            }
         }
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id){
-            try{
-                DishType dishType = new DishType();
-                return Ok(dishType.getById(id));
+        public IActionResult GetByID(string id)
+        {
+            try
+            {
+                District danhsach = new District();
+                return Ok(danhsach.getByID(id));
             }
-            catch{
+            catch
+            {
                 return Ok("Error");
             }
-
         }
 
         [Authorize]
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(string id, [FromBody] DishType dishType){
-            try{
+        public IActionResult EditByID(string id, [FromBody] District district)
+        {
+            try
+            {
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                User userInfo = new User();
-                if (userInfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (userInfo.checkAdmin(Email)==true){
-                        DishType dishType1 = new DishType();
-                        dishType1.AddbyidToFireBase(id, dishType);
+                User infoUser = new User();
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (infoUser.checkAdmin(Email) == true)
+                    {
+                        District district1 = new District();
+                        district1.AddbyidToFireBase(id, district);
                         return Ok(new[] { "sửa thành công" });
                     }
                     else
                     {
-                        return Ok("Bạn không có quyền");
+                        return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
-                else return Ok(new[] { "Bạn cần đăng nhập" });                
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch{
+            catch
+            {
                 return Ok(new[] { "Error" });
             }
         }
@@ -81,52 +90,64 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult deleteByID(string id){
-            try{
+        public IActionResult DeleteByID(string id)
+        {
+            try
+            {
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true) {
-                    if (userinfo.checkAdmin(Email)==true)
+                User infoUser = new User();
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (infoUser.checkAdmin(Email) == true)
                     {
-                        userinfo.Delete(id);
+                        District district = new District();
+                        district.Delete(id);
                         return Ok(new[] { "Xóa thành công" });
                     }
-                    else{
-                        return Ok("Bạn không có quyền");
+                    else
+                    {
+                        return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch{
+            catch
+            {
                 return Ok(new[] { "Error" });
             }
         }
 
-        [Authorize]
-        [HttpPost("CreateDishType")]
-        public IActionResult RegisterDishType([FromBody] DishType dishType){
+
+        //[Authorize]
+        [HttpPost("Create")]
+        public IActionResult Register([FromBody] District district)
+        {
             string err = "";
-            try{
+            try
+            {
                 var identity = HttpContext.User.Identity as ClaimsIdentity;
                 IList<Claim> claim = identity.Claims.ToList();
                 string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (userinfo.checkAdmin(Email)== true)
+                User infoUser = new User();
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (infoUser.checkAdmin(Email) == true)
                     {
-                        DishType dishType1 = new DishType();
-                        dishType1.AddToFireBase(dishType);
+                        District district1 = new District();
+                        district1.AddToFireBase(district);
                         err = "Đăng ký thành công";
                     }
-                    else{
-                        err = "Bạn không có quyền";
+                    else
+                    {
+                        err = "Bạn Không có quyền";
                     }
                 }
-                else return Ok(new[] { "Bạn cần đăng nhập" });                
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch{
+            catch
+            {
                 err = "Error";
             }
             return Ok(new[] { err });

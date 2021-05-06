@@ -110,17 +110,17 @@ namespace TLCN_WEB_API.Controllers
             }           
         }
 
-        [HttpGet("GetByIDNotToken")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDnottoken(string id){
-            try{
-                User infoUser = new User();
-                return Ok(infoUser.GetByIDnottoken(id));
-            }
-            catch {
-                return Ok("Error");
-            }
-        }
+        //[HttpGet("GetByIDNotToken")]
+        //// phương thức get by id dữ liệu từ firebase 
+        //public IActionResult GetByIDnottoken(string id){
+        //    try{
+        //        User infoUser = new User();
+        //        return Ok(infoUser.GetByIDnottoken(id));
+        //    }
+        //    catch {
+        //        return Ok("Error");
+        //    }
+        //}
 
         [Authorize]
         [HttpPost("EditByID")]
@@ -323,5 +323,7 @@ namespace TLCN_WEB_API.Controllers
                 return Ok("Error");
             }            
         }
+
+
     }
 }

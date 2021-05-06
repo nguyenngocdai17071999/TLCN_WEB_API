@@ -19,8 +19,9 @@ namespace TLCN_WEB_API.Models
     {
         public string BusinessTypeID { get; set; }
         public string BusinessTypeName { get; set; }
+        public string BusinessTypePicture { get; set; }
 
-        string columnName = "BusinessType";
+        string columnName = "BusinessType-New";
         IFirebaseClient client;
         IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
@@ -58,12 +59,30 @@ namespace TLCN_WEB_API.Models
         }
 
 
-        private void AddbyidToFireBase(string id, BusinessType businessType){
+        // thêm dư liệu lên firebase
+        public void AddToFireBase(BusinessType businessType)
+        {
             client = new FireSharp.FirebaseClient(config);
             var data = businessType;
-            PushResponse response = client.Push("BusinessType/", data);
+            PushResponse response = client.Push("BusinessTypeNew/", data);
+            data.BusinessTypeID = response.Result.name;
+            SetResponse setResponse = client.Set("BusinessTypeNew/" + data.BusinessTypeID, data);
+        }
+
+        //thêm dữ liệu lên firebase theo id
+        public void AddbyidToFireBase(string id, BusinessType businessType)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = businessType;
+            PushResponse response = client.Push("BusinessTypeNew/", data);
             data.BusinessTypeID = id;
-            SetResponse setResponse = client.Set("BusinessType/" + data.BusinessTypeID, data);
+            SetResponse setResponse = client.Set("BusinessTypeNew/" + data.BusinessTypeID, data);
+        }
+        public void Delete(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = new BusinessType();
+            SetResponse setResponse = client.Set("BusinessTypeNew/" + id, data);
         }
     }
 }

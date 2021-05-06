@@ -40,6 +40,7 @@ namespace TLCN_WEB_API.Controllers
             }
 
         }
+
         [HttpGet("GetByID")]
         // phương thức get by id store dữ liệu từ firebase 
         public IActionResult GetByID(string id){

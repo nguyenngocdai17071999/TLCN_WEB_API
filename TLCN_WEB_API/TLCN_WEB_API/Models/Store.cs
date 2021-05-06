@@ -29,24 +29,21 @@ namespace TLCN_WEB_API.Models
         IFirebaseClient client;
         public Store()
         {
-
-        }
-
-        public Store(string storeID, string storeAddress, string storeName, string storePicture, string openTime, string cLoseTime, string userID, string provinceID, string menuID, string businessTypeID, string ratePoint, string khoangcach, string status)
-        {
-            StoreID = storeID;
-            StoreAddress = storeAddress;
-            StoreName = storeName;
-            StorePicture = storePicture;
-            OpenTime = openTime;
-            CLoseTime = cLoseTime;
-            UserID = userID;
-            ProvinceID = provinceID;
-            MenuID = menuID;
-            BusinessTypeID = businessTypeID;
-            RatePoint = ratePoint;
-            this.khoangcach = khoangcach;
-            Status = status;
+            StoreID = "";
+            StoreAddress = "";
+            StoreName = "";
+            StorePicture = "";
+            OpenTime = "";
+            CLoseTime = "";
+            UserID = "";
+            ProvinceID = "";
+            BusinessTypeID = "";
+            RatePoint = "";
+            khoangcach = "";
+            Status = "";
+            Lat = "";
+            Long = "";
+            DistrictID = "";
         }
 
         public string StoreID { get; set; }
@@ -57,12 +54,14 @@ namespace TLCN_WEB_API.Models
         public string CLoseTime { get; set; }
         public string UserID { get; set; }
         public string ProvinceID { get; set; }
-        public string MenuID { get; set; }
         public string BusinessTypeID { get; set; }
         public string RatePoint { get; set; }
         public string khoangcach { get; set; }
         public string Status { get; set; }
-        string columnname = "Stores";
+        public string Lat { get; set; }
+        public string Long { get; set; }
+        public string DistrictID { get; set; }
+        string columnname = "Stores-New";
 
         public List<Store> getAll() {
             client = new FireSharp.FirebaseClient(config);
@@ -76,19 +75,7 @@ namespace TLCN_WEB_API.Models
             }
             return Check(list);
         }
-        public List<Store> getAllManage()
-        {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get(columnname);
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Store>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }
-            return list;
-        }
+
         public List<Store> getAllGanToi()
         {
             client = new FireSharp.FirebaseClient(config);
@@ -102,6 +89,7 @@ namespace TLCN_WEB_API.Models
             }
             return Check(gantoi(list));
         } 
+
         public List<Store> getAllGanToiProvince(string id)
         {
             client = new FireSharp.FirebaseClient(config);
@@ -126,10 +114,9 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = store;
-            PushResponse response = client.Push("Stores/", data);
+            PushResponse response = client.Push("Stores-New/", data);
             data.StoreID = response.Result.name;
-            data.Status = "1";
-            SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
+            SetResponse setResponse = client.Set("Stores-New/" + data.StoreID, data);
         }
         public static double Calculate(double sLatitude, double sLongitude, double eLatitude, double eLongitude)
         {
@@ -153,25 +140,7 @@ namespace TLCN_WEB_API.Models
 
             return Math.Round(result2, 2);
         }
-        public double tinhtoankhoangcach(string idStore)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("LatLongStore");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<LatLongStore>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
-            }
-            var list2 = new List<LatLongStore>();
-            foreach (var item in list)
-            {
-                if (item.IDStore == idStore)
-                    return Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long));
-            }
-            return 0;
-        }
+
         public void AddbyidToFireBase(string id, Store store)
         {
             client = new FireSharp.FirebaseClient(config);
@@ -180,7 +149,7 @@ namespace TLCN_WEB_API.Models
 
             client = new FireSharp.FirebaseClient(config);
 
-            FirebaseResponse response = client.Get("Stores");
+            FirebaseResponse response = client.Get("Stores-New");
             dynamic data2 = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             var list2 = new List<Store>();
@@ -204,13 +173,14 @@ namespace TLCN_WEB_API.Models
                 if (data.CLoseTime == null) data.CLoseTime = item.CLoseTime;
                 if (data.UserID == null) data.UserID = item.UserID;
                 if (data.ProvinceID == null) data.ProvinceID = item.ProvinceID;
-                if (data.MenuID == null) data.MenuID = item.MenuID;
                 if (data.BusinessTypeID == null) data.BusinessTypeID = item.BusinessTypeID;
                 if (data.RatePoint == null) data.RatePoint = item.RatePoint;
                 if (data.khoangcach == null) data.khoangcach = item.khoangcach;
                 if (data.Status == null) data.Status = item.Status;
+                if (data.Lat == null) data.Status = item.Lat;
+                if (data.Long == null) data.Status = item.Long;
             }
-            SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
+            SetResponse setResponse = client.Set("Stores-New/" + data.StoreID, data);
         }
         public void updateRatePoint(string id, string RatePoint) {
             client = new FireSharp.FirebaseClient(config);
@@ -263,16 +233,9 @@ namespace TLCN_WEB_API.Models
             client = new FireSharp.FirebaseClient(config);
             var data = new Store();
             // data.StoreID = id;
-            SetResponse setResponse = client.Set("Stores/" + id, data);
+            SetResponse setResponse = client.Set("Stores-New/" + id, data);
         }
-        public void AddToFireBasemoi(Store store)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            var data = store;
-            // PushResponse response = client.Push("Stores/", data);
-            //data.StoreID = response.Result.name;
-            SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
-        }
+
         public List<Store> Check(List<Store> store)
         {
             var list = new List<Store>();
@@ -283,46 +246,7 @@ namespace TLCN_WEB_API.Models
             }
             return list;
         }
-        public void AddToFireBasebydis(LatLongStore latLongStore)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            var data = latLongStore;
-            //PushResponse response = client.Push("LatLongStore/", data);
-            data.IDStore = latLongStore.IDStore;
-            SetResponse setResponse = client.Set("LatLongStore/" + data.IDStore, data);
-        }
 
-        public List<LatLongStore> getByIDLatLong(string id) {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("LatLongStore");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<LatLongStore>();
-
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
-            }
-            var list2 = new List<LatLongStore>();
-            foreach (var item in list)
-            {
-                if (item.IDStore == id)
-                    list2.Add(item);
-            }
-            return list2;
-        }
-        public List<LatLongStore> getALLDistance(string id) {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("LatLongStore");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<LatLongStore>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
-            }
-            return list;
-        }
         public List<Store> getByIDOwner(string id) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
@@ -427,63 +351,23 @@ namespace TLCN_WEB_API.Models
             return Check(list2);
         }
 
-
-       
-        public double getDistance(string id) {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("LatLongStore");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<LatLongStore>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<LatLongStore>(((JProperty)item).Value.ToString()));
-            }
-            var list2 = new List<LatLongStore>();
-            foreach (var item in list)
-            {
-                if (item.IDStore == id)
-                    return Calculate(10.851590, 106.763280, Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long));
-            }
-            return 0;
-        }
-
-
-
         public List<Store> gantoi(List<Store> store)
         {
-            var ListGanToi = new List<Store>();
             for (int i = 0; i < store.Count; i++)
             {
-                ListGanToi.Add(new Store(store[i].StoreID,
-                             store[i].StoreAddress,
-                             store[i].StoreName,
-                             store[i].StorePicture,
-                             store[i].OpenTime,
-                             store[i].CLoseTime,
-                             store[i].UserID,
-                             store[i].ProvinceID,
-                             store[i].MenuID,
-                             store[i].BusinessTypeID,
-                             store[i].RatePoint,
-                             store[i].khoangcach,
-                             store[i].Status));
-            }
-            Store a = new Store();
-            for (int i = 0; i < ListGanToi.Count; i++)
-            {
-                for (int j = i + 1; j < ListGanToi.Count; j++)
+                for (int j = i + 1; j < store.Count; j++)
                 {
-                    if (Convert.ToDouble(ListGanToi[j].khoangcach) < Convert.ToDouble(ListGanToi[i].khoangcach))
+                    if (Convert.ToDouble(store[j].khoangcach) < Convert.ToDouble(store[i].khoangcach))
                     {
+                        var a = new Store();
                         //cach trao doi gia tri
-                        a = ListGanToi[i];
-                        ListGanToi[i] = ListGanToi[j];
-                        ListGanToi[j] = a;
+                        a = store[i];
+                        store[i] = store[j];
+                        store[j] = a;
                     }
                 }
             }
-            return ListGanToi;
+            return store;
         }
     }
 }

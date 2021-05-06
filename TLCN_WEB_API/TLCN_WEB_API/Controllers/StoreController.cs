@@ -45,7 +45,7 @@ namespace TLCN_WEB_API.Controllers
             try
             {
                 Store store = new Store();
-                return Ok(store.getAllManage());
+                return Ok(store.getAll());
             }
             catch
             {
@@ -75,57 +75,6 @@ namespace TLCN_WEB_API.Controllers
             catch{
                 return Ok("Error");
             }
-        }
-        
-        [HttpPost("CreateLatLong")]
-        public IActionResult CreateDIS(LatLongStore latLongStore){
-            try{
-                Store store = new Store();
-                store.AddToFireBasebydis(latLongStore);
-                return Ok("OK");
-            }
-            catch{
-                return Ok("Error");
-            }
-        }
-
-        [HttpGet("GetByIDLatLong")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDLatLong(string id)
-        {
-            try
-            {
-                Store store = new Store();
-                return Ok(store.getByIDLatLong(id));
-            }
-            catch
-            {
-                return Ok("Error");
-            }
-        }
-
-        [HttpGet("GetALLDistance")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetDistanceByIDall(string ID){
-            try{
-                Store store = new Store();
-                return Ok(store.getALLDistance(ID));
-            }
-            catch{
-                return Ok("Error");
-            }
-        }
-
-        [HttpGet("GetDistance")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetDistanceByID(string ID){
-            try{
-                Store store = new Store();
-                return Ok(store.getDistance(ID));
-            }
-            catch{
-                return Ok("Error");
-            }           
         }
 
         [HttpGet("GetByIDOwner")]
@@ -306,34 +255,39 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("CreateStore")]
         public IActionResult RegisterStore( [FromBody] Store store){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true)
-                    {
-                        string err = "";
-                        try{
-                            Store store2 = new Store();
-                            store.Status = "3";
-                            store2.AddToFireBase(store);
-                            err = "Đăng ký thành công";
-                        }
-                        catch{
-                            err = "Lỗi rồi";
-                        }
-                        return Ok(new[] { err });
-                    }
-                    return Ok(new[] { "Bạn không có quyền" });
-                }
-                else return Ok(new[] { "Bạn cần đăng nhập" });
+                Store store2 = new Store();
+                //store.Status = "3";
+                store2.AddToFireBase(store);
+                return Ok("oke");
+                //var identity = HttpContext.User.Identity as ClaimsIdentity;
+                //IList<Claim> claim = identity.Claims.ToList();
+                //string Email = claim[1].Value;
+                //User infoUser = new User();
+                //if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
+                //    if (infoUser.checkAdmin(Email)==true)
+                //    {
+                //        string err = "";
+                //        try{
+                //            Store store2 = new Store();
+                //            //store.Status = "3";
+                //            store2.AddToFireBase(store);
+                //            err = "Đăng ký thành công";
+                //        }
+                //        catch{
+                //            err = "Lỗi rồi";
+                //        }
+                //        return Ok(new[] { err });
+                //    }
+                //    return Ok(new[] { "Bạn không có quyền" });
+                //}
+                //else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch{
+            catch
+            {
                 return Ok("Error");
             }           
             

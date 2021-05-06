@@ -118,36 +118,38 @@ namespace TLCN_WEB_API.Models
             }
             return list2;
         }  
-        public List<UserCommentInfo> GetByIDnottoken(string id)
-        {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get(columnName);
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            List<User> list = new List<User>();
-            //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
-            }
-            List<User> list2 = new List<User>();
 
-            foreach (var item in list)
-            {
-                if (item.UserID.ToString() == id)
-                    list2.Add(item);
-            }
+        //public List<UserCommentInfo> GetByIDnottoken(string id)
+        //{
+        //    client = new FireSharp.FirebaseClient(config);
+        //    FirebaseResponse response = client.Get(columnName);
+        //    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        //    List<User> list = new List<User>();
+        //    //danh sách tìm kiếm
+        //    foreach (var item in data)
+        //    {
+        //        list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+        //    }
+        //    List<User> list2 = new List<User>();
 
-            List<UserCommentInfo> list3 = new List<UserCommentInfo>();
-            foreach (var item in list2)
-            {
-                UserCommentInfo a = new UserCommentInfo();
-                a.Email = item.Email;
-                a.Picture = item.Picture;
-                a.UserName = item.UserName;
-                list3.Add(a);
-            }
-            return list3;
-        }
+        //    foreach (var item in list)
+        //    {
+        //        if (item.UserID.ToString() == id)
+        //            list2.Add(item);
+        //    }
+
+        //    List<UserCommentInfo> list3 = new List<UserCommentInfo>();
+        //    foreach (var item in list2)
+        //    {
+        //        UserCommentInfo a = new UserCommentInfo();
+        //        a.Email = item.Email;
+        //        a.Picture = item.Picture;
+        //        a.UserName = item.UserName;
+        //        list3.Add(a);
+        //    }
+        //    return list3;
+        //}
+
         public void editByID(string id,string email, User user) {
             if (id != null)
             {

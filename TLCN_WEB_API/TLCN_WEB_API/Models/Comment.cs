@@ -20,6 +20,11 @@ namespace TLCN_WEB_API.Models
         public string UserID { get; set; }
         public string StoreID { get; set; }
         public string ParentComment_ID { get; set; }
+        public string UserName { get; set; }
+        public string UserPicture { get; set; }
+        public string RatePoint { get; set; }
+
+
 
         IFirebaseConfig config = new FirebaseConfig
         {
@@ -43,6 +48,9 @@ namespace TLCN_WEB_API.Models
             UserID = "";
             StoreID = "";
             ParentComment_ID = "";
+            UserName = "";
+            UserPicture = "";
+            RatePoint = "";
         }
 
         IFirebaseClient client;
@@ -86,6 +94,7 @@ namespace TLCN_WEB_API.Models
             }
             return list2;
         }
+
 
         public void Delete(string id)
         {
