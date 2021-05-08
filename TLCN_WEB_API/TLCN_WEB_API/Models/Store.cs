@@ -44,6 +44,7 @@ namespace TLCN_WEB_API.Models
             Lat = "";
             Long = "";
             DistrictID = "";
+            NumberView = "";
         }
 
         public string StoreID { get; set; }
@@ -61,6 +62,7 @@ namespace TLCN_WEB_API.Models
         public string Lat { get; set; }
         public string Long { get; set; }
         public string DistrictID { get; set; }
+        public string NumberView { get; set; }
         string columnname = "Stores-New";
 
         public List<Store> getAll() {
@@ -282,6 +284,14 @@ namespace TLCN_WEB_API.Models
             {
                 if (item.StoreID == id)
                     list2.Add(item);
+            }
+            View_Store view_Store = new View_Store();
+            var listview = new List<View_Store>();
+            listview = view_Store.getByIDStore(id);
+            foreach(var item in list2)
+            {
+                item.NumberView = listview.Count().ToString();
+                AddbyidToFireBase(item.StoreID, item);
             }
             return Check(list2);
         }
