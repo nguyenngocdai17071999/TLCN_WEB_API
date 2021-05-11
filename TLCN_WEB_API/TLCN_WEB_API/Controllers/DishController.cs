@@ -158,40 +158,37 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("CreateDish")]
         public IActionResult RegisterDish([FromBody] Dish dish)
         {
-            Dish dish1 = new Dish();
-            dish1.AddToFireBase(dish);
-            return Ok("Error");
-            //try
-            //{
-            //    var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //    IList<Claim> claim = identity.Claims.ToList();
-            //    string Email = claim[1].Value;
-            //    User userinfo = new User();
-            //    if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-            //    {
-            //        if (userinfo.checkAdmin(Email)==true)
-            //        {
-            //            string err = "";
-            //            try
-            //            {
-            //                Dish dish1 = new Dish();
-            //                dish1.AddToFireBase(dish);
-            //                err = "Đăng ký thành công";
-            //            }
-            //            catch
-            //            {
-            //                err = "Lỗi rồi";
-            //            }
-            //            return Ok(new[] { err });
-            //        }
-            //        return Ok("Bạn không có quyền");
-            //    }
-            //    else return Ok(new[] { "Bạn cần đăng nhập" });
-            //}
-            //catch
-            //{
-            //    return Ok("Error");
-            //}
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                User userinfo = new User();
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (userinfo.checkAdmin(Email) == true)
+                    {
+                        string err = "";
+                        try
+                        {
+                            Dish dish1 = new Dish();
+                            dish1.AddToFireBase(dish);
+                            err = "Đăng ký thành công";
+                        }
+                        catch
+                        {
+                            err = "Lỗi rồi";
+                        }
+                        return Ok(new[] { err });
+                    }
+                    return Ok("Bạn không có quyền");
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
         }
     }
 }

@@ -259,32 +259,31 @@ namespace TLCN_WEB_API.Controllers
         [HttpPost("CreateStore")]
         public IActionResult RegisterStore( [FromBody] Store store){
             try{
-                Store store2 = new Store();
-                //store.Status = "3";
-                store2.AddToFireBase(store);
-                return Ok("oke");
-                //var identity = HttpContext.User.Identity as ClaimsIdentity;
-                //IList<Claim> claim = identity.Claims.ToList();
-                //string Email = claim[1].Value;
-                //User infoUser = new User();
-                //if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                //    if (infoUser.checkAdmin(Email)==true)
-                //    {
-                //        string err = "";
-                //        try{
-                //            Store store2 = new Store();
-                //            //store.Status = "3";
-                //            store2.AddToFireBase(store);
-                //            err = "Đăng ký thành công";
-                //        }
-                //        catch{
-                //            err = "Lỗi rồi";
-                //        }
-                //        return Ok(new[] { err });
-                //    }
-                //    return Ok(new[] { "Bạn không có quyền" });
-                //}
-                //else return Ok(new[] { "Bạn cần đăng nhập" });
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                User infoUser = new User();
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (infoUser.checkAdmin(Email) == true)
+                    {
+                        string err = "";
+                        try
+                        {
+                            Store store2 = new Store();
+                            //store.Status = "3";
+                            store2.AddToFireBase(store);
+                            err = "Đăng ký thành công";
+                        }
+                        catch
+                        {
+                            err = "Lỗi rồi";
+                        }
+                        return Ok(new[] { err });
+                    }
+                    return Ok(new[] { "Bạn không có quyền" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
             }
             catch
             {
