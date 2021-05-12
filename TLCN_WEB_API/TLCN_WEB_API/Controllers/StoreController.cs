@@ -89,6 +89,37 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
+
+        [HttpGet("GetByIDBusinessType")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDBusinessType(string id)
+        {
+            try
+            {
+                Store store = new Store();
+                return Ok(store.getByIDBusinessType(id));
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("GetByIDDistrict")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDDistrict(string id)
+        {
+            try
+            {
+                Store store = new Store();
+                return Ok(store.getByIDDistrict(id));
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id){
@@ -126,18 +157,6 @@ namespace TLCN_WEB_API.Controllers
             catch{
                 return Ok("Error");
             }            
-        }
-
-        [HttpGet("GetByIDBusinessType")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDBusinessType(string id){
-            try{
-                Store store = new Store();
-                return Ok(store.getByIDBusinessType(id));
-            }
-            catch{
-                return Ok("Error");
-            }           
         }
 
         [Authorize]

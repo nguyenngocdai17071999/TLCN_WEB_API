@@ -268,6 +268,7 @@ namespace TLCN_WEB_API.Models
             }
             return Check(list2);
         }
+
         public List<Store> getByID(string id) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
@@ -301,6 +302,29 @@ namespace TLCN_WEB_API.Models
             }
             return Check(list2);
         }
+
+        public List<Store> getByIDDistrict(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnname);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Store>();
+
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Store>();
+            foreach (var item in list)
+            {
+                if (item.DistrictID == id)
+                    list2.Add(item);
+            }
+            return list2;
+        }
+
+
         public List<Store> getByIDManage(string id) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
