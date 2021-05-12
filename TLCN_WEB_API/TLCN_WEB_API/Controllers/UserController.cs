@@ -209,6 +209,8 @@ namespace TLCN_WEB_API.Controllers
             }           
         }
 
+
+
         //Hàm login
         [HttpPost("LoginFaceBook")]
         public IActionResult LoginFaceBook(string idFacebook, string email)
@@ -262,6 +264,22 @@ namespace TLCN_WEB_API.Controllers
             catch
             {
                 return Ok("Error");
+            }
+        }
+
+        //Hàm login       
+        [HttpPost("Logout")]
+        public IActionResult Logout(string id)
+        {
+            try
+            {
+                User infoUser = new User();
+                infoUser.blockAccount(id, "1");
+                return Ok("Thay đổi thành công");
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
             }
         }
 

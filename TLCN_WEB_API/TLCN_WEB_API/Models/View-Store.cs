@@ -77,15 +77,19 @@ namespace TLCN_WEB_API.Models
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<View_Store>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
-                list.Add(JsonConvert.DeserializeObject<View_Store>(((JProperty)item).Value.ToString()));
-            }
             var listViewStore = new List<View_Store>();
-            foreach(var item in list)
+            if (data != null)
             {
-                if (item.StoreID == id) listViewStore.Add(item);
-            }    
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<View_Store>(((JProperty)item).Value.ToString()));
+                }
+
+                foreach (var item in list)
+                {
+                    if (item.StoreID == id) listViewStore.Add(item);
+                }
+            }  
             return listViewStore;
         }
 

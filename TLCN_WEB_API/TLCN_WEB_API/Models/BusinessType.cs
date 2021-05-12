@@ -21,7 +21,7 @@ namespace TLCN_WEB_API.Models
         public string BusinessTypeName { get; set; }
         public string BusinessTypePicture { get; set; }
 
-        string columnName = "BusinessType-New";
+        string columnName = "BusinessTypeNew";
         IFirebaseClient client;
         IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",

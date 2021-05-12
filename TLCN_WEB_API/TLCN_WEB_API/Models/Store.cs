@@ -74,7 +74,7 @@ namespace TLCN_WEB_API.Models
             foreach (var item in data)
             {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }
+            }           
             return Check(list);
         }
 
@@ -286,6 +286,12 @@ namespace TLCN_WEB_API.Models
                     list2.Add(item);
             }
             View_Store view_Store = new View_Store();
+            foreach (var item in list2)
+            {
+                view_Store.StoreID = item.StoreID;
+                view_Store.Date = DateTime.Now.ToString();
+                view_Store.Add(view_Store);
+            }
             var listview = new List<View_Store>();
             listview = view_Store.getByIDStore(id);
             foreach(var item in list2)

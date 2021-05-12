@@ -39,8 +39,7 @@ namespace TLCN_WEB_API.Models
 
         private static string key = "TLCN";
         string columnName = "User";
-        public string nameEmailSend = "nguyenngocdai17071999@gmail.com";
-        public string passEmailSend =  "conyeume";
+
         IFirebaseClient client;
         IFirebaseConfig config = new FirebaseConfig
         {
@@ -402,14 +401,17 @@ namespace TLCN_WEB_API.Models
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<User>();
             string err = "";
-            foreach (var item in data)
+            if (data != null)
             {
-                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
-            }
-            foreach (var item in list)
-            {
-                if (item.Email == email)
-                    return true;
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+                }
+                foreach (var item in list)
+                {
+                    if (item.Email == email)
+                        return true;
+                }
             }
             return false;
         }
@@ -491,8 +493,10 @@ namespace TLCN_WEB_API.Models
             UserModel user = null;
             foreach (var item in list)
             {
-                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord))
+                if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)&&item.Status!="2")
                 {
+                    item.Status = "3";
+                    item.AddbyidToFireBase(item.UserID, item);
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
                 }
             }
@@ -605,7 +609,7 @@ namespace TLCN_WEB_API.Models
 
             ////Gửi email
             var messenge = new MimeMessage();
-            messenge.From.Add(new MailboxAddress("Test Project", infoUser.nameEmailSend));
+            messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
             messenge.To.Add(new MailboxAddress("naren", Email));
             messenge.Subject = "hello";
             messenge.Body = new TextPart("plain")
@@ -616,7 +620,7 @@ namespace TLCN_WEB_API.Models
             using (var client = new SmtpClient())
             {
                 client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate(infoUser.nameEmailSend, infoUser.passEmailSend);
+                client.Authenticate("nguyenngocdai17071999@gmail.com", "conyeume");
                 client.Send(messenge);
                 client.Disconnect(true);
             }

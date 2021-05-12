@@ -255,7 +255,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("CreateStore")]
         public IActionResult RegisterStore( [FromBody] Store store){
             try{
@@ -271,7 +271,6 @@ namespace TLCN_WEB_API.Controllers
                         try
                         {
                             Store store2 = new Store();
-                            //store.Status = "3";
                             store2.AddToFireBase(store);
                             err = "Đăng ký thành công";
                         }

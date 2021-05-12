@@ -154,7 +154,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("CreateDish")]
         public IActionResult RegisterDish([FromBody] Dish dish)
         {
