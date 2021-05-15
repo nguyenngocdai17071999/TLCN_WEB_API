@@ -92,7 +92,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("ThongKeTheoNgay")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoNgay(string id)
+        public IActionResult ThongKeTheoNgay(string id,int ngay, int thang, int nam)
         {
             try
             {
@@ -105,7 +105,34 @@ namespace TLCN_WEB_API.Controllers
                     TimeSpan Time = a.TimeOfDay;
                     for(int i = 0; i < 24; i++)
                     {
-                        if (i == Time.Hours)
+                        if (i == Time.Hours && ngay == a.Day && thang == a.Month && nam == a.Year)
+                            thongkengay[i] = thongkengay[i] + 1;
+                    }
+                }
+                return Ok(thongkengay);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("ThongKeTheoNgayAll")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoNgayAll(int ngay, int thang, int nam)
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getAll();
+                int[] thongkengay = new int[24];
+                foreach (var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    TimeSpan Time = a.TimeOfDay;
+                    for (int i = 0; i < 24; i++)
+                    {
+                        if (i == Time.Hours && ngay == a.Day && thang == a.Month && nam == a.Year)
                             thongkengay[i] = thongkengay[i] + 1;
                     }
                 }
@@ -118,6 +145,36 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
+        [HttpGet("Nam")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult Nam()
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getAll();
+                List<int> danhsachnam = new List<int>();
+                foreach (var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    int dem = 0;
+                    for (int i=0;i<danhsachnam.Count; i++)
+                    {                        
+                        if (danhsachnam[i] == a.Year)
+                        {
+                            dem++;                            
+                        }                        
+                    }
+                    if (dem == 0) danhsachnam.Add(a.Year);
+                    if (danhsachnam.Count==0) danhsachnam.Add(a.Year);
+                }
+                return Ok(danhsachnam);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
 
         [HttpGet("ThongKeTheoThang")]
         // phương thức get by id dữ liệu từ firebase 
@@ -146,6 +203,33 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
+        
+        [HttpGet("ThongKeTheoThangAll")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoThangAll(int thang, int nam)
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getAll();
+                int songay = view_Store.fun(thang, nam);
+                int[] thongkethang = new int[songay];
+                foreach (var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    for (int i = 0; i < songay; i++)
+                    {
+                        if (i == a.Day-1)
+                            thongkethang[i] = thongkethang[i] + 1;
+                    }
+                }
+                return Ok(thongkethang);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
 
         [HttpGet("ThongKeTheoNam")]
         // phương thức get by id dữ liệu từ firebase 
@@ -162,6 +246,32 @@ namespace TLCN_WEB_API.Controllers
                     for (int i = 0; i < 12; i++)
                     {
                         if (i == a.Month-1)
+                            thongkenam[i] = thongkenam[i] + 1;
+                    }
+                }
+                return Ok(thongkenam);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("ThongKeTheoNamAll")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoNamAll(int nam)
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getAll();
+                int[] thongkenam = new int[12];
+                foreach (var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    for (int i = 0; i < 12; i++)
+                    {
+                        if (i == a.Month - 1)
                             thongkenam[i] = thongkenam[i] + 1;
                     }
                 }
