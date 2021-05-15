@@ -70,6 +70,7 @@ namespace TLCN_WEB_API.Models
             }
             return list;
         }
+
         public List<View_Store> getByIDStore(string id)
         {
             client = new FireSharp.FirebaseClient(config);
@@ -91,6 +92,20 @@ namespace TLCN_WEB_API.Models
                 }
             }  
             return listViewStore;
+        }
+
+        public bool isCheck(int nam)
+        {
+            if ((nam % 4 == 0 && nam % 100 != 0) || nam % 400 == 0)
+                return true;
+            return false;
+        }
+        public int fun(int thang, int nam)
+        {
+            if (thang == 1 || thang == 3 || thang == 5 || thang == 7 || thang == 8 || thang == 10 || thang == 12) return 31;
+            else if (thang == 4 || thang == 6 || thang == 9 || thang == 11) return 30;
+            else if (isCheck(nam)) return 29;
+            else return 28;
         }
 
     }

@@ -90,6 +90,89 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
+        [HttpGet("ThongKeTheoNgay")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoNgay(string id)
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView= view_Store.getByIDStore(id);
+                int[] thongkengay = new int[24];
+                foreach(var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    TimeSpan Time = a.TimeOfDay;
+                    for(int i = 0; i < 24; i++)
+                    {
+                        if (i == Time.Hours)
+                            thongkengay[i] = thongkengay[i] + 1;
+                    }
+                }
+                return Ok(thongkengay);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+
+
+        [HttpGet("ThongKeTheoThang")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoThang(string id,int thang, int nam)
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getByIDStore(id);
+                int songay = view_Store.fun(thang, nam);
+                int[] thongkethang = new int[songay];
+                foreach (var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    for (int i = 0; i < songay; i++)
+                    {
+                        if (i == a.Day-1)
+                            thongkethang[i] = thongkethang[i] + 1;
+                    }
+                }
+                return Ok(thongkethang);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+
+        [HttpGet("ThongKeTheoNam")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoNam(string id, int nam)
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getByIDStore(id);
+                int[] thongkenam = new int[12];
+                foreach (var item in danhsachView)
+                {
+                    DateTime a = DateTime.Parse(item.Date);
+                    for (int i = 0; i < 12; i++)
+                    {
+                        if (i == a.Month-1)
+                            thongkenam[i] = thongkenam[i] + 1;
+                    }
+                }
+                return Ok(thongkenam);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
         [HttpGet("GetByIDBusinessType")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByIDBusinessType(string id)

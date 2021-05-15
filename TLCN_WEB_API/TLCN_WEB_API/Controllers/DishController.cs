@@ -43,6 +43,23 @@ namespace TLCN_WEB_API.Controllers
 
         }
 
+
+        [HttpGet("GetByIDStore")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult GetByIDStrore(string id)
+        {
+            try
+            {
+                Dish dish = new Dish();
+                return Ok(dish.getByIDStore(id));
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+        }
+
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByID(string id)
