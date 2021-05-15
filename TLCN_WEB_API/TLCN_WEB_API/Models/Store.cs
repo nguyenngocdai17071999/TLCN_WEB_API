@@ -44,7 +44,7 @@ namespace TLCN_WEB_API.Models
             Lat = "";
             Long = "";
             DistrictID = "";
-            NumberView = "";
+            NumberView = "0";
         }
 
         public string StoreID { get; set; }

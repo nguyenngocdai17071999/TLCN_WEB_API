@@ -132,7 +132,7 @@ namespace TLCN_WEB_API.Controllers
                     TimeSpan Time = a.TimeOfDay;
                     for (int i = 0; i < 24; i++)
                     {
-                        if (i == Time.Hours && ngay == a.Day && thang == a.Month && nam == a.Year)
+                        if (i == a.Hour && ngay == a.Day && thang == a.Month && nam == a.Year)
                             thongkengay[i] = thongkengay[i] + 1;
                     }
                 }
@@ -191,7 +191,7 @@ namespace TLCN_WEB_API.Controllers
                     DateTime a = DateTime.Parse(item.Date);
                     for (int i = 0; i < songay; i++)
                     {
-                        if (i == a.Day-1)
+                        if (i == a.Day-1&&thang==a.Month&&nam==a.Year)
                             thongkethang[i] = thongkethang[i] + 1;
                     }
                 }
@@ -219,7 +219,7 @@ namespace TLCN_WEB_API.Controllers
                     DateTime a = DateTime.Parse(item.Date);
                     for (int i = 0; i < songay; i++)
                     {
-                        if (i == a.Day-1)
+                        if (i == a.Day-1 && thang == a.Month && nam == a.Year)
                             thongkethang[i] = thongkethang[i] + 1;
                     }
                 }
@@ -245,7 +245,7 @@ namespace TLCN_WEB_API.Controllers
                     DateTime a = DateTime.Parse(item.Date);
                     for (int i = 0; i < 12; i++)
                     {
-                        if (i == a.Month-1)
+                        if (i == a.Month-1&&nam==a.Year)
                             thongkenam[i] = thongkenam[i] + 1;
                     }
                 }
@@ -271,7 +271,7 @@ namespace TLCN_WEB_API.Controllers
                     DateTime a = DateTime.Parse(item.Date);
                     for (int i = 0; i < 12; i++)
                     {
-                        if (i == a.Month - 1)
+                        if (i == a.Month - 1 && nam == a.Year)
                             thongkenam[i] = thongkenam[i] + 1;
                     }
                 }
