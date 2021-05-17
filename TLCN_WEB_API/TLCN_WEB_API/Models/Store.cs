@@ -74,7 +74,7 @@ namespace TLCN_WEB_API.Models
             foreach (var item in data)
             {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }        
+            }   
             if(LatNew!=0 && LongNew!=0)
             {
                 foreach (var item in list)
