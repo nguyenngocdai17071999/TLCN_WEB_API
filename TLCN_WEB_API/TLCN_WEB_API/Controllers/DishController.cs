@@ -79,14 +79,14 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("Search")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult Search(string dishname)
+        public IActionResult Search(string dishname,double Lat, double Long)
         {
             try
             {
                 if (dishname != null)
                 {
                     Dish dish = new Dish();
-                    return Ok(dish.search(dishname));
+                    return Ok(dish.search(dishname, Lat, Long));
                 }
                 return Ok("Không có kết quả tìm kiếm");
             }

@@ -97,14 +97,14 @@ namespace TLCN_WEB_API.Models
             return list2;
         }
 
-        public List<Store> search(string dishname) {
+        public List<Store> search(string dishname,double Lat, double Long) {
 
             dishname = convertToUnSign3(dishname.ToLower());
             Store Store = new Store();
             Dish  Dish = new Dish();
 
             var StoreID = new List<string>();
-            var danhsachStore = Store.getAll();
+            var danhsachStore = Store.getAll(Lat, Long);
             var danhsachDish = Dish.getAll();
 
             foreach (var item in danhsachDish)

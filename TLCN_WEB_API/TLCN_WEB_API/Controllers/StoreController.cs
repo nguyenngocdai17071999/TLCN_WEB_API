@@ -28,10 +28,10 @@ namespace TLCN_WEB_API.Controllers
     {       
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll(){
+        public IActionResult GetAll(double Lat, double Long){
             try{
                 Store store = new Store();
-                return Ok(store.getAll());
+                return Ok(store.getAll(Lat,Long));
             }
             catch{
                 return Ok("Error");
@@ -40,12 +40,12 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetAllManage")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllmanage()
+        public IActionResult GetAllmanage(double Lat, double Long)
         {
             try
             {
                 Store store = new Store();
-                return Ok(store.getAll());
+                return Ok(store.getAll(Lat,Long));
             }
             catch
             {
@@ -55,10 +55,11 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetAllGanToi")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllGanToi(){
+        public IActionResult GetAllGanToi(double Lat, double Long)
+        {
             try{
                 Store store = new Store();
-                return Ok(store.getAllGanToi());
+                return Ok(store.getAllGanToi(Lat, Long));
             }
             catch{
                 return Ok("Error");
@@ -67,10 +68,11 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetAllGanToiProvince")]
         //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllGanToi(string id){
+        public IActionResult GetAllGanToi(string id, double Lat, double Long)
+        {
             try{
                 Store store = new Store();
-                return Ok(store.getAllGanToiProvince(id));
+                return Ok(store.getAllGanToiProvince(id,Lat,Long));
             }
             catch{
                 return Ok("Error");
@@ -79,10 +81,11 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDOwner")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDOwner(string id){
+        public IActionResult GetByIDOwner(string id, double Lat, double Long)
+        {
             try{
                 Store store = new Store();
-                return Ok(store.getByIDOwner(id));
+                return Ok(store.getByIDOwner(id,Lat,Long));
             }
             catch{
                 return Ok("Error");
@@ -178,7 +181,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("ThongKeTheoThang")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoThang(string id,int thang, int nam)
+        public IActionResult ThongKeTheoThang(string id,int thang, int nam,double Lat, double Long)
         {
             try
             {
@@ -233,7 +236,7 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("ThongKeTheoNam")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoNam(string id, int nam)
+        public IActionResult ThongKeTheoNam(string id, int nam, double Lat, double Long)
         {
             try
             {
@@ -285,12 +288,12 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDBusinessType")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDBusinessType(string id)
+        public IActionResult GetByIDBusinessType(string id, double Lat, double Long)
         {
             try
             {
                 Store store = new Store();
-                return Ok(store.getByIDBusinessType(id));
+                return Ok(store.getByIDBusinessType(id,Lat,Long));
             }
             catch
             {
@@ -300,12 +303,12 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDDistrict")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDDistrict(string id)
+        public IActionResult GetByIDDistrict(string id, double Lat, double Long)
         {
             try
             {
                 Store store = new Store();
-                return Ok(store.getByIDDistrict(id));
+                return Ok(store.getByIDDistrict(id, Lat, Long));
             }
             catch
             {
@@ -315,10 +318,11 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByID")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id){
+        public IActionResult GetByID(string id, double Lat, double Long)
+        {
             try{
                 Store store = new Store();
-                return Ok(store.getByID(id));
+                return Ok(store.getByID(id, Lat, Long));
             }
             catch{
                 return Ok("Error");
@@ -327,12 +331,12 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDManage")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDManage(string id)
+        public IActionResult GetByIDManage(string id, double Lat, double Long)
         {
             try
             {
                 Store store = new Store();
-                return Ok(store.getByIDManage(id));
+                return Ok(store.getByIDManage(id, Lat, Long));
             }
             catch
             {
@@ -342,10 +346,11 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("GetByIDProvince")]
         // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDProvince(string id,string id2){
+        public IActionResult GetByIDProvince(string id,string id2, double Lat, double Long)
+        {
             try{
                 Store store = new Store();
-                return Ok(store.getByIDProvince(id,id2));
+                return Ok(store.getByIDProvince(id,id2, Lat, Long));
             }
             catch{
                 return Ok("Error");

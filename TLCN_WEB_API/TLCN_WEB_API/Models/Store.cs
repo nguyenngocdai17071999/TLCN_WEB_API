@@ -65,7 +65,7 @@ namespace TLCN_WEB_API.Models
         public string NumberView { get; set; }
         string columnname = "Stores-New";
 
-        public List<Store> getAll() {
+        public List<Store> getAll(double LatNew, double LongNew) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -74,11 +74,18 @@ namespace TLCN_WEB_API.Models
             foreach (var item in data)
             {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }           
+            }        
+            if(LatNew!=0 && LongNew!=0)
+            {
+                foreach (var item in list)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }               
             return Check(list);
         }
 
-        public List<Store> getAllGanToi()
+        public List<Store> getAllGanToi(double LatNew, double LongNew)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
@@ -89,10 +96,17 @@ namespace TLCN_WEB_API.Models
             {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
             return Check(gantoi(list));
         } 
 
-        public List<Store> getAllGanToiProvince(string id)
+        public List<Store> getAllGanToiProvince(string id, double LatNew, double LongNew)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
@@ -108,6 +122,13 @@ namespace TLCN_WEB_API.Models
             {
                 if (item.ProvinceID == id)
                     list2.Add(item);
+            }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list2)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
             }
             return Check(gantoi(list2));
         }
@@ -249,7 +270,7 @@ namespace TLCN_WEB_API.Models
             return list;
         }
 
-        public List<Store> getByIDOwner(string id) {
+        public List<Store> getByIDOwner(string id,double LatNew,double LongNew) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -266,10 +287,17 @@ namespace TLCN_WEB_API.Models
                 if (item.UserID == id)
                     list2.Add(item);
             }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list2)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
             return Check(list2);
         }
 
-        public List<Store> getByID(string id) {
+        public List<Store> getByID(string id, double LatNew, double LongNew) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -300,10 +328,17 @@ namespace TLCN_WEB_API.Models
                 item.NumberView = listview.Count().ToString();
                 AddbyidToFireBase(item.StoreID, item);
             }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list2)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
             return Check(list2);
         }
 
-        public List<Store> getByIDDistrict(string id)
+        public List<Store> getByIDDistrict(string id, double LatNew, double LongNew)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
@@ -321,11 +356,18 @@ namespace TLCN_WEB_API.Models
                 if (item.DistrictID == id)
                     list2.Add(item);
             }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list2)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
             return list2;
         }
 
 
-        public List<Store> getByIDManage(string id) {
+        public List<Store> getByIDManage(string id, double LatNew, double LongNew) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -342,9 +384,17 @@ namespace TLCN_WEB_API.Models
                 if (item.StoreID == id)
                     list2.Add(item);
             }
+
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list2)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
             return list2;
         }
-        public List<Store> getByIDProvince(string id,string id2) {
+        public List<Store> getByIDProvince(string id,string id2, double LatNew, double LongNew) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -369,9 +419,16 @@ namespace TLCN_WEB_API.Models
                     AddbyidToFireBase(item.StoreID, item);
                 }
             }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list2)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
             return Check(list2);
         }
-        public List<Store> getByIDBusinessType(string id) {
+        public List<Store> getByIDBusinessType(string id, double LatNew, double LongNew) {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -387,6 +444,13 @@ namespace TLCN_WEB_API.Models
             {
                 if (item.BusinessTypeID == id)
                     list2.Add(item);
+            }
+             if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
             }
             return Check(list2);
         }
