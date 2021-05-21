@@ -13,7 +13,6 @@ namespace TLCN_WEB_API.Models
     public class DiscountType
     {
         public string DiscountTypeID { get; set; }
-        public string StoreID { get; set; }
         public string DiscountTypeName { get; set; }
         public string DiscountTypePicture { get; set; }
         string columnName = "DiscountType";
@@ -29,7 +28,6 @@ namespace TLCN_WEB_API.Models
             DiscountTypeID = "";
             DiscountTypeName = "";
             DiscountTypePicture = "";
-            StoreID = "";
         }
 
         public List<DiscountType> getAll()
@@ -81,7 +79,6 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = discountType;
-            PushResponse response = client.Push("DiscountType/", data);
             data.DiscountTypeID = id;
             SetResponse setResponse = client.Set("DiscountType/" + data.DiscountTypeID, data);
         }
@@ -89,7 +86,14 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = new DiscountType();
-            SetResponse setResponse = client.Set("DiscountType/" + id, data);
+            SetResponse setResponse = client.Set("DiscountType/" + id,setnull(data));
+        }
+        public DiscountType setnull(DiscountType a)
+        {
+            a.DiscountTypeID = null;
+            a.DiscountTypeName = null;
+            a.DiscountTypePicture = null;
+            return a;
         }
     }
 }
