@@ -38,7 +38,7 @@ namespace TLCN_WEB_API.Models
             return list;
         }
 
-        public List<Discount> getByidDiscountType(string idDiscountType)
+        public List<Store> getByidDiscountType(string idDiscountType)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
@@ -55,7 +55,18 @@ namespace TLCN_WEB_API.Models
                 if (item.IDDiscountType == idDiscountType)
                     list2.Add(item);
             }
-            return list2;
+            Store a = new Store();
+            var danhsachstore = a.getAll(0,0);
+            var danhsachcantim = new List<Store>();
+            foreach(var item in list2)
+            {
+                foreach(var item2 in danhsachstore)
+                {
+                    if (item2.StoreID == item.IDStore)
+                        danhsachcantim.Add(item2);
+                }
+            }
+            return danhsachcantim;
         }
 
         public List<Discount> getByidStore(string IdStore)
@@ -93,7 +104,6 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = discount;
-            PushResponse response = client.Push("Discount/", data);
             data.IDDiscount = id;
             SetResponse setResponse = client.Set("Discount/" + data.IDDiscount, data);
         }

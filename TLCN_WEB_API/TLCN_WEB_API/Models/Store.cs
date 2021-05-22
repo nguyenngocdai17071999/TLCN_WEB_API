@@ -81,7 +81,7 @@ namespace TLCN_WEB_API.Models
                 {
                     item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
-            }               
+            }
             return Check(list);
         }
 
