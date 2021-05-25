@@ -55,6 +55,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
+
         [HttpGet("GetByIDStore")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult GetByIDStore(string id)
@@ -101,10 +102,12 @@ namespace TLCN_WEB_API.Controllers
                 return Ok(new[] { "Error" });
             }
         }
+
+
         [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByID(string id)
+        public IActionResult DeleteByID(string idstore, string iddiscounttype)
         {
             try
             {
@@ -114,10 +117,10 @@ namespace TLCN_WEB_API.Controllers
                 User infoUser = new User();
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    if (infoUser.checkAdmin(Email) == true)
+                    if (infoUser.checkAdmin(Email) == true||infoUser.checkOwner(Email)==true)
                     {
                         Discount discount = new Discount();
-                        discount.Delete(id);
+                        discount.Delete(discount.getiddiscount(idstore,iddiscounttype));
                         return Ok(new[] { "Xóa thành công" });
                     }
                     else

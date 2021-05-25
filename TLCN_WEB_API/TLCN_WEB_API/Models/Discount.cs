@@ -69,6 +69,28 @@ namespace TLCN_WEB_API.Models
             return danhsachcantim;
         }
 
+        public string getiddiscount(string idstore, string iddiscounttype)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Discount>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Discount>(((JProperty)item).Value.ToString()));
+            }
+            
+            foreach(var item in list)
+            {
+                if (item.IDStore == idstore && item.IDDiscountType == iddiscounttype)
+                {
+                    return item.IDDiscount;
+                }
+            }
+            return "";
+        }
+
         public List<Discount> getByidStore(string IdStore)
         {
             client = new FireSharp.FirebaseClient(config);
@@ -109,10 +131,19 @@ namespace TLCN_WEB_API.Models
         }
         public void Delete(string id)
         {
-            client = new FireSharp.FirebaseClient(config);
-            var data = new Discount();
-            SetResponse setResponse = client.Set("Discount/" + id, data);
+            if(id!="")
+            {
+                client = new FireSharp.FirebaseClient(config);
+                var data = new Discount();
+                SetResponse setResponse = client.Set("Discount/" + id, setnull(data));
+            }
         }
-
+        public Discount setnull(Discount a)
+        {
+            a.IDDiscount = null;
+            a.IDDiscountType = null;
+            a.IDStore = null;
+            return a;
+        }
     }
 }
