@@ -150,7 +150,7 @@ namespace TLCN_WEB_API.Controllers
                 User infoUser = new User();
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    if (infoUser.checkAdmin(Email) == true)
+                    if (infoUser.checkAdmin(Email) == true||infoUser.checkOwner(Email)==true)
                     {
                         Discount discount1 = new Discount();
                         discount1.AddToFireBase(discount);

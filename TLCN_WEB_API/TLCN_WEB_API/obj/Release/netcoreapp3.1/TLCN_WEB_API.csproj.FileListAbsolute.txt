@@ -73,3 +73,4 @@ C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Release
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Release\netcoreapp3.1\TLCN_WEB_API.dll
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Release\netcoreapp3.1\TLCN_WEB_API.pdb
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Release\netcoreapp3.1\TLCN_WEB_API.genruntimeconfig.cache
+C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Release\netcoreapp3.1\aws-beanstalk-tools-defaults.json

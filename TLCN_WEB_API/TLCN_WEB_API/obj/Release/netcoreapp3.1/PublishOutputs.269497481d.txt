@@ -1,6 +1,7 @@
 C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\TLCN_WEB_API.exe
 C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\appsettings.Development.json
 C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\appsettings.json
+C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\aws-beanstalk-tools-defaults.json
 C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\TLCN_WEB_API.dll
 C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\TLCN_WEB_API.deps.json
 C:\Users\Dai\AppData\Local\Temp\AWSDeploy.2b6f9ea6\package\TLCN_WEB_API.runtimeconfig.json
