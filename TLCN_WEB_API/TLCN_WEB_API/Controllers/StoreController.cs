@@ -441,7 +441,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("ChangeStatusStore")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult BlockStore(string id, string status){
@@ -506,6 +506,70 @@ namespace TLCN_WEB_API.Controllers
                 return Ok("Error");
             }           
             
-        } 
+        }
+
+
+        [Authorize]
+        [HttpGet("getAllCheck")]
+        public IActionResult getAllCheck([FromBody] Store store,double lat, double log)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                User infoUser = new User();
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    if (infoUser.checkAdmin(Email) == true)
+                    {
+                        string err = "";
+                        try
+                        {
+                            Store store2 = new Store();
+                            return Ok(store2.getAllCheck(lat,log));
+                        }
+                        catch
+                        {
+                            err = "Lỗi rồi";
+                        }
+                        return Ok(new[] { err });
+                    }
+                    return Ok(new[] { "Bạn không có quyền" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+        }
+
+        [HttpGet("CreateStoreOwner")]
+        public IActionResult RegisterStoreOwner([FromBody] Store store)
+        {
+            try
+            {
+                string err;
+                  try
+                  {
+                        Store store2 = new Store();
+                        store2.AddToFireBase(store);
+                        err = "Đăng ký thành công";
+                  }
+                  catch
+                  {
+                        err = "Lỗi rồi";
+                  }
+                  return Ok(new[] { err });                 
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+
+        }
+
     }
 }

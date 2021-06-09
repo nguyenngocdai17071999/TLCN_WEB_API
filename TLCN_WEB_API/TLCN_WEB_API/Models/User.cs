@@ -305,7 +305,7 @@ namespace TLCN_WEB_API.Models
         {
             TimeSpan Time = DateTime.Now - date;
             if (Time.Days > 1) return false;
-            if (Time.Minutes > 2) return false;
+            if (Time.Minutes > 20) return false;
             return true;
         }
 
@@ -598,6 +598,38 @@ namespace TLCN_WEB_API.Models
             return encodetoken;
         }
 
+        public void sendMail(string Email, string text)
+        {
+            ////Gửi email
+            var messenge = new MimeMessage();
+            messenge.From.Add(new MailboxAddress("Test Project", " nguyenngocdai1707@gmail.com"));
+            messenge.To.Add(new MailboxAddress("naren", Email));
+            messenge.Subject = "Xac Nhan";
+            messenge.Body = new TextPart("plain")
+            {
+                Text = "Quán " + text + " đã được xác nhận"
+            };
+
+            using (var client = new SmtpClient())
+            {
+                client.Connect("smtp.gmail.com", 587, false);
+                client.Authenticate("nguyenngocdai1707@gmail.com", "conyeumenhieulam");
+                client.Send(messenge);
+                client.Disconnect(true);
+            }
+        }
+
+        public string GetEmailByID(string ID)
+        {
+            var danhsach = getAll();
+            foreach(var item in danhsach)
+            {
+                if (item.UserID == ID)
+                    return item.Email;
+            }
+            return "";
+        }
+
         public void updateCodeForget(string email)
         {
             User infoUser = new User();
@@ -609,9 +641,9 @@ namespace TLCN_WEB_API.Models
 
             ////Gửi email
             var messenge = new MimeMessage();
-            messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));
+            messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai1707@gmail.com"));
             messenge.To.Add(new MailboxAddress("naren", Email));
-            messenge.Subject = "hello";
+            messenge.Subject = "Xac nhan";
             messenge.Body = new TextPart("plain")
             {
                 Text = "Code ResetPass cua ban la: " + code + ""
@@ -620,7 +652,7 @@ namespace TLCN_WEB_API.Models
             using (var client = new SmtpClient())
             {
                 client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate("nguyenngocdai17071999@gmail.com", "conyeume");
+                client.Authenticate("nguyenngocdai1707@gmail.com", "conyeumenhieulam");
                 client.Send(messenge);
                 client.Disconnect(true);
             }

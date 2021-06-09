@@ -104,7 +104,36 @@ namespace TLCN_WEB_API.Models
                 }
             }
             return Check(gantoi(list));
-        } 
+        }
+
+        public List<Store> getAllCheck(double LatNew, double LongNew)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnname);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Store>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+            }
+            if (LatNew != 0 && LongNew != 0)
+            {
+                foreach (var item in list)
+                {
+                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                }
+            }
+            var list2 = new List<Store>();
+            foreach(var item in list)
+            {
+                if(item.Status=="-1")
+                {
+                    list2.Add(item);
+                }    
+            }
+            return list2;
+        }
 
         public List<Store> getAllGanToiProvince(string id, double LatNew, double LongNew)
         {
@@ -246,8 +275,18 @@ namespace TLCN_WEB_API.Models
             }
             foreach (var item in list2)
             {
-                item.Status = status;
-                AddbyidToFireBase(item.StoreID, item);
+                if (item.Status == "-1")
+                {
+                    item.Status = status;
+                    AddbyidToFireBase(item.StoreID, item);
+                    User infoOwner = new User();
+                    infoOwner.sendMail(infoOwner.GetEmailByID(item.UserID), item.StoreName);
+                }
+                else
+                {
+                    item.Status = status;
+                    AddbyidToFireBase(item.StoreID, item);
+                }               
             }
         }
 
