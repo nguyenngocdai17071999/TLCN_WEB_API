@@ -185,6 +185,30 @@ namespace TLCN_WEB_API.Controllers
             return Ok(new[] { err });
         }
 
+        [HttpPost("RegisterOwner")]
+        public IActionResult RegisterOwner([FromBody] User user)
+        {
+            string err = "";
+            User infoUser = new User();
+            try
+            {
+                if (infoUser.kiemtraEmail(user.Email) == false)
+                {
+                   
+                    err = infoUser.AddToFireBaseReturn(user);
+                }
+                else
+                {
+                    err = "Email đã tồn tại";
+                }
+            }
+            catch
+            {
+                err = "Error";
+            }
+            return Ok(new[] { err });
+        }
+
         //Hàm login
         [HttpPost("Login")]
         public IActionResult Login([FromBody] Login userlogin){ 

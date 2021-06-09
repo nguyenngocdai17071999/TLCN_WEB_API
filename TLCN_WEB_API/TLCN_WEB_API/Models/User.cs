@@ -359,6 +359,17 @@ namespace TLCN_WEB_API.Models
             data.Password = Encrypt(data.Password);
             SetResponse setResponse = client.Set("User/" + data.UserID, data);
         }
+        public string AddToFireBaseReturn(User user)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            var data = user;
+            PushResponse response = client.Push("User/", data);
+            data.UserID = response.Result.name;
+            data.Password = Encrypt(data.Password);
+            data.UserTypeID = "-MO5VWchsca2XwktyNAw";
+            SetResponse setResponse = client.Set("User/" + data.UserID, data);
+            return data.UserID;
+        }
 
         public void UpdateToFireBase(User user)
         {

@@ -509,7 +509,7 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        [Authorize]
+
         [HttpGet("getAllCheck")]
         public IActionResult getAllCheck([FromBody] Store store,double lat, double log)
         {
@@ -546,7 +546,7 @@ namespace TLCN_WEB_API.Controllers
 
         }
 
-        [HttpGet("CreateStoreOwner")]
+        [HttpPost("CreateStoreOwner")]
         public IActionResult RegisterStoreOwner([FromBody] Store store)
         {
             try
