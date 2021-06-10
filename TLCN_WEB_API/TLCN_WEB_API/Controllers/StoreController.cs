@@ -511,7 +511,7 @@ namespace TLCN_WEB_API.Controllers
 
 
         [HttpGet("getAllCheck")]
-        public IActionResult getAllCheck([FromBody] Store store,double lat, double log)
+        public IActionResult getAllCheck(double lat, double log)
         {
             try
             {
