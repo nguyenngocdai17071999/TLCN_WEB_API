@@ -55,10 +55,6 @@ namespace TLCN_WEB_API.Models
             {
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
             }
-            foreach(var item in list)
-            {
-                AddToFireBase(item);
-            }
             return list;
         }
 

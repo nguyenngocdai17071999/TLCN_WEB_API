@@ -82,10 +82,6 @@ namespace TLCN_WEB_API.Models
                     item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
-            foreach(var item in list)
-            {
-                AddToFireBase(item);
-            }
             return Check(list);
         }
 
@@ -210,32 +206,35 @@ namespace TLCN_WEB_API.Models
             var list = new List<Store>();
             var list2 = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data2)
+            if(data2 !=null)
             {
-                list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }
-            foreach (var item in list)
-            {
-                if (item.StoreID == id)
-                    list2.Add(item);
-            }
-            foreach (var item in list2)
-            {
-                if (data.StoreID == null) data.StoreID = item.StoreID;
-                if (data.StoreAddress == null) data.StoreAddress = item.StoreAddress;
-                if (data.StoreName == null) data.StoreName = item.StoreName;
-                if (data.StorePicture == null) data.StorePicture = item.StorePicture;
-                if (data.OpenTime == null) data.OpenTime = item.OpenTime;
-                if (data.CLoseTime == null) data.CLoseTime = item.CLoseTime;
-                if (data.UserID == null) data.UserID = item.UserID;
-                if (data.ProvinceID == null) data.ProvinceID = item.ProvinceID;
-                if (data.BusinessTypeID == null) data.BusinessTypeID = item.BusinessTypeID;
-                if (data.RatePoint == null) data.RatePoint = item.RatePoint;
-                if (data.khoangcach == null) data.khoangcach = item.khoangcach;
-                if (data.Status == null) data.Status = item.Status;
-                if (data.Lat == null) data.Status = item.Lat;
-                if (data.Long == null) data.Status = item.Long;
-            }
+                foreach (var item in data2)
+                {
+                    list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
+                }
+                foreach (var item in list)
+                {
+                    if (item.StoreID == id)
+                        list2.Add(item);
+                }
+                foreach (var item in list2)
+                {
+                    if (data.StoreID == null) data.StoreID = item.StoreID;
+                    if (data.StoreAddress == null) data.StoreAddress = item.StoreAddress;
+                    if (data.StoreName == null) data.StoreName = item.StoreName;
+                    if (data.StorePicture == null) data.StorePicture = item.StorePicture;
+                    if (data.OpenTime == null) data.OpenTime = item.OpenTime;
+                    if (data.CLoseTime == null) data.CLoseTime = item.CLoseTime;
+                    if (data.UserID == null) data.UserID = item.UserID;
+                    if (data.ProvinceID == null) data.ProvinceID = item.ProvinceID;
+                    if (data.BusinessTypeID == null) data.BusinessTypeID = item.BusinessTypeID;
+                    if (data.RatePoint == null) data.RatePoint = item.RatePoint;
+                    if (data.khoangcach == null) data.khoangcach = item.khoangcach;
+                    if (data.Status == null) data.Status = item.Status;
+                    if (data.Lat == null) data.Status = item.Lat;
+                    if (data.Long == null) data.Status = item.Long;
+                }
+            }                
             SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
         public void updateRatePoint(string id, string RatePoint) {
