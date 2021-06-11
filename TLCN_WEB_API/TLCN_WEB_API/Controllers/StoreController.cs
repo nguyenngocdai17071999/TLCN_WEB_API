@@ -394,17 +394,9 @@ namespace TLCN_WEB_API.Controllers
         {
             try
             {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    Store store2 = new Store();
-                    store2.updateRatePoint(id, RatePoint);
-                    return Ok("Cập nhật thành công");
-                }
-                else return Ok(new[] { "Bạn cần đăng nhập" });
+                Store store2 = new Store();
+                store2.updateRatePoint(id, RatePoint);
+                return Ok("Cập nhật thành công");
             }
             catch
             {
@@ -441,7 +433,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("ChangeStatusStore")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult BlockStore(string id, string status){

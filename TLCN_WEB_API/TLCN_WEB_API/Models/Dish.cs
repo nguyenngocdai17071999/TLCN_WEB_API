@@ -22,7 +22,7 @@ namespace TLCN_WEB_API.Models
         public string Store_ID { get; set; }
 
         private static string key = "TLCN";
-        string columnName = "Dishes-New";
+        string columnName = "Dishes";
         IFirebaseConfig config = new FirebaseConfig
         {
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
@@ -54,6 +54,10 @@ namespace TLCN_WEB_API.Models
             foreach (var item in data)
             {
                 list.Add(JsonConvert.DeserializeObject<Dish>(((JProperty)item).Value.ToString()));
+            }
+            foreach(var item in list)
+            {
+                AddToFireBase(item);
             }
             return list;
         }
@@ -262,9 +266,9 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = dish;
-            PushResponse response = client.Push("Dishes-New/", data);
+            PushResponse response = client.Push("Dishes/", data);
             data.Dish_ID = response.Result.name;
-            SetResponse setResponse = client.Set("Dishes-New/" + data.Dish_ID, data);
+            SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
         }
 
         //thêm dữ liệu lên firebase theo id
@@ -273,7 +277,7 @@ namespace TLCN_WEB_API.Models
             client = new FireSharp.FirebaseClient(config);
             var data = dish;
             data.Dish_ID = id;
-            SetResponse setResponse = client.Set("Dishes-New/" + data.Dish_ID, data);
+            SetResponse setResponse = client.Set("Dishes/" + data.Dish_ID, data);
         }
 
         public void Delete(string id)
@@ -281,7 +285,7 @@ namespace TLCN_WEB_API.Models
             client = new FireSharp.FirebaseClient(config);
             var data = new Dish();
             //data.Dish_ID = id;
-            SetResponse setResponse = client.Set("Dishes-New/" + id, data);
+            SetResponse setResponse = client.Set("Dishes/" + id, data);
         }
     }
 }

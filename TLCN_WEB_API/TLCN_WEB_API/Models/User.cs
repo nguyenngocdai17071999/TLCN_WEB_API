@@ -613,7 +613,7 @@ namespace TLCN_WEB_API.Models
         {
             ////Gửi email
             var messenge = new MimeMessage();
-            messenge.From.Add(new MailboxAddress("Test Project", " nguyenngocdai1707@gmail.com"));
+            messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai1707@gmail.com"));
             messenge.To.Add(new MailboxAddress("naren", Email));
             messenge.Subject = "Xac Nhan";
             messenge.Body = new TextPart("plain")

@@ -63,7 +63,7 @@ namespace TLCN_WEB_API.Models
         public string Long { get; set; }
         public string DistrictID { get; set; }
         public string NumberView { get; set; }
-        string columnname = "Stores-New";
+        string columnname = "Stores";
 
         public List<Store> getAll(double LatNew, double LongNew) {
             client = new FireSharp.FirebaseClient(config);
@@ -81,6 +81,10 @@ namespace TLCN_WEB_API.Models
                 {
                     item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
+            }
+            foreach(var item in list)
+            {
+                AddToFireBase(item);
             }
             return Check(list);
         }
@@ -166,9 +170,9 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = store;
-            PushResponse response = client.Push("Stores-New/", data);
+            PushResponse response = client.Push("Stores/", data);
             data.StoreID = response.Result.name;
-            SetResponse setResponse = client.Set("Stores-New/" + data.StoreID, data);
+            SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
         public static double Calculate(double sLatitude, double sLongitude, double eLatitude, double eLongitude)
         {
@@ -201,7 +205,7 @@ namespace TLCN_WEB_API.Models
 
             client = new FireSharp.FirebaseClient(config);
 
-            FirebaseResponse response = client.Get("Stores-New");
+            FirebaseResponse response = client.Get("Stores");
             dynamic data2 = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             var list2 = new List<Store>();
@@ -232,7 +236,7 @@ namespace TLCN_WEB_API.Models
                 if (data.Lat == null) data.Status = item.Lat;
                 if (data.Long == null) data.Status = item.Long;
             }
-            SetResponse setResponse = client.Set("Stores-New/" + data.StoreID, data);
+            SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
         public void updateRatePoint(string id, string RatePoint) {
             client = new FireSharp.FirebaseClient(config);
@@ -295,7 +299,7 @@ namespace TLCN_WEB_API.Models
             client = new FireSharp.FirebaseClient(config);
             var data = new Store();
             // data.StoreID = id;
-            SetResponse setResponse = client.Set("Stores-New/" + id, data);
+            SetResponse setResponse = client.Set("Stores/" + id, data);
         }
 
         public List<Store> Check(List<Store> store)
