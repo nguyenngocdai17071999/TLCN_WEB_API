@@ -80,7 +80,6 @@ namespace TLCN_WEB_API.Models
         {
             client = new FireSharp.FirebaseClient(config);
             var data = district;
-            PushResponse response = client.Push("District/", data);
             data.DistrictID = id;
             SetResponse setResponse = client.Set("District/" + data.DistrictID, data);
         }
