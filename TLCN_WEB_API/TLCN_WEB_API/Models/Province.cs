@@ -79,7 +79,7 @@ namespace TLCN_WEB_API.Models
             client = new FireSharp.FirebaseClient(config);
             var data = province;
             PushResponse response = client.Push("Provinces/", data);
-            data.ProvinceID = data.ProvinceID;
+            data.ProvinceID = response.Result.name;
             SetResponse setResponse = client.Set("Provinces/" + data.ProvinceID, data);
         }
 

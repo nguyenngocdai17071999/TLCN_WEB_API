@@ -23,7 +23,7 @@ namespace TLCN_WEB_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DistrictController : Controller
+    public class DiscountDishController : Controller
     {
         [HttpGet("GetAll")]
         //phương thức get dữ liệu từ firebase
@@ -31,7 +31,7 @@ namespace TLCN_WEB_API.Controllers
         {
             try
             {
-                District danhsach = new District();
+                DiscountDish danhsach = new DiscountDish();
                 return Ok(danhsach.getAll());
             }
             catch
@@ -46,23 +46,8 @@ namespace TLCN_WEB_API.Controllers
         {
             try
             {
-                District danhsach = new District();
+                DiscountDish danhsach = new DiscountDish();
                 return Ok(danhsach.getByID(id));
-            }
-            catch
-            {
-                return Ok("Error");
-            }
-        }
-
-        [HttpGet("GetByIDProvince")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDProvince(string id)
-        {
-            try
-            {
-                District danhsach = new District();
-                return Ok(danhsach.getByIDProvince(id));
             }
             catch
             {
@@ -73,7 +58,7 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("EditByID")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(string id, [FromBody] District district)
+        public IActionResult EditByID(string id, [FromBody] DiscountDish discountDish)
         {
             try
             {
@@ -83,10 +68,10 @@ namespace TLCN_WEB_API.Controllers
                 User infoUser = new User();
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    if (infoUser.checkAdmin(Email) == true)
+                    if (infoUser.checkAdmin(Email) == true|| infoUser.checkOwner(Email) == true)
                     {
-                        District district1 = new District();
-                        district1.AddbyidToFireBase(id, district);
+                        DiscountDish discountDish1 = new DiscountDish();
+                        discountDish1.AddbyidToFireBase(id, discountDish);
                         return Ok(new[] { "sửa thành công" });
                     }
                     else
@@ -115,10 +100,10 @@ namespace TLCN_WEB_API.Controllers
                 User infoUser = new User();
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    if (infoUser.checkAdmin(Email) == true)
+                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true)
                     {
-                        District district = new District();
-                        district.Delete(id);
+                        DiscountDish discountDish = new DiscountDish();
+                        discountDish.Delete(id);
                         return Ok(new[] { "Xóa thành công" });
                     }
                     else
@@ -135,9 +120,9 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        //[Authorize]
-        [HttpPost("Create")]
-        public IActionResult Register([FromBody] District district)
+        [Authorize]
+        [HttpPost("CreateDiscountDish")]
+        public IActionResult RegisterDiscountDish([FromBody] DiscountDish discountDish)
         {
             string err = "";
             try
@@ -148,10 +133,10 @@ namespace TLCN_WEB_API.Controllers
                 User infoUser = new User();
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
                 {
-                    if (infoUser.checkAdmin(Email) == true)
+                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true)
                     {
-                        District district1 = new District();
-                        district1.AddToFireBase(district);
+                        DiscountDish discountDish1 = new DiscountDish();
+                        discountDish1.AddToFireBase(discountDish);
                         err = "Đăng ký thành công";
                     }
                     else
