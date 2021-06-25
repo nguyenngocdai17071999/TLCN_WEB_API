@@ -94,14 +94,51 @@ namespace TLCN_WEB_API.Models
             }
             return list2;
         }
-
+        public Comment getbyIdcomment(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Comment>();
+            //danh sách tìm kiếm
+            //if (data == null) return Ok("Error");
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
+            }
+            Comment a = new Comment();
+          
+            foreach (var item in list)
+            {
+                if (item.CommentID == id)
+                {
+                    a = item;
+                }    
+            }
+            return a;
+        }
 
         public void Delete(string id)
         {
             client = new FireSharp.FirebaseClient(config);
             var data = new Comment();
             // data.CommentID = id;
-            SetResponse setResponse = client.Set("Comment/" + id, data);
+            SetResponse setResponse = client.Set("Comment/" + id, Nulldata(data));
+        }
+
+        public Comment Nulldata(Comment comment)
+        {
+            comment.CommentID = null;
+            comment.Content = null;
+            comment.Date = null;
+            comment.Image = null;
+            comment.UserID = null;
+            comment.StoreID = null;
+            comment.ParentComment_ID = null;
+            comment.UserName = null;
+            comment.UserPicture = null;
+            comment.RatePoint = null;
+            return comment;
         }
 
         public string GetIDUser(string Email)

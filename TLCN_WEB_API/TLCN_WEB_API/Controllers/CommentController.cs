@@ -79,6 +79,36 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("EditByIDForUser")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult EditByIDForUser(string id, string idusercomment, [FromBody] Comment comment)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                User userinfo = new User();
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    Comment comment1 = new Comment();
+                    var a = comment1.getbyIdcomment(id);
+                    if (a.UserID == idusercomment)
+                    {
+                        comment1.AddbyidToFireBase(id, comment);
+                        return Ok(new[] { "sửa thành công" });
+                    }
+                    return Ok(new[] { "Không có quyền" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+        }
+
+        [Authorize]
         [HttpPost("DeleteByID")]
         //thay đổi thông tin đã có trên firebase theo id
         public IActionResult deleteByID(string idcomment, string idusercomment, string idStore){
@@ -104,6 +134,37 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
+        [HttpPost("DeleteByIDForUser")]
+        //thay đổi thông tin đã có trên firebase theo id
+        public IActionResult DeleteByIDForUser(string idcomment, string idusercomment, string idStore)
+        {
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                IList<Claim> claim = identity.Claims.ToList();
+                string Email = claim[1].Value;
+                User userinfo = new User();
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
+                {
+                    Comment comment1 = new Comment();
+                    var a = comment1.getbyIdcomment(idcomment);
+                    if (a.UserID==idusercomment)
+                    {
+                        comment1.Delete(idcomment);
+                        return Ok(new[] { "Xóa thành công" });
+                    }
+                    return Ok(new[] { "Bạn không được xóa" });
+                }
+                else return Ok(new[] { "Bạn cần đăng nhập" });
+
+            }
+            catch
+            {
+                return Ok(new[] { "Error" });
+            }
+        }
+
+        [Authorize]
         [HttpPost("CreateComment")]
         public IActionResult RegisterComment([FromBody] Comment comment){
             string err = "";
@@ -123,6 +184,7 @@ namespace TLCN_WEB_API.Controllers
                 err = "Error";
             }
             return Ok(new[] { err });
-        }        
+        }  
+        
     }
 }
