@@ -81,7 +81,7 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("EditByIDForUser")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByIDForUser(string id, string idusercomment, [FromBody] Comment comment)
+        public IActionResult EditByIDForUser(string id, [FromBody] Comment comment)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace TLCN_WEB_API.Controllers
                 {
                     Comment comment1 = new Comment();
                     var a = comment1.getbyIdcomment(id);
-                    if (a.UserID == idusercomment)
+                    if (a.UserID == userinfo.GetIDToken(Email))
                     {
                         comment1.AddbyidToFireBase(id, comment);
                         return Ok(new[] { "sửa thành công" });
@@ -136,7 +136,7 @@ namespace TLCN_WEB_API.Controllers
         [Authorize]
         [HttpPost("DeleteByIDForUser")]
         //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByIDForUser(string idcomment, string idusercomment, string idStore)
+        public IActionResult DeleteByIDForUser(string idcomment)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace TLCN_WEB_API.Controllers
                 {
                     Comment comment1 = new Comment();
                     var a = comment1.getbyIdcomment(idcomment);
-                    if (a.UserID==idusercomment)
+                    if (a.UserID==userinfo.GetIDToken(Email))
                     {
                         comment1.Delete(idcomment);
                         return Ok(new[] { "Xóa thành công" });
