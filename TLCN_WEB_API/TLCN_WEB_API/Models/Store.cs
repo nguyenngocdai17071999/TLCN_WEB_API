@@ -45,6 +45,7 @@ namespace TLCN_WEB_API.Models
             Long = "";
             DistrictID = "";
             NumberView = "0";
+            Discount = false;
         }
 
         public string StoreID { get; set; }
@@ -63,6 +64,8 @@ namespace TLCN_WEB_API.Models
         public string Long { get; set; }
         public string DistrictID { get; set; }
         public string NumberView { get; set; }
+        public bool Discount { get; set; }
+
         string columnname = "Stores";
 
         public List<Store> getAll(double LatNew, double LongNew) {

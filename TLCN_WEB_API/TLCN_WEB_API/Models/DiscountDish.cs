@@ -39,7 +39,7 @@ namespace TLCN_WEB_API.Models
                 foreach (var item in data)
                 {
                     list.Add(JsonConvert.DeserializeObject<DiscountDish>(((JProperty)item).Value.ToString()));
-                }               
+                }
             }
             return list;
         }

@@ -31,10 +31,15 @@ namespace TLCN_WEB_API.Controllers
         //phương thức get dữ liệu từ firebase
         public IActionResult GetAll()
         {
-
+            try
+            {
                 Dish dish = new Dish();
                 return Ok(dish.getAll());
-
+            }
+            catch
+            {
+                return Ok("Error");
+            }
 
         }
 
