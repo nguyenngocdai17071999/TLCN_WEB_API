@@ -214,4 +214,3 @@ C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\n
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\TLCN_WEB_API.csproj.CoreCompileInputs.cache
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\TLCN_WEB_API.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\obj\Debug\netcoreapp3.1\scopedcss\bundle\TLCN_WEB_API.styles.css
-C:\Users\Dai\Documents\GitHub\TLCN_WEB_API\TLCN_WEB_API\TLCN_WEB_API\bin\Debug\netcoreapp3.1\aws-beanstalk-tools-defaults.json
