@@ -252,6 +252,21 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
+        [HttpGet("ThongKeView")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeView()
+        {
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var danhsachView = view_Store.getAll();                
+                return Ok(danhsachView.Count);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
 
         [HttpGet("Nam")]
         // phương thức get by id dữ liệu từ firebase 
