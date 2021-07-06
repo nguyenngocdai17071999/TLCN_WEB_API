@@ -120,6 +120,111 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
+        [HttpGet("ThongKeTheoTinh")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoTinh()
+        {
+            try
+            {
+                Province province = new Province();
+                var danhsachtinh = province.getAll();
+                List<BienThongKeTinh> bienThongKeTinhs = new List<BienThongKeTinh>();
+                foreach(var item in danhsachtinh)
+                {
+                    BienThongKeTinh bienThongKes = new BienThongKeTinh();
+                    bienThongKes.ProvinceID = item.ProvinceID;
+                    bienThongKes.ProvinceName = item.ProvinceName;
+                    bienThongKeTinhs.Add(bienThongKes);
+                }
+                Store store = new Store();
+                var danhsachquan = store.getAll(0,0);
+                foreach(var item in bienThongKeTinhs)
+                {
+                    int dem = 0;
+                    foreach(var itemquan in danhsachquan)
+                    {
+                        if (itemquan.ProvinceID == item.ProvinceID) dem++;
+                    }
+                    item.SoQuan = dem;
+                }    
+                return Ok(bienThongKeTinhs);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("ThongKeTheoQuan")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoQuan(string ProvinceID)
+        {
+            try
+            {
+                District district = new District();
+                var danhsachquan = district.getByIDProvince(ProvinceID);
+                List<BienThongKeQuan> bienThongKeQuans = new List<BienThongKeQuan>();
+                foreach (var item in danhsachquan)
+                {
+                    BienThongKeQuan bienThongKes = new BienThongKeQuan();
+                    bienThongKes.DistrictID = item.DistrictID;
+                    bienThongKes.DistrictName = item.DistrictName;
+                    bienThongKeQuans.Add(bienThongKes);
+                }
+                Store store = new Store();
+                var danhsachquanan = store.getAll(0, 0);
+                foreach (var item in bienThongKeQuans)
+                {
+                    int dem = 0;
+                    foreach (var itemquan in danhsachquanan)
+                    {
+                        if (itemquan.DistrictID == item.DistrictID) dem++;
+                    }
+                    item.SoQuan = dem;
+                }
+                return Ok(bienThongKeQuans);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("ThongKeTheoBusinessType")]
+        // phương thức get by id dữ liệu từ firebase 
+        public IActionResult ThongKeTheoBusinessType()
+        {
+            try
+            {
+                BusinessType businessType = new BusinessType();
+                var danhsachbusinessType = businessType.getAll();
+                List<BienThongKeBusinessType> bienThongKeQuans = new List<BienThongKeBusinessType>();
+                foreach (var item in danhsachbusinessType)
+                {
+                    BienThongKeBusinessType bienThongKes = new BienThongKeBusinessType();
+                    bienThongKes.BusinessTypeID = item.BusinessTypeID;
+                    bienThongKes.BusinessTypetName = item.BusinessTypeName;
+                    bienThongKeQuans.Add(bienThongKes);
+                }
+                Store store = new Store();
+                var danhsachquanan = store.getAll(0, 0);
+                foreach (var item in bienThongKeQuans)
+                {
+                    int dem = 0;
+                    foreach (var itemquan in danhsachquanan)
+                    {
+                        if (itemquan.BusinessTypeID == item.BusinessTypeID) dem++;
+                    }
+                    item.SoQuan = dem;
+                }
+                return Ok(bienThongKeQuans);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
         [HttpGet("ThongKeTheoNgayAll")]
         // phương thức get by id dữ liệu từ firebase 
         public IActionResult ThongKeTheoNgayAll(int ngay, int thang, int nam)

@@ -367,5 +367,19 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
+        [HttpGet("ThongKeNguoiOnline")]
+        //phương thức get dữ liệu từ firebase
+        public IActionResult ThongKeNguoiOnline()
+        {
+            try
+            {
+                User infoUser = new User();
+                return Ok(infoUser.ThongKeNguoiOnlie());
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
     }
 }

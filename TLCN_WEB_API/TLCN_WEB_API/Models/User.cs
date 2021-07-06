@@ -87,6 +87,27 @@ namespace TLCN_WEB_API.Models
             }
             return list;
         }
+
+        public int ThongKeNguoiOnlie()
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<User>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+            }
+            int dem = 0;
+            foreach (var item in list)
+            {
+                if (item.Status == "3")
+                    dem++;
+            }
+            return dem;
+        }
+
         public List<User> getByID(string id, string email)
         {
             client = new FireSharp.FirebaseClient(config);
