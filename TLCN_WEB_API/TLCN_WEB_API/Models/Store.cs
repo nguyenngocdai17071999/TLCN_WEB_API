@@ -159,7 +159,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list2)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(gantoi(list2));
