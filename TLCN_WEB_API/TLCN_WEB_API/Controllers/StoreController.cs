@@ -21,14 +21,12 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-    //[EnableCors("MyPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class StoreController : ControllerBase
     {       
-        [HttpGet("GetAll")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll(double Lat, double Long){
+        [HttpGet("GetAll")]                                      //lấy dữ liệu danh sách các quán ăn có kiểm tra live
+        public IActionResult GetAll(double Lat, double Long){    
             try{
                 Store store = new Store();
                 return Ok(store.getAll(Lat,Long));
@@ -38,23 +36,18 @@ namespace TLCN_WEB_API.Controllers
             }           
         }
 
-        [HttpGet("GetAllManage")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllmanage(double Lat, double Long)
-        {
-            try
-            {
+        [HttpGet("GetAllManage")]                                        //Lấy dữ liệu danh sách tất cả quán ăn k kiểm tra live
+        public IActionResult GetAllmanage(double Lat, double Long){
+            try{
                 Store store = new Store();
                 return Ok(store.getAll(Lat,Long));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetAllGanToi")]
-        //phương thức get dữ liệu từ firebase
+        [HttpGet("GetAllGanToi")]                                          //Danh sách quán ăn được sắp xếp gần tới xa
         public IActionResult GetAllGanToi(double Lat, double Long)
         {
             try{
@@ -66,9 +59,8 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        [HttpGet("GetAllGanToiProvince")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetAllGanToi(string id, double Lat, double Long)
+        [HttpGet("GetAllGanToiProvince")]                                       //Danh sách quán ăn gần tôi theo Thành phố
+        public IActionResult GetAllGanToi(string id, double Lat, double Long)    //IdProvince
         {
             try{
                 Store store = new Store();
@@ -79,8 +71,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        [HttpGet("GetByIDOwner")]
-        // phương thức get by id dữ liệu từ firebase 
+        [HttpGet("GetByIDOwner")]                                                  //danh sách quán ăn của chủ quán
         public IActionResult GetByIDOwner(string id, double Lat, double Long)
         {
             try{
@@ -93,127 +84,102 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        [HttpGet("ThongKeTheoNgay")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoNgay(string id,int ngay, int thang, int nam)
+        [HttpGet("ThongKeTheoNgay")]                                                      //thống kế lượt view của quán theo từng ngày
+        public IActionResult ThongKeTheoNgay(string id,int ngay, int thang, int nam)      //IdStore
         {
-            try
-            {
-                View_Store view_Store = new View_Store();
-                var danhsachView= view_Store.getByIDStore(id);
-                int[] thongkengay = new int[24];
-                foreach(var item in danhsachView)
-                {
-                    DateTime a = DateTime.Parse(item.Date);
-                    TimeSpan Time = a.TimeOfDay;
-                    for(int i = 0; i < 24; i++)
-                    {
-                        if (i == Time.Hours && ngay == a.Day && thang == a.Month && nam == a.Year)
+            try{
+                View_Store view_Store = new View_Store();                                 //Model View_Store
+                var danhsachView= view_Store.getByIDStore(id);                            //Danh sách lượt xem
+                int[] thongkengay = new int[24];                                          //Mãng 24 giờ trong 1 ngày
+                foreach(var item in danhsachView){
+                    DateTime a = DateTime.Parse(item.Date);                               //thời gian của view
+                    TimeSpan Time = a.TimeOfDay;                                          //Biến timespan giúp phân chia hours, day, month, year
+                    for(int i = 0; i < 24; i++){
+                        if (i == Time.Hours && ngay == a.Day && thang == a.Month && nam == a.Year) //kiểm tra đúng ngày đúng giờ thêm view
                             thongkengay[i] = thongkengay[i] + 1;
                     }
                 }
                 return Ok(thongkengay);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeTheoTinh")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoTinh()
-        {
-            try
-            {
+        [HttpGet("ThongKeTheoTinh")]                                                         //thống kê số quán của tỉnh
+        public IActionResult ThongKeTheoTinh(){
+            try{
                 Province province = new Province();
-                var danhsachtinh = province.getAll();
-                List<BienThongKeTinh> bienThongKeTinhs = new List<BienThongKeTinh>();
-                foreach(var item in danhsachtinh)
-                {
+                var danhsachtinh = province.getAll();                                          //Danh sách tỉnh
+                List<BienThongKeTinh> bienThongKeTinhs = new List<BienThongKeTinh>();          //Danh sách thống kê số quán
+                foreach(var item in danhsachtinh){
                     BienThongKeTinh bienThongKes = new BienThongKeTinh();
                     bienThongKes.ProvinceID = item.ProvinceID;
                     bienThongKes.ProvinceName = item.ProvinceName;
-                    bienThongKeTinhs.Add(bienThongKes);
+                    bienThongKeTinhs.Add(bienThongKes);                                         // thêm dữ liệu vào danh sách
                 }
                 Store store = new Store();
-                var danhsachquan = store.getAll(0,0);
-                foreach(var item in bienThongKeTinhs)
-                {
+                var danhsachquan = store.getAll(0,0);                                           //danh sách quán ăn
+                foreach(var item in bienThongKeTinhs){
                     int dem = 0;
-                    foreach(var itemquan in danhsachquan)
-                    {
-                        if (itemquan.ProvinceID == item.ProvinceID) dem++;
+                    foreach(var itemquan in danhsachquan){
+                        if (itemquan.ProvinceID == item.ProvinceID) dem++;                      //nếu quán có IDprovince trùng thì đếm số quán
                     }
                     item.SoQuan = dem;
                 }    
-                return Ok(bienThongKeTinhs);
+                return Ok(bienThongKeTinhs);                                                    //Danh sách thống kê
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeTheoQuan")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoQuan(string ProvinceID)
-        {
-            try
-            {
-                District district = new District();
+        [HttpGet("ThongKeTheoQuan")]                                                           //thống kê quán theo từng quận
+        public IActionResult ThongKeTheoQuan(string ProvinceID){
+            try{
+                District district = new District();                                               //danh sách quận
                 var danhsachquan = district.getByIDProvince(ProvinceID);
-                List<BienThongKeQuan> bienThongKeQuans = new List<BienThongKeQuan>();
-                foreach (var item in danhsachquan)
-                {
+                List<BienThongKeQuan> bienThongKeQuans = new List<BienThongKeQuan>();             //Danh sách thống kê số quán của quận
+                foreach (var item in danhsachquan){
                     BienThongKeQuan bienThongKes = new BienThongKeQuan();
                     bienThongKes.DistrictID = item.DistrictID;
                     bienThongKes.DistrictName = item.DistrictName;
-                    bienThongKeQuans.Add(bienThongKes);
+                    bienThongKeQuans.Add(bienThongKes);                                           //Thêm thông tin quận vào danh sách thống kế
                 }
                 Store store = new Store();
                 var danhsachquanan = store.getAll(0, 0);
-                foreach (var item in bienThongKeQuans)
-                {
+                foreach (var item in bienThongKeQuans){
                     int dem = 0;
-                    foreach (var itemquan in danhsachquanan)
-                    {
-                        if (itemquan.DistrictID == item.DistrictID) dem++;
+                    foreach (var itemquan in danhsachquanan){
+                        if (itemquan.DistrictID == item.DistrictID) dem++;                         //Nếu trùng IDDistrict tăng biến đếm số quán trong quận
                     }
                     item.SoQuan = dem;
                 }
                 return Ok(bienThongKeQuans);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeTheoBusinessType")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoBusinessType()
-        {
-            try
-            {
-                BusinessType businessType = new BusinessType();
+        [HttpGet("ThongKeTheoBusinessType")]                                                        //Thống kê số quán theo từng loại mô hình quán
+        public IActionResult ThongKeTheoBusinessType(){
+            try{
+                BusinessType businessType = new BusinessType();                                     //Danh sách loại kinh doanh
                 var danhsachbusinessType = businessType.getAll();
                 List<BienThongKeBusinessType> bienThongKeQuans = new List<BienThongKeBusinessType>();
-                foreach (var item in danhsachbusinessType)
-                {
+                foreach (var item in danhsachbusinessType){
                     BienThongKeBusinessType bienThongKes = new BienThongKeBusinessType();
                     bienThongKes.BusinessTypeID = item.BusinessTypeID;
                     bienThongKes.BusinessTypetName = item.BusinessTypeName;
-                    bienThongKeQuans.Add(bienThongKes);
+                    bienThongKeQuans.Add(bienThongKes);                                             // Thêm thông tin loại kinh doanh vào danh sách thống kê
                 }
                 Store store = new Store();
                 var danhsachquanan = store.getAll(0, 0);
-                foreach (var item in bienThongKeQuans)
-                {
+                foreach (var item in bienThongKeQuans){
                     int dem = 0;
-                    foreach (var itemquan in danhsachquanan)
-                    {
-                        if (itemquan.BusinessTypeID == item.BusinessTypeID) dem++;
+                    foreach (var itemquan in danhsachquanan){
+                        if (itemquan.BusinessTypeID == item.BusinessTypeID) dem++;                 // Nếu BusinessTypeID trùng biến đếm tăng 
                     }
                     item.SoQuan = dem;
                 }
@@ -225,221 +191,169 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        [HttpGet("ThongKeTheoNgayAll")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoNgayAll(int ngay, int thang, int nam)
-        {
-            try
-            {
+        [HttpGet("ThongKeTheoNgayAll")]                                           //thống kê view theo ngày của website
+        public IActionResult ThongKeTheoNgayAll(int ngay, int thang, int nam){
+            try{
                 View_Store view_Store = new View_Store();
                 var danhsachView = view_Store.getAll();
-                int[] thongkengay = new int[24];
-                foreach (var item in danhsachView)
-                {
+                int[] thongkengay = new int[24];                                   //mảng 24 giờ của 1 ngày
+                foreach (var item in danhsachView){
                     DateTime a = DateTime.Parse(item.Date);
                     TimeSpan Time = a.TimeOfDay;
-                    for (int i = 0; i < 24; i++)
-                    {
-                        if (i == a.Hour && ngay == a.Day && thang == a.Month && nam == a.Year)
+                    for (int i = 0; i < 24; i++){
+                        if (i == a.Hour && ngay == a.Day && thang == a.Month && nam == a.Year)   //Nếu trùng giờ thì số view sẽ tăng lên
                             thongkengay[i] = thongkengay[i] + 1;
                     }
                 }
                 return Ok(thongkengay);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeView")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeView()
-        {
-            try
-            {
+        [HttpGet("ThongKeView")]                                       //Thống kê số view của website
+        public IActionResult ThongKeView(){
+            try{
                 View_Store view_Store = new View_Store();
                 var danhsachView = view_Store.getAll();                
-                return Ok(danhsachView.Count);
+                return Ok(danhsachView.Count);                         //trả về 1 con số hiển thị số view của website
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("Nam")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult Nam()
-        {
-            try
-            {
+        [HttpGet("Nam")]                                              // danh sách năm của view website để hiển thị chọn báo cáo
+        public IActionResult Nam(){
+            try{
                 View_Store view_Store = new View_Store();
-                var danhsachView = view_Store.getAll();
+                var danhsachView = view_Store.getAll();                 //danh sách view
                 List<int> danhsachnam = new List<int>();
-                foreach (var item in danhsachView)
-                {
+                foreach (var item in danhsachView){
                     DateTime a = DateTime.Parse(item.Date);
                     int dem = 0;
-                    for (int i=0;i<danhsachnam.Count; i++)
-                    {                        
-                        if (danhsachnam[i] == a.Year)
-                        {
+                    for (int i=0;i<danhsachnam.Count; i++){                        
+                        if (danhsachnam[i] == a.Year){
                             dem++;                            
                         }                        
                     }
-                    if (dem == 0) danhsachnam.Add(a.Year);
-                    if (danhsachnam.Count==0) danhsachnam.Add(a.Year);
+                    if (dem == 0) danhsachnam.Add(a.Year);                  //nếu năm này chưa thêm vào danh sách thì add
+                    if (danhsachnam.Count==0) danhsachnam.Add(a.Year);       // nếu danh sách năm chưa có thêm năm đầu tiên cho phần tử số 0
                 }
                 return Ok(danhsachnam);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeTheoThang")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoThang(string id,int thang, int nam,double Lat, double Long)
-        {
-            try
-            {
+        [HttpGet("ThongKeTheoThang")]                                      //thống kê lượt view theo tháng
+        public IActionResult ThongKeTheoThang(string id,int thang, int nam,double Lat, double Long){    //IDStore
+            try{
                 View_Store view_Store = new View_Store();
-                var danhsachView = view_Store.getByIDStore(id);
-                int songay = view_Store.fun(thang, nam);
-                int[] thongkethang = new int[songay];
-                foreach (var item in danhsachView)
-                {
+                var danhsachView = view_Store.getByIDStore(id);               //Danh sach quán ăn
+                int songay = view_Store.fun(thang, nam);                      //số ngày của tháng
+                int[] thongkethang = new int[songay];                         //mang số ngày trong tháng
+                foreach (var item in danhsachView){
                     DateTime a = DateTime.Parse(item.Date);
-                    for (int i = 0; i < songay; i++)
-                    {
-                        if (i == a.Day-1&&thang==a.Month&&nam==a.Year)
-                            thongkethang[i] = thongkethang[i] + 1;
+                    for (int i = 0; i < songay; i++){
+                        if (i == a.Day-1 && thang == a.Month && nam == a.Year) //nếu trùng thời gian thì tăng lượt đếm view
+                            thongkethang[i] = thongkethang[i] + 1;             //(i=a.day-1 vì i bắt đầu = 0 ngày bắt đầu bằng 1)
                     }
                 }
                 return Ok(thongkethang);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
-
         
-        [HttpGet("ThongKeTheoThangAll")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoThangAll(int thang, int nam)
-        {
-            try
-            {
+        [HttpGet("ThongKeTheoThangAll")]                                    //thống kê lượt view theo tháng website
+        public IActionResult ThongKeTheoThangAll(int thang, int nam){
+            try{
                 View_Store view_Store = new View_Store();
                 var danhsachView = view_Store.getAll();
-                int songay = view_Store.fun(thang, nam);
+                int songay = view_Store.fun(thang, nam);                      //Số ngày của tháng
                 int[] thongkethang = new int[songay];
-                foreach (var item in danhsachView)
-                {
+                foreach (var item in danhsachView){
                     DateTime a = DateTime.Parse(item.Date);
-                    for (int i = 0; i < songay; i++)
-                    {
-                        if (i == a.Day-1 && thang == a.Month && nam == a.Year)
+                    for (int i = 0; i < songay; i++){
+                        if (i == a.Day-1 && thang == a.Month && nam == a.Year)    
                             thongkethang[i] = thongkethang[i] + 1;
                     }
                 }
                 return Ok(thongkethang);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeTheoNam")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoNam(string id, int nam, double Lat, double Long)
-        {
-            try
-            {
+        [HttpGet("ThongKeTheoNam")]                                             //Thống kê lượt view theo năm của quán
+        public IActionResult ThongKeTheoNam(string id, int nam, double Lat, double Long){        //IDStore
+            try{
                 View_Store view_Store = new View_Store();
                 var danhsachView = view_Store.getByIDStore(id);
-                int[] thongkenam = new int[12];
-                foreach (var item in danhsachView)
-                {
+                int[] thongkenam = new int[12];                        //1 năm 12 tháng, mảng tháng trong năm
+                foreach (var item in danhsachView){
                     DateTime a = DateTime.Parse(item.Date);
-                    for (int i = 0; i < 12; i++)
-                    {
+                    for (int i = 0; i < 12; i++){
                         if (i == a.Month-1&&nam==a.Year)
                             thongkenam[i] = thongkenam[i] + 1;
                     }
                 }
                 return Ok(thongkenam);
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("ThongKeTheoNamAll")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult ThongKeTheoNamAll(int nam)
-        {
-            try
-            {
+        [HttpGet("ThongKeTheoNamAll")]                                   //Thống kê lượt view của website
+        public IActionResult ThongKeTheoNamAll(int nam){
+            try{
                 View_Store view_Store = new View_Store();
                 var danhsachView = view_Store.getAll();
-                int[] thongkenam = new int[12];
-                foreach (var item in danhsachView)
-                {
+                int[] thongkenam = new int[12];                          //1 năm 12 tháng, mảng tháng trong năm
+                foreach (var item in danhsachView){
                     DateTime a = DateTime.Parse(item.Date);
-                    for (int i = 0; i < 12; i++)
-                    {
+                    for (int i = 0; i < 12; i++){
                         if (i == a.Month - 1 && nam == a.Year)
                             thongkenam[i] = thongkenam[i] + 1;
                     }
                 }
-                return Ok(thongkenam);
+                return Ok(thongkenam);                                  
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByIDBusinessType")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDBusinessType(string id, double Lat, double Long)
-        {
-            try
-            {
+        [HttpGet("GetByIDBusinessType")]                                       // Lấy danh sách quán ăn theo mô thình kinh doanh
+        public IActionResult GetByIDBusinessType(string id, double Lat, double Long){//IDBusinessType
+            try{
                 Store store = new Store();
                 return Ok(store.getByIDBusinessType(id,Lat,Long));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByIDDistrict")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDDistrict(string id, double Lat, double Long)
-        {
-            try
-            {
+        [HttpGet("GetByIDDistrict")]                                              //Lấy danh sách quán theo quận 
+        public IActionResult GetByIDDistrict(string id, double Lat, double Long){    //IDDistrict
+            try{
                 Store store = new Store();
                 return Ok(store.getByIDDistrict(id, Lat, Long));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id, double Lat, double Long)
-        {
+        [HttpGet("GetByID")]                                                //lấy thông tin của quán 
+        public IActionResult GetByID(string id, double Lat, double Long){    //IDStore có check live
             try{
                 Store store = new Store();
                 return Ok(store.getByID(id, Lat, Long));
@@ -449,25 +363,19 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        [HttpGet("GetByIDManage")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDManage(string id, double Lat, double Long)
-        {
-            try
-            {
+        [HttpGet("GetByIDManage")]                                                 //lấy thông tin của quán cho admin
+        public IActionResult GetByIDManage(string id, double Lat, double Long){     //IDStore không check live
+            try{
                 Store store = new Store();
                 return Ok(store.getByIDManage(id, Lat, Long));
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByIDProvince")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDProvince(string id,string id2, double Lat, double Long)
-        {
+        [HttpGet("GetByIDProvince")]                                           //Lấy danh sách quán ăn theo tỉnh
+        public IActionResult GetByIDProvince(string id,string id2, double Lat, double Long){   //IDProvince
             try{
                 Store store = new Store();
                 return Ok(store.getByIDProvince(id,id2, Lat, Long));
@@ -478,20 +386,18 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("EditByID")]                                                       //Chỉnh sửa thông tin quán ăn
         public IActionResult EditByID(string id, [FromBody] Store store){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true || infoUser.checkOwner(Email) == true)
-                    {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                         //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                      //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                      //Email của token             
+                User infoUser = new User();                                                         //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){         //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true || infoUser.checkOwner(Email) == true){    //Kiểm tra có phải admin, owner không
                         try{
                             Store store2 = new Store();
-                            store2.AddbyidToFireBase(id, store);
+                            store2.AddbyidToFireBase(id, store);                                    //Update data
                             return Ok(new[] { "sửa thành công" });
                         }
                         catch{
@@ -508,36 +414,31 @@ namespace TLCN_WEB_API.Controllers
         }
 
 
-        [HttpPost("UpdateRatePoint")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult UpdateRatePoint(string id, string RatePoint)
-        {
-            try
-            {
+        [HttpPost("UpdateRatePoint")]                                       // cập nhật điểm đánh giá cho quán
+        public IActionResult UpdateRatePoint(string id, string RatePoint){  //IDStore, Ratepoint
+            try{
                 Store store2 = new Store();
                 store2.updateRatePoint(id, RatePoint);
                 return Ok("Cập nhật thành công");
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
         [Authorize]
-        [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("DeleteByID")]                                           // Xóa quán ăn
         public IActionResult deleteByID(string id){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true || infoUser.checkOwner(Email)==true){
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                             //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                          //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                          //Email của token             
+                User infoUser = new User();                                                             //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){             //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true || infoUser.checkOwner(Email)==true){          //Kiểm tra có phải admin, owner không
                         try{
                             Store store2 = new Store();
-                            store2.Delete(id);
+                            store2.Delete(id);                                                          //Update data
                             return Ok(new[] { "Xóa thành công" });
                         }
                         catch{
@@ -554,20 +455,18 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("ChangeStatusStore")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("ChangeStatusStore")]                                      // thay đổi trạng thái của quán ăn
         public IActionResult BlockStore(string id, string status){
-            try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true)
-                    {
+            try{                                                                                    //khai báo biến danh tính của token
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                         //Danh sách các biến trong identity
+                IList<Claim> claim = identity.Claims.ToList();                                      //Email của token             
+                string Email = claim[1].Value;                                                      //Khai bao biến thông tin người dùng
+                User infoUser = new User();                                                         //kiểm tra thời gian đăng nhập còn không
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){         //Kiểm tra có phải admin không
+                    if (infoUser.checkAdmin(Email)==true){
                         try{
-                            Store store2 = new Store();
-                            store2.blockStore(id, status);
+                            Store store2 = new Store();                                             
+                            store2.blockStore(id, status);                                          //Update data
                             return Ok(new[] { "sửa thành công" });
                         }
                         catch{
@@ -585,26 +484,22 @@ namespace TLCN_WEB_API.Controllers
 
 
         [Authorize]
-        [HttpPost("CreateStore")]
+        [HttpPost("CreateStore")]                                                    // Thêm quán ăn
         public IActionResult RegisterStore( [FromBody] Store store){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                      //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                   //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                   //Email của token             
+                User infoUser = new User();                                                      //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){      //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                     //Kiểm tra có phải admin không
                         string err = "";
-                        try
-                        {
+                        try{
                             Store store2 = new Store();
-                            store2.AddToFireBase(store);
+                            store2.AddToFireBase(store);                                         //Create data
                             err = "Đăng ký thành công";
                         }
-                        catch
-                        {
+                        catch{
                             err = "Lỗi rồi";
                         }
                         return Ok(new[] { err });
@@ -613,36 +508,27 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }           
             
         }
 
-
-
-        [HttpGet("getAllCheck")]
-        public IActionResult getAllCheck(double lat, double log)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
+        [HttpGet("getAllCheck")]                                                                //Lấy danh sách quán cần xác nhận lên live
+        public IActionResult getAllCheck(double lat, double log){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                     //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                  //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                  //Email của token             
+                User infoUser = new User();                                                     //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){     //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                    //Kiểm tra có phải admin không
                         string err = "";
-                        try
-                        {
+                        try{
                             Store store2 = new Store();
                             return Ok(store2.getAllCheck(lat,log));
                         }
-                        catch
-                        {
+                        catch{
                             err = "Lỗi rồi";
                         }
                         return Ok(new[] { err });
@@ -651,37 +537,28 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
 
-        [HttpPost("CreateStoreOwner")]
-        public IActionResult RegisterStoreOwner([FromBody] Store store)
-        {
-            try
-            {
+        [HttpPost("CreateStoreOwner")]                                              //đăng kí quán ăn mới chưa được lên live
+        public IActionResult RegisterStoreOwner([FromBody] Store store){
+            try{
                 string err;
-                  try
-                  {
+                  try{
                         Store store2 = new Store();
                         store2.AddToFireBase(store);
                         err = "Đăng ký thành công";
                   }
-                  catch
-                  {
+                  catch{
                         err = "Lỗi rồi";
                   }
                   return Ok(new[] { err });                 
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
-
         }
-
     }
 }

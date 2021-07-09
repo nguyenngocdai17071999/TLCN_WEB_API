@@ -25,29 +25,22 @@ namespace TLCN_WEB_API.Controllers
     [ApiController]
     public class DiscountTypeController : Controller
     {
-        [HttpGet("GetAll")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll()
-        {
-            try
-            {
-                DiscountType danhsach = new DiscountType();
-                return Ok(danhsach.getAll());
+        [HttpGet("GetAll")]                                     //Lấy tất cả dữ liệu loại khuyến mãi
+        public IActionResult GetAll(){
+            try{
+                DiscountType danhsach = new DiscountType();     //Khai báo model loại khuyến mãi
+                return Ok(danhsach.getAll());                   //Trả về danh sách loại khuyến mãi
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id)
-        {
-            try
-            {
-                DiscountType danhsach = new DiscountType();
-                return Ok(danhsach.getByID(id));
+        [HttpGet("GetByID")]                                                  //Lấy tất cả dữ liệu loại khuyến mãi
+        public IActionResult GetByID(string id){
+            try{
+                DiscountType danhsach = new DiscountType();                   //Khai báo model loại khuyến mãi
+                return Ok(danhsach.getByID(id));                              //Trả về danh sách loại khuyến mãi
             }
             catch
             {
@@ -56,22 +49,17 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(string id, [FromBody] DiscountType discountType)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        DiscountType discountType1 = new DiscountType();
-                        discountType1.AddbyidToFireBase(id, discountType);
+        [HttpPost("EditByID")]                                                                //Chỉnh sửa loại khuyến mãi truyền vào id loại khuyến mãi  và body model loại khuyến mãi
+        public IActionResult EditByID(string id, [FromBody] DiscountType discountType){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                   //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                //Email của token             
+                User infoUser = new User();                                                   //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){   //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                  //Kiểm tra có phải admin không
+                        DiscountType discountType1 = new DiscountType();                      //Khai báo biến Model loại khuyến mãi
+                        discountType1.AddbyidToFireBase(id, discountType);                    //Update data
                         return Ok(new[] { "sửa thành công" });
                     }
                     else
@@ -81,73 +69,58 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
         [Authorize]
-        [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByID(string id)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        DiscountType discountType = new DiscountType();
-                        discountType.Delete(id);
+        [HttpPost("DeleteByID")]                                                               //Xóa loại khuyến mãi truyền vào id loại khuyến mãi
+        public IActionResult DeleteByID(string id){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                    //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                 //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                 //Email của token             
+                User infoUser = new User();                                                    //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){    //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                   //Kiểm tra có phải admin không
+                        DiscountType discountType = new DiscountType();                        //Khai báo biến Model DiscountType
+                        discountType.Delete(id);                                               //Xóa data
                         return Ok(new[] { "Xóa thành công" });
                     }
-                    else
-                    {
+                    else{
                         return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
-
-        //[Authorize]
+        [Authorize]
         [HttpPost("Create")]
-        public IActionResult Register([FromBody] DiscountType discountType)
-        {
+        public IActionResult Register([FromBody] DiscountType discountType){                    //Tạo loại khuyến mãi
             string err = "";
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        DiscountType discountType1 = new DiscountType();
-                        discountType1.AddToFireBase(discountType);
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                     //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                  //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                  //Email của token             
+                User infoUser = new User();                                                     //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){     //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                    //Kiểm tra có phải admin không
+                        DiscountType discountType1 = new DiscountType();                        //Khai báo biến Model DiscountType
+                        discountType1.AddToFireBase(discountType);                              //Thêm data
                         err = "Đăng ký thành công";
                     }
-                    else
-                    {
+                    else{
                         err = "Bạn Không có quyền";
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 err = "Error";
             }
             return Ok(new[] { err });

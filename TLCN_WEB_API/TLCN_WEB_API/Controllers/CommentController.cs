@@ -25,50 +25,41 @@ namespace TLCN_WEB_API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase
-    {
-       
-        [HttpGet("GetAll")]
-
-        //phương thức get dữ liệu từ firebase
+    {       
+        [HttpGet("GetAll")]                                 //Lấy tất cả dữ liệu comment
         public IActionResult GetAll(){
             try{
-                Comment comment = new Comment();
-                return Ok(comment.getAll());
+                Comment comment = new Comment();            //Khai báo Model Comment
+                return Ok(comment.getAll());                //trả về danh sách toàn bộ comment
             }
             catch{
                 return Ok("Error");
             }
-
         }
 
-        [HttpGet("GetByID")]
-        // phương thức get by id store dữ liệu từ firebase 
+        [HttpGet("GetByID")]                                //Lấy tất cả dữ liệu comment của quán truyền vào id quán
         public IActionResult GetByID(string id){
             try{
-                Comment comment = new Comment();
-                return Ok(comment.getbyId(id));
+                Comment comment = new Comment();            //Khai báo biến comment
+                return Ok(comment.getbyId(id));             //Trả về danh sách toàn bộ comment của quán 
             }
             catch{
                 return Ok("Error");
-            }
-            finally
-            {
-
-            }
+            }            
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("EditByID")]                                                           //Chỉnh sửa thông tin comment
         public IActionResult EditByID(string id, [FromBody] Comment comment){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    Comment comment1 = new Comment();
-                    comment1.AddbyidToFireBase(id, comment);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;              //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                           //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                           //Email của token   
+                User userinfo = new User();                                              //Khai bao biến thông tin người dùng
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true 
+                    && userinfo.checkAdmin(Email) == true){                              //kiểm tra thời gian đăng nhập còn không và có phải là admin không
+                    Comment comment1 = new Comment();                                    //khai báo model comment
+                    comment1.AddbyidToFireBase(id, comment);                             //Update data
                     return Ok(new[] { "sửa thành công" });
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
@@ -79,20 +70,16 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("EditByIDForUser")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByIDForUser(string id, [FromBody] Comment comment)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    Comment comment1 = new Comment();
-                    var a = comment1.getbyIdcomment(id);
+        [HttpPost("EditByIDForUser")]                                                            //Thay đổi comment truyền vào Id của comment và Body comment
+        public IActionResult EditByIDForUser(string id, [FromBody] Comment comment){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                      //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                   //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                   //Email của token   
+                User userinfo = new User();                                                      //Khai bao biến thông tin người dùng
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){      //kiểm tra thời gian đăng nhập còn không
+                    Comment comment1 = new Comment();                                            //Khai báo biến model Comment
+                    var a = comment1.getbyIdcomment(id);                                         //lấy dữ liệu comment
                     if (a.UserID == userinfo.GetIDToken(Email))
                     {
                         comment1.AddbyidToFireBase(id, comment);
@@ -110,17 +97,16 @@ namespace TLCN_WEB_API.Controllers
 
         [Authorize]
         [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult deleteByID(string idcomment, string idusercomment, string idStore){
+        public IActionResult deleteByID(string idcomment, string idusercomment, string idStore){                                 //Xóa comment truyền vào Id của comment , id người comment và id quán
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    Comment comment1 = new Comment();
-                    if (comment1.GetIDUser(Email)==idusercomment|| comment1.GetIDUser(Email) == comment1.idchuquan(idStore)){
-                        comment1.Delete(idcomment);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                                                       //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                                                    //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                                                    //Email của token   
+                User userinfo = new User();                                                                                       //Khai bao biến thông tin người dùng
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){                                       //kiểm tra thời gian đăng nhập còn không
+                    Comment comment1 = new Comment();                                                                             //Khai báo biến model Comment
+                    if (comment1.GetIDUser(Email)==idusercomment|| comment1.GetIDUser(Email) == comment1.idchuquan(idStore)){     //Kiểm tra đúng người người xóa phải người comment không hoặc chủ quán xóa 
+                        comment1.Delete(idcomment);                                                                               //Xóa comment
                         return Ok(new[] { "Xóa thành công" });
                     }
                     return Ok(new[] { "Bạn không được xóa" });
@@ -134,23 +120,18 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("DeleteByIDForUser")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByIDForUser(string idcomment)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    Comment comment1 = new Comment();
-                    var a = comment1.getbyIdcomment(idcomment);
-                    if (a.UserID==userinfo.GetIDToken(Email))
-                    {
-                        comment1.Delete(idcomment);
+        [HttpPost("DeleteByIDForUser")]                                                     
+        public IActionResult DeleteByIDForUser(string idcomment){                                      //Xóa comment truyền vào Id của comment 
+            try{                                                                                                                                                    
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                            //khai báo biến danh tính của token                                         
+                IList<Claim> claim = identity.Claims.ToList();                                         //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                         //Email của token   
+                User userinfo = new User();                                                            //Khai bao biến thông tin người dùng
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){            //kiểm tra thời gian đăng nhập còn không                          
+                    Comment comment1 = new Comment();                                                  //Khai báo biến model Comment                                               
+                    var a = comment1.getbyIdcomment(idcomment);                                        //Lấy dữ liệu comment
+                    if (a.UserID==userinfo.GetIDToken(Email)){                                         //Kiểm tra đúng người comment không
+                        comment1.Delete(idcomment);                                                    //Delete comment
                         return Ok(new[] { "Xóa thành công" });
                     }
                     return Ok(new[] { "Bạn không được xóa" });
@@ -158,33 +139,31 @@ namespace TLCN_WEB_API.Controllers
                 else return Ok(new[] { "Bạn cần đăng nhập" });
 
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
         [Authorize]
         [HttpPost("CreateComment")]
-        public IActionResult RegisterComment([FromBody] Comment comment){
-            string err = "";
-            try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User userinfo = new User();
-                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    Comment comment1 = new Comment();
-                    string Idcomment = comment1.AddToFireBase(comment);
-                    err = Idcomment;
-                }
+        public IActionResult RegisterComment([FromBody] Comment comment){                             //Xóa comment truyền vào body model comment
+            string err = "";                                                                                                                                       
+            try{                                                                                                                   
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                           //khai báo biến danh tính của token     
+                IList<Claim> claim = identity.Claims.ToList();                                        //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                        //Email của token   
+                User userinfo = new User();                                                           //Khai bao biến thông tin người dùng                          
+                if (userinfo.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){           //kiểm tra thời gian đăng nhập còn không                             
+                    Comment comment1 = new Comment();                                                 //Khai báo biến model Comment           
+                    string Idcomment = comment1.AddToFireBase(comment);                               //Thêm comment
+                    err = Idcomment;                                                                  //Trả về IDcomment
+                }                                                                                     
                 else return Ok(new[] { "Bạn cần đăng nhập" });                
             }
             catch{
                 err = "Error";
             }
             return Ok(new[] { err });
-        }  
-        
+        }          
     }
 }

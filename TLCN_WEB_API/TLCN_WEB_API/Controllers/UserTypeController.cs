@@ -25,26 +25,22 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-    //[EnableCors("MyPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserTypeController : ControllerBase
     {
-
         [Authorize]
-        [HttpGet("GetAll")]
-        //phương thức get dữ liệu từ firebase
+        [HttpGet("GetAll")]                                                                  //Lấy danh sách loại tài khoản
         public IActionResult GetAll() {
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true)
-                    {
-                        UserType infoUserType = new UserType();
-                        return Ok(infoUserType.getAll());
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                  //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                               //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                               //Email của token             
+                User infoUser = new User();                                                  //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){  //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                   //Kiểm tra có phải admin không
+                        UserType infoUserType = new UserType();                              //Khai báo biến Model Usertype
+                        return Ok(infoUserType.getAll());                                    //Trả vê danh sách loại tài khoản
                     }
                     return Ok("Bạn không có quyền");
                 }
@@ -56,18 +52,17 @@ namespace TLCN_WEB_API.Controllers
         }      
 
         [Authorize]
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
+        [HttpGet("GetByID")]                                                                    //lấy thông tin loại tài khoản truyền vào IDUserType
         public IActionResult GetByID(string id) {
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true){
-                        UserType userType = new UserType();
-                        return Ok(userType.getByID(id));
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                     //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                  //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                  //Email của token             
+                User infoUser = new User();                                                     //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){     //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                      //Kiểm tra có phải admin không
+                        UserType userType = new UserType();                                     //Khai báo biến Model Usertype
+                        return Ok(userType.getByID(id));                                        //Trả về thông tin 
                     }
                     return Ok("Bạn không có quyền");
                 }
@@ -79,19 +74,17 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("EditByID")]                                                                   //Chỉnh sửa loại tài khoản
         public IActionResult EditByID(string id, [FromBody] UserType usertype){
             try {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true)
-                    {
-                        UserType userType = new UserType();                        
-                        userType.AddbyidToFireBase(id, usertype);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                      //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                   //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                   //Email của token             
+                User infoUser = new User();                                                      //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){      //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                       //Kiểm tra có phải admin không
+                        UserType userType = new UserType();                                      //Khai báo biến Model Usertype
+                        userType.AddbyidToFireBase(id, usertype);                                //Update data
                         return Ok(new[] { "ok" });
                     }
                     return Ok("Bạn không có quyền");
@@ -104,19 +97,17 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("DeleteByID")]                                                                 //Xóa loại tài khoản
         public IActionResult DeleteByID(string id){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true)
-                    {
-                        UserType userType = new UserType();
-                        userType.Delete(id);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                      //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                   //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                   //Email của token             
+                User infoUser = new User();                                                      //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){      //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                       //Kiểm tra có phải admin không
+                        UserType userType = new UserType();                                      //Khai báo biến Model Usertype
+                        userType.Delete(id);                                                     //Xóa data
                         return Ok(new[] { "Xóa thành công" });
                     }
                     return Ok("Bạn không có quyền");
@@ -129,19 +120,18 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("CreateUserType")]
+        [HttpPost("CreateUserType")]                                                          //Thêm loại tài khoản
         public IActionResult RegisterUser([FromBody] UserType userType){
             string err = "";
-            try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true)
-                    {
-                        UserType userType2 = new UserType();
-                        userType2.AddToFireBase(userType);
+            try{                                                                              
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                   //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                //Email của token             
+                User infoUser = new User();                                                   //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){   //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                    //Kiểm tra có phải admin không
+                        UserType userType2 = new UserType();                                  //Khai báo biến Model Usertype
+                        userType2.AddToFireBase(userType);                                    //Thêm data
                         err = "Đăng ký thành công";
                     }
                     else{

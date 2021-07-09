@@ -103,7 +103,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(gantoi(list));
@@ -337,7 +338,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list2)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(list2);
@@ -378,7 +380,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list2)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(list2);
@@ -406,10 +409,11 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list2)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
-            return list2;
+            return Check(list2);
         }
 
 
@@ -435,7 +439,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list2)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return list2;
@@ -469,7 +474,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list2)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(list2);
@@ -495,7 +501,8 @@ namespace TLCN_WEB_API.Models
             {
                 foreach (var item in list)
                 {
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(list2);

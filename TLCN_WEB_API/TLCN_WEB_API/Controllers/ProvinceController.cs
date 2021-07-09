@@ -21,30 +21,26 @@ using TLCN_WEB_API.Models;
 
 namespace TLCN_WEB_API.Controllers
 {
-    //[EnableCors("MyPolicy")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProvinceController : ControllerBase
-    {
-        
-        [HttpGet("GetAll")]
-        //phương thức get dữ liệu từ firebase
+    {        
+        [HttpGet("GetAll")]                                //Lấy tất cả dữ liệu thành phố
         public IActionResult GetAll(){
             try{
-                Province province = new Province();
-                return Ok(province.getAll());
+                Province province = new Province();        //Khai báo model Province
+                return Ok(province.getAll());              //Trả về danh sách thành phố
             }
             catch{
                 return Ok("Error");
             }           
         }
 
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
+        [HttpGet("GetByID")]                               //Lấy tất cả dữ liệu thành phố truyền vào IDProvince
         public IActionResult GetByID(string id){
             try{
-                Province province = new Province();
-                return Ok(province.getByID(id));
+                Province province = new Province();        //Khai báo model Province
+                return Ok(province.getByID(id));           //Trả về danh sách thành phố
             }
             catch{
                 return Ok("Error");
@@ -52,18 +48,17 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("EditByID")]                                                               //Chỉnh sửa thông tin thành phố
         public IActionResult EditByID(string id, [FromBody] Province province){            
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true){
-                        Province province1 = new Province();
-                        province1.AddbyidToFireBase(id, province);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                  //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                               //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                               //Email của token             
+                User infoUser = new User();                                                  //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){  //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                   //Kiểm tra có phải admin không
+                        Province province1 = new Province();                                 //Khai báo biến Model Province 
+                        province1.AddbyidToFireBase(id, province);                           //Update data
                         return Ok(new[] { "sửa thành công" });
                     }
                     else{
@@ -78,18 +73,17 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
+        [HttpPost("DeleteByID")]                                                                   //Xóa thông tin thành phố
         public IActionResult DeleteByID(string id){
             try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email)==true){
-                        Province province = new Province();
-                        province.Delete(id);
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                        //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                     //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                     //Email của token             
+                User infoUser = new User();                                                        //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){        //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email)==true){                                         //Kiểm tra có phải admin không
+                        Province province = new Province();                                        //Khai báo biến Model Province 
+                        province.Delete(id);                                                       //delete data
                         return Ok(new[] { "Xóa thành công" });
                     }
                     else{
@@ -104,19 +98,18 @@ namespace TLCN_WEB_API.Controllers
         }
 
         [Authorize]
-        [HttpPost("CreateProvince")]
+        [HttpPost("CreateProvince")]                                                           //thêm thông tin thành phố
         public IActionResult RegisterProvince([FromBody] Province province){
             string err = "";
-            try{
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        Province province1 = new Province();
-                        province1.AddToFireBase(province);
+            try{                                                                              
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                    //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                 //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                 //Email của token             
+                User infoUser = new User();                                                    //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){    //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                   //Kiểm tra có phải admin không
+                        Province province1 = new Province();                                   //Khai báo biến Model Province 
+                        province1.AddToFireBase(province);                                     //Create data
                         return Ok(new[] { "Đăng ký thành công" });
                     }
                     else{                        
@@ -129,7 +122,6 @@ namespace TLCN_WEB_API.Controllers
                 err = "Error";
             }
             return Ok(new[] { err });
-
         }
     }
 }

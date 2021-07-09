@@ -25,53 +25,40 @@ namespace TLCN_WEB_API.Controllers
     [ApiController]
     public class DiscountDishController : Controller
     {
-        [HttpGet("GetAll")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll()
-        {
-            try
-            {
-                DiscountDish danhsach = new DiscountDish();
-                return Ok(danhsach.getAll());
+        [HttpGet("GetAll")]                                 //Lấy tất cả dữ liệu khuyến mãi món ăn
+        public IActionResult GetAll(){
+            try{
+                DiscountDish danhsach = new DiscountDish(); //Khai báo model khuyến mãi món ăn
+                return Ok(danhsach.getAll());               //Trả về danh sách khuyến mãi món ăn
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id)
-        {
-            try
-            {
-                DiscountDish danhsach = new DiscountDish();
-                return Ok(danhsach.getByID(id));
+        [HttpGet("GetByID")]                                 //lấy dư liệu khuyến mãi theo id loại khuyến mãi món ăn
+        public IActionResult GetByID(string id){
+            try{
+                DiscountDish danhsach = new DiscountDish();  //Khai báo model khuyến mãi món ăn
+                return Ok(danhsach.getByID(id));             //Trả về danh sách quán ăn theo loại hình khuyến mãi món ăn
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(string id, [FromBody] DiscountDish discountDish)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true|| infoUser.checkOwner(Email) == true)
-                    {
-                        DiscountDish discountDish1 = new DiscountDish();
-                        discountDish1.AddbyidToFireBase(id, discountDish);
+        [HttpPost("EditByID")]                                                                      //Chỉnh sửa khuyến mãi truyền vào id khuyến mãi dish và body model khuyến mãi dish
+        public IActionResult EditByID(string id, [FromBody] DiscountDish discountDish){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                         //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                      //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                      //Email của token             
+                User infoUser = new User();                                                         //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){         //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true|| infoUser.checkOwner(Email) == true){   //Kiểm tra có phải admin hoặc owener không
+                        DiscountDish discountDish1 = new DiscountDish();                            //Khai báo biến Model khuyến mãi món ăn 
+                        discountDish1.AddbyidToFireBase(id, discountDish);                          //Update data
                         return Ok(new[] { "sửa thành công" });
                     }
                     else
@@ -81,29 +68,23 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
         [Authorize]
-        [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByID(string id)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true)
-                    {
-                        DiscountDish discountDish = new DiscountDish();
-                        discountDish.Delete(id);
+        [HttpPost("DeleteByID")]                                                                     //Xóa khuyến mãi dish truyền vào id khuyến mãi
+        public IActionResult DeleteByID(string id){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                          //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                       //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                       //Email của token             
+                User infoUser = new User();                                                          //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){          //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true){   //Kiểm tra có phải admin hoặc owner không
+                        DiscountDish discountDish = new DiscountDish();                              //Khai báo biến Model DiscountDish
+                        discountDish.Delete(id);                                                     //Xóa data
                         return Ok(new[] { "Xóa thành công" });
                     }
                     else
@@ -113,30 +94,24 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
-
         [Authorize]
         [HttpPost("CreateDiscountDish")]
-        public IActionResult RegisterDiscountDish([FromBody] DiscountDish discountDish)
-        {
+        public IActionResult RegisterDiscountDish([FromBody] DiscountDish discountDish){                 //Tạo khuyến mãi cho món ăn
             string err = "";
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true)
-                    {
-                        DiscountDish discountDish1 = new DiscountDish();
-                        discountDish1.AddToFireBase(discountDish);
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                              //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                           //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                           //Email của token             
+                User infoUser = new User();                                                              //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){              //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true){       //Kiểm tra có phải admin hoặc owner không
+                        DiscountDish discountDish1 = new DiscountDish();                                 //Khai báo biến Model DiscountDish 
+                        discountDish1.AddToFireBase(discountDish);                                       //Thêm data
                         err = "Đăng ký thành công";
                     }
                     else
@@ -146,8 +121,7 @@ namespace TLCN_WEB_API.Controllers
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 err = "Error";
             }
             return Ok(new[] { err });

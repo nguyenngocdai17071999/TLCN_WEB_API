@@ -25,144 +25,111 @@ namespace TLCN_WEB_API.Controllers
     [ApiController]
     public class DistrictController : Controller
     {
-        [HttpGet("GetAll")]
-        //phương thức get dữ liệu từ firebase
-        public IActionResult GetAll()
-        {
-            try
-            {
-                District danhsach = new District();
-                return Ok(danhsach.getAll());
+        [HttpGet("GetAll")]                                    //Lấy tất cả dữ liệu quận
+        public IActionResult GetAll(){
+            try{
+                District danhsach = new District();            //Khai báo model District
+                return Ok(danhsach.getAll());                  //Trả về danh sách khuyến mãi món ăn
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByID")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByID(string id)
-        {
-            try
-            {
-                District danhsach = new District();
-                return Ok(danhsach.getByID(id));
+        [HttpGet("GetByID")]                                     //Lấy tất cả dữ liệu quận truyền vào IDDistrict
+        public IActionResult GetByID(string id){
+            try{
+                District danhsach = new District();              //Khai báo model District
+                return Ok(danhsach.getByID(id));                 //Trả về danh sách District
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
-        [HttpGet("GetByIDProvince")]
-        // phương thức get by id dữ liệu từ firebase 
-        public IActionResult GetByIDProvince(string id)
-        {
-            try
-            {
-                District danhsach = new District();
-                return Ok(danhsach.getByIDProvince(id));
+        [HttpGet("GetByIDProvince")]                                //Lấy tất cả dữ liệu quận theo Thành phố truyền vào IDProvince
+        public IActionResult GetByIDProvince(string id){
+            try{
+                District danhsach = new District();                 //Khai báo model District
+                return Ok(danhsach.getByIDProvince(id));            //Trả về danh sách District
             }
-            catch
-            {
+            catch{
                 return Ok("Error");
             }
         }
 
         [Authorize]
-        [HttpPost("EditByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult EditByID(string id, [FromBody] District district)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        District district1 = new District();
-                        district1.AddbyidToFireBase(id, district);
+        [HttpPost("EditByID")]                                                               //Chỉnh sửa quận truyền vào IDDistrict
+        public IActionResult EditByID(string id, [FromBody] District district){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                  //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                               //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                               //Email của token             
+                User infoUser = new User();                                                  //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){  //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                 //Kiểm tra có phải admin không
+                        District district1 = new District();                                 //Khai báo biến Model District
+                        district1.AddbyidToFireBase(id, district);                           //Update data
                         return Ok(new[] { "sửa thành công" });
                     }
-                    else
-                    {
+                    else{
                         return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
         [Authorize]
-        [HttpPost("DeleteByID")]
-        //thay đổi thông tin đã có trên firebase theo id
-        public IActionResult DeleteByID(string id)
-        {
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        District district = new District();
-                        district.Delete(id);
+        [HttpPost("DeleteByID")]                                                             //Xóa quận truyền vào IDDistrict
+        public IActionResult DeleteByID(string id){
+            try{
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                  //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                               //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                               //Email của token             
+                User infoUser = new User();                                                  //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){  //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                 //Kiểm tra có phải admin không
+                        District district = new District();                                  //Khai báo biến Model District 
+                        district.Delete(id);                                                 //Delete data
                         return Ok(new[] { "Xóa thành công" });
                     }
-                    else
-                    {
+                    else{
                         return Ok(new[] { "Bạn Không có quyền" });
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 return Ok(new[] { "Error" });
             }
         }
 
-
-        //[Authorize]
-        [HttpPost("Create")]
-        public IActionResult Register([FromBody] District district)
-        {
+        [Authorize]
+        [HttpPost("Create")]                                                                    //Thêm district
+        public IActionResult Register([FromBody] District district){
             string err = "";
-            try
-            {
-                var identity = HttpContext.User.Identity as ClaimsIdentity;
-                IList<Claim> claim = identity.Claims.ToList();
-                string Email = claim[1].Value;
-                User infoUser = new User();
-                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true)
-                {
-                    if (infoUser.checkAdmin(Email) == true)
-                    {
-                        District district1 = new District();
-                        district1.AddToFireBase(district);
+            try{                                                                                
+                var identity = HttpContext.User.Identity as ClaimsIdentity;                     //khai báo biến danh tính của token
+                IList<Claim> claim = identity.Claims.ToList();                                  //Danh sách các biến trong identity
+                string Email = claim[1].Value;                                                  //Email của token             
+                User infoUser = new User();                                                     //Khai bao biến thông tin người dùng
+                if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){     //kiểm tra thời gian đăng nhập còn không
+                    if (infoUser.checkAdmin(Email) == true){                                    //Kiểm tra có phải admin không
+                        District district1 = new District();                                    //Khai báo biến Model District
+                        district1.AddToFireBase(district);                                      //Create data
                         err = "Đăng ký thành công";
                     }
-                    else
-                    {
+                    else{
                         err = "Bạn Không có quyền";
                     }
                 }
                 else return Ok(new[] { "Bạn cần đăng nhập" });
             }
-            catch
-            {
+            catch{
                 err = "Error";
             }
             return Ok(new[] { err });
