@@ -9,7 +9,7 @@ namespace TLCN_WEB_API.Models
     {
         public string BusinessTypeID { get; set; }
         public string BusinessTypetName { get; set; }
-        public int SoQuan { get; set; }
+        public int SoQuan { get; set; } // số lượng quán 
         public BienThongKeBusinessType()
         {
             BusinessTypeID = "";

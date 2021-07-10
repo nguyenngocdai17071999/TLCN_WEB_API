@@ -17,47 +17,41 @@ namespace TLCN_WEB_API.Models
         public string DiscountTypePicture { get; set; }
         string columnName = "DiscountType";
         IFirebaseClient client;
-        IFirebaseConfig config = new FirebaseConfig
-        {
+        IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
 
-        public DiscountType()
-        {
+        public DiscountType(){
             DiscountTypeID = "";
             DiscountTypeName = "";
             DiscountTypePicture = "";
         }
 
-        public List<DiscountType> getAll()
-        {
+        public List<DiscountType> getAll(){                           //lấy danh sách loại khuyến mãi
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<DiscountType>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<DiscountType>(((JProperty)item).Value.ToString()));
             }
             return list;
         }
 
-        public List<DiscountType> getByID(string id)
-        {
+        public List<DiscountType> getByID(string id){                    // xem thông tin loại khuyến mãi truyền vào IDDiscountType
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<DiscountType>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<DiscountType>(((JProperty)item).Value.ToString()));
             }
+            //thông tin khuyến mãi loại
             var list2 = new List<DiscountType>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.DiscountTypeID == id)
                     list2.Add(item);
             }
@@ -65,8 +59,7 @@ namespace TLCN_WEB_API.Models
         }
 
         // thêm dư liệu lên firebase
-        public void AddToFireBase(DiscountType discountType)
-        {
+        public void AddToFireBase(DiscountType discountType){
             client = new FireSharp.FirebaseClient(config);
             var data = discountType;
             PushResponse response = client.Push("DiscountType/", data);
@@ -74,22 +67,21 @@ namespace TLCN_WEB_API.Models
             SetResponse setResponse = client.Set("DiscountType/" + data.DiscountTypeID, data);
         }
 
-        //thêm dữ liệu lên firebase theo id
-        public void AddbyidToFireBase(string id, DiscountType discountType)
-        {
+        //Update dữ liệu lên firebase theo id
+        public void AddbyidToFireBase(string id, DiscountType discountType){
             client = new FireSharp.FirebaseClient(config);
             var data = discountType;
             data.DiscountTypeID = id;
             SetResponse setResponse = client.Set("DiscountType/" + data.DiscountTypeID, data);
         }
-        public void Delete(string id)
-        {
+        //Xóa dữ liệu
+        public void Delete(string id){
             client = new FireSharp.FirebaseClient(config);
             var data = new DiscountType();
             SetResponse setResponse = client.Set("DiscountType/" + id,setnull(data));
         }
-        public DiscountType setnull(DiscountType a)
-        {
+        //Set null dữ liệu
+        public DiscountType setnull(DiscountType a){
             a.DiscountTypeID = null;
             a.DiscountTypeName = null;
             a.DiscountTypePicture = null;

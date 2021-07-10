@@ -21,27 +21,26 @@ namespace TLCN_WEB_API.Models
         public string BusinessTypeName { get; set; }
         public string BusinessTypePicture { get; set; }
 
-        string columnName = "BusinessType";
+        string columnName = "BusinessType"; // tên bảng 
         IFirebaseClient client;
         IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
 
-
-        public List<BusinessType> getAll(){
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get(columnName);
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        public List<BusinessType> getAll(){                                    //lấy tất cả dữ liệu BusinessType
+            client = new FireSharp.FirebaseClient(config);                     //Kết nối với Firebase
+            FirebaseResponse response = client.Get(columnName);                 //Lấy dữ liệu trên FireBase về
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body); //convert dữ liệu ra data
             var list = new List<BusinessType>();
             //danh sách tìm kiếm
             foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString()));
+                list.Add(JsonConvert.DeserializeObject<BusinessType>(((JProperty)item).Value.ToString())); //thêm dữ liệu vào danh sách
             }
             return list;
         }
 
-        public List<BusinessType> getByID(string id){
+        public List<BusinessType> getByID(string id){                            // lấy dữ liệu BusinessType truyền vào IDBusinessType
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -60,26 +59,24 @@ namespace TLCN_WEB_API.Models
 
 
         // thêm dư liệu lên firebase
-        public void AddToFireBase(BusinessType businessType)
-        {
-            client = new FireSharp.FirebaseClient(config);
+        public void AddToFireBase(BusinessType businessType){
+            client = new FireSharp.FirebaseClient(config);                            //kết nối với firebase
             var data = businessType;
-            PushResponse response = client.Push("BusinessType/", data);
+            PushResponse response = client.Push("BusinessType/", data);              //gửi phản hồi lên bảng trên firebase
             data.BusinessTypeID = response.Result.name;
             SetResponse setResponse = client.Set("BusinessType/" + data.BusinessTypeID, data);
         }
 
-        //thêm dữ liệu lên firebase theo id
-        public void AddbyidToFireBase(string id, BusinessType businessType)
-        {
-            client = new FireSharp.FirebaseClient(config);
+        //Update dữ liệu
+        public void AddbyidToFireBase(string id, BusinessType businessType){
+            client = new FireSharp.FirebaseClient(config);                              //kết nối với firebase
             var data = businessType;
             data.BusinessTypeID = id;
             SetResponse setResponse = client.Set("BusinessType/" + data.BusinessTypeID, data);
         }
-        public void Delete(string id)
-        {
-            client = new FireSharp.FirebaseClient(config);
+        //xóa dữ liệu
+        public void Delete(string id){
+            client = new FireSharp.FirebaseClient(config);                             //kết nối với firebase
             var data = new BusinessType();
             SetResponse setResponse = client.Set("BusinessType/" + id, data);
         }

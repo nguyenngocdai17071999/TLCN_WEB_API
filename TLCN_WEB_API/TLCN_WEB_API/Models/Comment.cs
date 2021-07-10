@@ -26,18 +26,12 @@ namespace TLCN_WEB_API.Models
 
 
 
-        IFirebaseConfig config = new FirebaseConfig
-        {
+        IFirebaseConfig config = new FirebaseConfig{
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
-        string columnName = "Comment";
-        private static string key = "TLCN";
-        private IConfiguration _config;
-        public Comment(IConfiguration config)
-        {
-            _config = config;
-        }
+        string columnName = "Comment";                  //tên bảng
+        IFirebaseClient client;                        //biến client kết nối firebase
 
         public Comment()
         {
@@ -53,81 +47,66 @@ namespace TLCN_WEB_API.Models
             RatePoint = "";
         }
 
-        IFirebaseClient client;
-        //thêm dữ liệu lên firebase theo id
-        public void AddbyidToFireBase(string id, Comment comment)
-        {
+        //Update data
+        public void AddbyidToFireBase(string id, Comment comment){     //IDComment
             client = new FireSharp.FirebaseClient(config);
             var data = comment;
             data.CommentID = id;
             SetResponse setResponse = client.Set("Comment/" + data.CommentID, data);
         }
 
-        public List<Comment> getAll() {
+        public List<Comment> getAll() {                                //Lấy tất cả dữ liệu comment
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Comment>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
             }
             return list;
         }
-        public List<Comment> getbyId(string id) {
+        public List<Comment> getbyId(string id) {                             //Lấy dữ liệu comment của quán IDStore
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Comment>();
-            //danh sách tìm kiếm
-            //if (data == null) return Ok("Error");
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Comment>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.StoreID == id)
                     list2.Add(item);
             }
             return list2;
         }
-        public Comment getbyIdcomment(string id)
+        public Comment getbyIdcomment(string id)                                   //Lấy dữ liệu comment truyền vào IDcomment
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Comment>();
-            //danh sách tìm kiếm
-            //if (data == null) return Ok("Error");
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
             }
-            Comment a = new Comment();
-          
-            foreach (var item in list)
-            {
-                if (item.CommentID == id)
-                {
+            Comment a = new Comment();          
+            foreach (var item in list){
+                if (item.CommentID == id){
                     a = item;
                 }    
             }
             return a;
         }
 
-        public void Delete(string id)
-        {
+        public void Delete(string id){                                          //Xóa comment
             client = new FireSharp.FirebaseClient(config);
             var data = new Comment();
             // data.CommentID = id;
             SetResponse setResponse = client.Set("Comment/" + id, Nulldata(data));
         }
 
-        public Comment Nulldata(Comment comment)
-        {
+        public Comment Nulldata(Comment comment){                     //Xét null các giá trị để xóa trên firebase
             comment.CommentID = null;
             comment.Content = null;
             comment.Date = null;
@@ -141,40 +120,35 @@ namespace TLCN_WEB_API.Models
             return comment;
         }
 
-        public string GetIDUser(string Email)
-        {
+        public string GetIDUser(string Email){                                    //lấy thông tin User bằng EMail
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("User");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<User>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<User>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.Email.ToString() == Email)
                     return item.UserID;
             }
             return "";
         }
 
-        public string idchuquan(string idstore)
+        public string idchuquan(string idstore)                                              //Lấy ID chủ quán
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Stores");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data)
-            {
+            foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Store>();
-            foreach (var item in list)
-            {
+            foreach (var item in list){
                 if (item.StoreID.ToString() == idstore)
                     return item.UserID;
             }
@@ -182,8 +156,7 @@ namespace TLCN_WEB_API.Models
         }
 
         // thêm dư liệu lên firebase
-        public string AddToFireBase(Comment comment)
-        {
+        public string AddToFireBase(Comment comment){
             client = new FireSharp.FirebaseClient(config);
             var data = comment;
             PushResponse response = client.Push("Comment/", data);

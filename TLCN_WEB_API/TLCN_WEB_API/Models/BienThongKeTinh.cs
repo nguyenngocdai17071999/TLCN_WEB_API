@@ -9,7 +9,7 @@ namespace TLCN_WEB_API.Models
     {
         public string ProvinceID { get; set; }
         public string ProvinceName { get; set; }
-        public int SoQuan { get; set; }
+        public int SoQuan { get; set; }// số lượng quán 
         public BienThongKeTinh(){
             ProvinceID = "";
             ProvinceName = "";
