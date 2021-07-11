@@ -80,6 +80,28 @@ namespace TLCN_WEB_API.Models
             return "";
         }
 
+        public Discount getDiscount(string iddiscount)
+        {              //xem thông tin ID khuyến mãi
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Discount>();
+            //danh sách tìm kiếm
+            foreach (var item in data)
+            {
+                list.Add(JsonConvert.DeserializeObject<Discount>(((JProperty)item).Value.ToString()));
+            }
+            var discount = new Discount();
+            foreach (var item in list)
+            {
+                if (item.IDDiscount == iddiscount)
+                {
+                    discount=item;
+                }
+            }
+            return discount;
+        }
+
         public List<Discount> getByidStore(string IdStore){                            //lấy danh sách khuyến mãi của quán
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
@@ -104,6 +126,13 @@ namespace TLCN_WEB_API.Models
             PushResponse response = client.Push("Discount/", data);
             data.IDDiscount = response.Result.name;
             SetResponse setResponse = client.Set("Discount/" + data.IDDiscount, data);
+            Store danhsachstore = new Store();
+            var store = danhsachstore.getByID(discount.IDStore, 0, 0);
+            foreach(var item in store) //bật biến khuyến mãi của quán thành true
+            {
+                item.Discount = true;
+                danhsachstore.AddbyidToFireBase(item.StoreID, item);
+            }
         }
 
         //update dữ liệu lên firebase theo id
@@ -113,12 +142,28 @@ namespace TLCN_WEB_API.Models
             data.IDDiscount = id;
             SetResponse setResponse = client.Set("Discount/" + data.IDDiscount, data);
         }
-        //xóa dữ liệu
+        //xóa dữ liệu IDDiscount
         public void Delete(string id){
             if(id!=""){
                 client = new FireSharp.FirebaseClient(config);
+                var discounts = getDiscount(id);           //lấy thông tin khuyến mãi
                 var data = new Discount();
                 SetResponse setResponse = client.Set("Discount/" + id, setnull(data));
+
+
+                var danhsachkhuyenmai = getByidStore(discounts.IDStore);
+                if (danhsachkhuyenmai.Count==0)       //nếu chỉ có 1 khuyến mãi của quán
+                {
+
+                        Store danhsachstore = new Store();
+                        var store = danhsachstore.getByID(discounts.IDStore, 0, 0);
+                        foreach (var item2 in store) //tắt biến khuyến mãi của quán thành false
+                        {
+                            item2.Discount = false;
+                            danhsachstore.AddbyidToFireBase(item2.StoreID, item2);
+                        }
+                    
+                }
             }
         }
         //set null các thành phần dữ liệu đễ xóa
