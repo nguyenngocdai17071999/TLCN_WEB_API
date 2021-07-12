@@ -35,6 +35,18 @@ namespace TLCN_WEB_API.Controllers
                 return Ok("Error");
             }           
         }
+        
+        [HttpGet("TangViewWebsite")]                                      //tăng view Website
+        public IActionResult TangViewWebsite(double Lat, double Long){    
+            try{
+                Store store = new Store();
+                store.ViewWebsite();
+                return Ok("OK");
+            }
+            catch{
+                return Ok("Error");
+            }           
+        } 
 
         [HttpGet("GetAllManage")]                                        //Lấy dữ liệu danh sách tất cả quán ăn k kiểm tra live
         public IActionResult GetAllmanage(double Lat, double Long){
@@ -47,7 +59,7 @@ namespace TLCN_WEB_API.Controllers
             }
         }
 
-        [HttpGet("GetAllGanToi")]                                          //Danh sách quán ăn được sắp xếp gần tới xa
+        [HttpGet("GetAllGanToi")]                                          //Danh sách quán ăn được sắp xếp gần Uơ xa
         public IActionResult GetAllGanToi(double Lat, double Long)
         {
             try{
@@ -413,13 +425,41 @@ namespace TLCN_WEB_API.Controllers
             }                 
         }
 
+        [HttpGet("TongViewQuan")]                                       // cập nhật điểm đánh giá cho quán
+        public IActionResult TongViewQuan(string id)
+        {  //IDStore, Ratepoint
+            try
+            {
+                View_Store view_Store = new View_Store();
+                var tongview = view_Store.getByIDStore(id);
+                return Ok(tongview.Count);
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
+        [HttpGet("ListRate")]                                       // cập nhật điểm đánh giá cho quán
+        public IActionResult Danhsachrate(string id)
+        {  //IDStore, Ratepoint
+            try
+            {
+                Store store2 = new Store();
+                return Ok(store2.danhsachrate(id));
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
 
         [HttpPost("UpdateRatePoint")]                                       // cập nhật điểm đánh giá cho quán
-        public IActionResult UpdateRatePoint(string id, string RatePoint){  //IDStore, Ratepoint
+        public IActionResult UpdateRatePoint(string id){  //IDStore, Ratepoint
             try{
                 Store store2 = new Store();
-                store2.updateRatePoint(id, RatePoint);
-                return Ok("Cập nhật thành công");
+                double a = store2.updateRatePoint(id);
+                return Ok(a.ToString());
             }
             catch{
                 return Ok("Error");

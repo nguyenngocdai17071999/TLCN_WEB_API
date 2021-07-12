@@ -39,6 +39,29 @@ namespace TLCN_WEB_API.Models
             return list;
         }
 
+        public List<DiscountDish> getByIDStore(string id)
+        {                    //lấy thông tin khuyến mãi của món ăn truyền vào IDDish
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<DiscountDish>();
+            var list2 = new List<DiscountDish>();
+            if (data != null)
+            {
+                //danh sách tìm kiếm
+                foreach (var item in data)
+                {
+                    list.Add(JsonConvert.DeserializeObject<DiscountDish>(((JProperty)item).Value.ToString()));
+                }
+                foreach (var item in list)
+                {
+                    if (item.StoreID == id)
+                        list2.Add(item);
+                }
+            }
+            return list2;
+        }
+
         public List<DiscountDish> getByID(string id){                    //lấy thông tin khuyến mãi của món ăn truyền vào IDDish
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
@@ -81,13 +104,24 @@ namespace TLCN_WEB_API.Models
             }
         }
 
+        public bool kiemtrakhuyenmai(string IDDishCheck, string IDDiscountTypeCheck) {
+            var danhsachkhuyemai = new List<DiscountDish>();
+            danhsachkhuyemai = getByID(IDDishCheck);
+            foreach(var item in danhsachkhuyemai) {
+                if (item.DishcountTypeID == IDDiscountTypeCheck)
+                    return true;
+            }
+            return false;
+        }
+
         //thêm dữ liệu lên firebase theo id
         public void AddbyidToFireBase(string id, DiscountDish discountDish){
-            client = new FireSharp.FirebaseClient(config);
-            var data = discountDish;
-            data.DiscountDishID = id;
-            SetResponse setResponse = client.Set("DiscountDish/" + data.DiscountDishID, data);
-            
+            if(kiemtrakhuyenmai(discountDish.DishID,discountDish.DishcountTypeID)==false){
+                client = new FireSharp.FirebaseClient(config);
+                var data = discountDish;
+                data.DiscountDishID = id;
+                SetResponse setResponse = client.Set("DiscountDish/" + data.DiscountDishID, data);
+            }           
         }
         //Xóa khuyến mãi quán
         public void Delete(string id){

@@ -15,12 +15,12 @@ namespace TLCN_WEB_API.Models
     {
         private string v;
         private static string key = "TLCN";
-        IFirebaseConfig config = new FirebaseConfig{
+        IFirebaseConfig config = new FirebaseConfig {
             AuthSecret = "0ypBJAvuHDxyKu9sDI6xVtKpI6kkp9QEFqHS92dk",
             BasePath = "https://tlcn-1a9cf.firebaseio.com/"
         };
         IFirebaseClient client;
-        public Store(){
+        public Store() {
             StoreID = "";
             StoreAddress = "";
             StoreName = "";
@@ -30,7 +30,7 @@ namespace TLCN_WEB_API.Models
             UserID = "";
             ProvinceID = "";
             BusinessTypeID = "";
-            RatePoint = "";
+            RatePoint = "0";
             khoangcach = "";
             Status = "";
             Lat = "";
@@ -66,28 +66,29 @@ namespace TLCN_WEB_API.Models
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data){
+            foreach (var item in data) {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }   
-            if(LatNew!=0 && LongNew!=0){          //nếu thay đổi location tính lại khoản cách
-                foreach (var item in list){
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+            }  
+            if (LatNew != 0 && LongNew != 0) {          //nếu thay đổi location tính lại khoản cách
+                foreach (var item in list) {
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             return Check(list);
         }
 
-        public List<Store> getAllGanToi(double LatNew, double LongNew){              //lấy danh sách tất cả các quán sắp xếp khoảng cách gần tới xa
+        public List<Store> getAllGanToi(double LatNew, double LongNew) {              //lấy danh sách tất cả các quán sắp xếp khoảng cách gần tới xa
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data){
+            foreach (var item in data) {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
-            if (LatNew != 0 && LongNew != 0){           //nếu đổi location thì tỉnh lại khoảng cách
-                foreach (var item in list){
+            if (LatNew != 0 && LongNew != 0) {           //nếu đổi location thì tỉnh lại khoảng cách
+                foreach (var item in list) {
                     if (item.Lat != "" && item.Long != "")
                         item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
@@ -95,45 +96,46 @@ namespace TLCN_WEB_API.Models
             return Check(gantoi(list));
         }
 
-        public List<Store> getAllCheck(double LatNew, double LongNew){                     //lấy danh sách quán cần xác nhận lên live        
+        public List<Store> getAllCheck(double LatNew, double LongNew) {                     //lấy danh sách quán cần xác nhận lên live        
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data){
+            foreach (var item in data) {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
-            if (LatNew != 0 && LongNew != 0){               //nếu thay đổi location thì tính lại khoản cách
-                foreach (var item in list){
-                    item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
+            if (LatNew != 0 && LongNew != 0) {               //nếu thay đổi location thì tính lại khoản cách
+                foreach (var item in list) {
+                    if (item.Lat != "" && item.Long != "")
+                        item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
             }
             var list2 = new List<Store>();           //lọc quán cần xác nhận với status = -1
-            foreach(var item in list){
-                if(item.Status=="-1"){
+            foreach (var item in list) {
+                if (item.Status == "-1") {
                     list2.Add(item);
-                }    
+                }
             }
             return list2;
         }
 
-        public List<Store> getAllGanToiProvince(string id, double LatNew, double LongNew){ //lấy danh sách tất cả các quán sắp xếp khoảng cách gần tới xa theo IDProvince
-            client = new FireSharp.FirebaseClient(config);                        
+        public List<Store> getAllGanToiProvince(string id, double LatNew, double LongNew) { //lấy danh sách tất cả các quán sắp xếp khoảng cách gần tới xa theo IDProvince
+            client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data){
+            foreach (var item in data) {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Store>();
-            foreach (var item in list){                         //lọc quán theo IDProvince thêm vào danh sách
+            foreach (var item in list) {                         //lọc quán theo IDProvince thêm vào danh sách
                 if (item.ProvinceID == id)
                     list2.Add(item);
             }
-            if (LatNew != 0 && LongNew != 0){                          //Nếu thay đổi location thì tính lại khoảng cách
-                foreach (var item in list2){
+            if (LatNew != 0 && LongNew != 0) {                          //Nếu thay đổi location thì tính lại khoảng cách
+                foreach (var item in list2) {
                     if (item.Lat != "" && item.Long != "")
                         item.khoangcach = Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), LatNew, LongNew).ToString();
                 }
@@ -141,7 +143,7 @@ namespace TLCN_WEB_API.Models
             return Check(gantoi(list2));
         }
         // thêm dư liệu lên firebase
-        public void AddToFireBase(Store store){
+        public void AddToFireBase(Store store) {
             client = new FireSharp.FirebaseClient(config);
             var data = store;
             PushResponse response = client.Push("Stores/", data);
@@ -149,7 +151,7 @@ namespace TLCN_WEB_API.Models
             SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
 
-        public static double Calculate(double sLatitude, double sLongitude, double eLatitude, double eLongitude){       //tính khoảng cách giữa 2 location 
+        public static double Calculate(double sLatitude, double sLongitude, double eLatitude, double eLongitude) {       //tính khoảng cách giữa 2 location 
             var radiansOverDegrees = (Math.PI / 180.0);                   //radian trên độ
             var sLatitudeRadians = sLatitude * radiansOverDegrees;         //tọa độ radian
             var sLongitudeRadians = sLongitude * radiansOverDegrees;
@@ -185,15 +187,15 @@ namespace TLCN_WEB_API.Models
             var list = new List<Store>();
             var list2 = new List<Store>();
             //danh sách tìm kiếm
-            if(data2 !=null){
-                foreach (var item in data2){
+            if (data2 != null) {
+                foreach (var item in data2) {
                     list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
                 }
-                foreach (var item in list){                          //tìm kiếm nội dung trong csdl để so sánh
+                foreach (var item in list) {                          //tìm kiếm nội dung trong csdl để so sánh
                     if (item.StoreID == id)
                         list2.Add(item);
                 }
-                foreach (var item in list2){                              //cập nhật các nội dung k chỉnh sửa
+                foreach (var item in list2) {                              //cập nhật các nội dung k chỉnh sửa
                     if (data.StoreID == null) data.StoreID = item.StoreID;
                     if (data.StoreAddress == null) data.StoreAddress = item.StoreAddress;
                     if (data.StoreName == null) data.StoreName = item.StoreName;
@@ -209,28 +211,179 @@ namespace TLCN_WEB_API.Models
                     if (data.Lat == null) data.Status = item.Lat;
                     if (data.Long == null) data.Status = item.Long;
                 }
-            }                
+            }
             SetResponse setResponse = client.Set("Stores/" + data.StoreID, data);
         }
-        
-        public void updateRatePoint(string id, string RatePoint) {                            //cập nhật điểm đánh giá của quán truyền vào IDStore
+
+        public double updateRatePoint(string id) {                            //cập nhật điểm đánh giá của quán truyền vào IDStore
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnname);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
             var list = new List<Store>();
             //danh sách tìm kiếm
-            foreach (var item in data){
+            foreach (var item in data) {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
             }
             var list2 = new List<Store>();
-            foreach (var item in list){
+            foreach (var item in list) {
                 if (item.StoreID == id)
                     list2.Add(item);
             }
-            foreach (var item in list2){
-                item.RatePoint = RatePoint;
+            double a = tinhratepoint(id);
+            foreach (var item in list2) {
+                item.RatePoint = a.ToString();
                 AddbyidToFireBase(item.StoreID, item);
             }
+            return a;
+        }
+
+        public List<Comment> danhsachrate(string IDStoretinh) {                   //danh sách rating
+            Comment comment = new Comment();
+            var danhsachcomment = new List<Comment>();
+            danhsachcomment = comment.getbyId(IDStoretinh);
+            var danhsachUserID = new List<Comment>();
+            foreach (var item in danhsachcomment)
+            {
+                if (danhsachUserID.Count == 0) danhsachUserID.Add(item);
+                else
+                {
+                    int dem = 0;
+                    foreach (var item2 in danhsachUserID)
+                    {
+                        if (item.UserID == item2.UserID) dem++;
+                    }
+                    if (dem == 0) danhsachUserID.Add(item);
+                }
+            }
+            var danhsachrate = new List<Comment>();
+            foreach (var item in danhsachUserID)
+            {
+                var danhsachcmtuser = comment.getbyId(item.StoreID, item.UserID);
+                string ngay = danhsachcmtuser[0].Date.ToString();
+                string cmtID = danhsachcmtuser[0].CommentID;
+                User user = new User();
+                for (int i = 1; i < danhsachcmtuser.Count; i++)
+                {
+                    if (user.checkAdmin(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false
+                        && user.checkOwner(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false)
+                    {
+                        if (kiemtrangaynaotruoc(ngay, danhsachcmtuser[i].Date) == false)
+                        {
+                            ngay = danhsachcmtuser[i].Date;
+                            cmtID = danhsachcmtuser[i].CommentID;
+                        }
+                    }
+                }
+                foreach (var item2 in danhsachcmtuser)
+                {
+                    if (item2.CommentID == cmtID) danhsachrate.Add(item2);
+                }
+            }
+            return danhsachrate;
+        }
+
+        public double tinhratepoint(string IDStoretinh) {
+            Comment comment = new Comment();
+            var danhsachcomment = new List<Comment>();
+            danhsachcomment = comment.getbyId(IDStoretinh);
+            var danhsachUserID = new List<Comment>();
+            foreach (var item in danhsachcomment)
+            {
+                if (danhsachUserID.Count == 0) danhsachUserID.Add(item);
+                else
+                {
+                    int dem = 0;
+                    foreach(var item2 in danhsachUserID)
+                    {
+                        if (item.UserID == item2.UserID) dem++;
+                    }
+                    if (dem == 0) danhsachUserID.Add(item);
+                }
+            }
+            var danhsachrate = new List<Comment>();
+            foreach (var item in danhsachUserID)
+            {
+                var danhsachcmtuser = comment.getbyId(item.StoreID, item.UserID);
+                string ngay = danhsachcmtuser[0].Date.ToString();
+                string cmtID = danhsachcmtuser[0].CommentID;
+                User user = new User();
+                for (int i = 1; i < danhsachcmtuser.Count; i++)
+                {
+                    if(user.checkAdmin(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false 
+                        && user.checkOwner(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false)
+                    {
+                        if (kiemtrangaynaotruoc(ngay, danhsachcmtuser[i].Date) == false)
+                        {
+                            ngay = danhsachcmtuser[i].Date;
+                            cmtID = danhsachcmtuser[i].CommentID;
+                        }
+                    }                                           
+                }
+                foreach(var item2 in danhsachcmtuser)
+                {
+                    if (item2.CommentID == cmtID) danhsachrate.Add(item2);
+                }
+            }
+            double tongrate = 0.0;
+            int demrate = 0;
+            foreach(var item in danhsachrate)
+            {
+                tongrate = tongrate + Convert.ToInt32(item.RatePoint);
+                demrate++;
+            }
+            if (demrate == 0) return 0;
+            tongrate = tongrate/demrate;
+            return tongrate;
+        }
+
+        public bool kiemtrangaynaotruoc(string ngay1, string ngay2){ //true là ngày 1 truoc,false la ngay 2 truoc        
+            DateTime Time1 = DateTime.Parse(ngay1);
+            DateTime Time2 = DateTime.Parse(ngay2);
+            if (Time1.Year <= Time2.Year)
+            {
+                if (Time1.Year == Time2.Year){
+                    if(Time1.Month <= Time2.Month){
+                        if (Time1.Month == Time2.Month){
+                            if (Time1.Day <= Time2.Day){
+                                if (Time1.Day == Time2.Day){
+                                    string newstring1 = ngay1.Substring(ngay1.Length - 2, 2);
+                                    string newstring2 = ngay1.Substring(ngay2.Length - 2, 2);
+                                    if (newstring1 == newstring1){
+                                        if (Time1.Hour <= Time2.Hour){
+                                            if (Time1.Hour == Time2.Hour){
+                                                if (Time1.Minute <= Time2.Minute){
+                                                    if (Time1.Minute == Time2.Minute){
+                                                        if (Time1.Second <= Time2.Second){
+                                                            if (Time1.Second == Time2.Second){
+                                                                return true;
+                                                            }
+                                                            else return true;
+                                                        }
+                                                        else return false;
+                                                    }
+                                                    else return true;
+                                                }
+                                                else return false;
+                                            }
+                                            else return true;
+                                        }
+                                        else return false;
+                                    }
+                                    else if (newstring1 == "AM" && newstring2 == "PM") return true;
+                                    else if (newstring1 == "PM" && newstring2 == "AM") return false;
+                                }
+                                else return true;
+                            }
+                            else return false;
+                        }
+                        else return true;
+                    }
+                    else return false;
+                }    
+                else return true;
+            }
+            else return false;
+            return true;
         }
 
         public void blockStore(string id, string status) {                                 //đổi status của quán khóa quán
@@ -353,6 +506,14 @@ namespace TLCN_WEB_API.Models
                 }
             }
             return Check(list2);
+        }
+
+        public void ViewWebsite(){
+            View_Store view_Store = new View_Store();
+            //mỗi lần xem chi tiết quán ăn sẽ lưu lại lượt view 
+            view_Store.StoreID = "";
+            view_Store.Date = DateTime.Now.ToString();
+            view_Store.Add(view_Store);
         }
 
         public List<Store> getByIDDistrict(string id, double LatNew, double LongNew){             //lấy danh sách quán theo quận truyền vào IDDistrict

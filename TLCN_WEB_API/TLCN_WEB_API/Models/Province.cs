@@ -39,6 +39,39 @@ namespace TLCN_WEB_API.Models
                 list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
             }
             return list;
+        } 
+        public List<Province> GetAllProvincesHaveStore() {                        //lấy danh sách thành phố
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Province>();
+            //danh sách tìm kiếm
+            foreach (var item in data){
+                list.Add(JsonConvert.DeserializeObject<Province>(((JProperty)item).Value.ToString()));
+            }
+            Store store = new Store();
+            var danhsachquan = store.getAll(0,0);
+            var danhsachtinh = new List<Province>();
+            foreach(var item in list)
+            {
+                
+                foreach(var item2 in danhsachquan)
+                {
+                    if(item.ProvinceID==item2.ProvinceID)
+                    {
+                        int dem = 0;
+                        foreach(var item3 in danhsachtinh)
+                        {
+                            if(item3.ProvinceID==item2.ProvinceID)
+                            {
+                                dem++;
+                            }    
+                        }
+                        if (dem == 0) danhsachtinh.Add(item);
+                    }    
+                }
+            }
+            return danhsachtinh;
         }
 
         public List<Province> getByID(string id)                   //xem thông tin thành phố IDProvince

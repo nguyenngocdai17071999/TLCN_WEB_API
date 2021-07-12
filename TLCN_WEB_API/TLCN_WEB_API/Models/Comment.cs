@@ -81,6 +81,21 @@ namespace TLCN_WEB_API.Models
             }
             return list2;
         }
+        public List<Comment> getbyId(string idStore, string idUser) {                             //Lấy dữ liệu comment của quán IDStore
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get(columnName);
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var list = new List<Comment>();
+            foreach (var item in data){
+                list.Add(JsonConvert.DeserializeObject<Comment>(((JProperty)item).Value.ToString()));
+            }
+            var list2 = new List<Comment>();
+            foreach (var item in list){
+                if (item.StoreID == idStore && item.UserID==idUser)
+                    list2.Add(item);
+            }
+            return list2;
+        }
         public Comment getbyIdcomment(string id)                                   //Lấy dữ liệu comment truyền vào IDcomment
         {
             client = new FireSharp.FirebaseClient(config);

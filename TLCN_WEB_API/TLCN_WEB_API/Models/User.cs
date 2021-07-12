@@ -34,6 +34,7 @@ namespace TLCN_WEB_API.Models
         public string idGoogle { get; set; }
         public string numberVerify { get; set; }
         public string dateCodeVerify { get; set; }
+        public string DateLogin { get; set; }
 
 
         private static string key = "TLCN";
@@ -68,6 +69,7 @@ namespace TLCN_WEB_API.Models
             idGoogle = "";
             numberVerify = "";
             dateCodeVerify = "";
+            DateLogin = "";
         }
 
         public List<User> getAll(){                                            //Lấy danh sách tài khoản 
@@ -79,13 +81,16 @@ namespace TLCN_WEB_API.Models
             foreach (var item in data){
                 list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
             }
-            foreach (var item in list){
-                item.Password = Decrypt(item.Password);
-            }
             return list;
         }
 
-        public int ThongKeNguoiOnlie(){                                      //thống kê số người đang online với status = 3 là đang online
+        public bool kiemtracononline(string datetimelogin) {
+            TimeSpan Time = DateTime.Now - DateTime.Parse(datetimelogin);
+            if (Time.Days < 1 && Time.Minutes < 60) return true;
+            return false;
+        }
+
+        public int ThongKeNguoiOnlie(){                                      //thống kê số người đang online 
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get(columnName);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -96,10 +101,22 @@ namespace TLCN_WEB_API.Models
             }
             int dem = 0;
             foreach (var item in list){
-                if (item.Status == "3")
-                    dem++;
+                if (item.DateLogin != "" && item.DateLogin != null)
+                    if (kiemtracononline(item.DateLogin) == true)
+                        dem++;
             }
             return dem;
+        }
+
+        public void logout(string IDUser) {
+            var danhsachUser = getAll();
+            foreach(var item in danhsachUser) {
+                if (item.UserID == IDUser) {
+                    item.DateLogin = "";
+                    item.AddbyidToFireBase(item.UserID, item);
+                }
+                    
+            }
         }
 
         public List<User> getByID(string id, string email){                   //xem thông tin chi tiết tài khoản IDUser, Email
@@ -489,7 +506,7 @@ namespace TLCN_WEB_API.Models
             UserModel user = null;
             foreach (var item in list){
                 if (item.Email == login.EmailAddress && item.Password == Encrypt(login.PassWord)&&item.Status!="2"){
-                    item.Status = "3";                                //nếu đúng thì đổi sang chế độ đang online cho tài khoản
+                    item.DateLogin = DateTime.Now.ToString(); //lưu lại ngày đăng nhập
                     item.AddbyidToFireBase(item.UserID, item);
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
                 }
@@ -514,7 +531,7 @@ namespace TLCN_WEB_API.Models
             foreach (var item in list)                                    
             {
                 if (item.Email == login.EmailAddress && item.idFacebook == login.idFacebook){
-                    item.Status = "3";                                //nếu đúng thì đổi sang chế độ đang online cho tài khoản
+                    item.DateLogin = DateTime.Now.ToString();                                //lưu lại ngày đăng nhập
                     item.AddbyidToFireBase(item.UserID, item);
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
                 }
@@ -546,7 +563,7 @@ namespace TLCN_WEB_API.Models
             UserModel user = null;
             foreach (var item in list){
                 if (item.Email == login.EmailAddress && item.idGoogle == login.idGoogle){
-                    item.Status = "3";                                //nếu đúng thì đổi sang chế độ đang online cho tài khoản
+                    item.DateLogin = DateTime.Now.ToString();                                 //lưu lại ngày đăng nhập
                     item.AddbyidToFireBase(item.UserID, item);
                     user = new UserModel { UserName = item.UserName, EmailAddress = item.Email, PassWord = Decrypt(item.Password), Status = item.Status };
                 }
@@ -583,7 +600,7 @@ namespace TLCN_WEB_API.Models
                 issuer: "ashproghelp.com",                        //nhà phát hành
                 audience: "ashproghelp.com",                      //khán giả
                 claims,                                           //các giá trị trong token
-                expires: DateTime.Now.AddMinutes(120),            //thời gian token hoạt động
+                expires: DateTime.Now.AddMinutes(60),             //thời gian token hoạt động
                 signingCredentials: credentials);                 //thông tin xác thực
             //tạo token
             var encodetoken = new JwtSecurityTokenHandler().WriteToken(token);

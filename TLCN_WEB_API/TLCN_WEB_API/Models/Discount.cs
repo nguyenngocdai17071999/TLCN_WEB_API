@@ -119,20 +119,34 @@ namespace TLCN_WEB_API.Models
             return list2;
         }
 
+        public bool kiemtrakhuyenmai(string IDStoreCheck, string IDDiscountTypeCheck) {
+            var danhsachkhuyenmai = new List<Discount>();
+            danhsachkhuyenmai = getByidStore(IDStoreCheck);
+            foreach(var item in danhsachkhuyenmai) {
+                if (item.IDDiscountType == IDDiscountTypeCheck)
+                    return true;
+            }
+            return false;
+        }
+
         // thêm dư liệu lên firebase
         public void AddToFireBase(Discount discount){
-            client = new FireSharp.FirebaseClient(config);
-            var data = discount;
-            PushResponse response = client.Push("Discount/", data);
-            data.IDDiscount = response.Result.name;
-            SetResponse setResponse = client.Set("Discount/" + data.IDDiscount, data);
-            Store danhsachstore = new Store();
-            var store = danhsachstore.getByID(discount.IDStore, 0, 0);
-            foreach(var item in store) //bật biến khuyến mãi của quán thành true
-            {
-                item.Discount = true;
-                danhsachstore.AddbyidToFireBase(item.StoreID, item);
+            if (kiemtrakhuyenmai(discount.IDStore, discount.IDDiscountType) == false) {
+                client = new FireSharp.FirebaseClient(config);
+                var data = discount;
+                PushResponse response = client.Push("Discount/", data);
+                data.IDDiscount = response.Result.name;
+                SetResponse setResponse = client.Set("Discount/" + data.IDDiscount, data);
+                Store danhsachstore = new Store();
+                var store = danhsachstore.getByID(discount.IDStore, 0, 0);
+                foreach (var item in store){ //bật biến khuyến mãi của quán thành true                
+                    if(item.Discount==false){
+                        item.Discount = true;
+                        danhsachstore.AddbyidToFireBase(item.StoreID, item);
+                    }                    
+                }
             }
+           
         }
 
         //update dữ liệu lên firebase theo id

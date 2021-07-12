@@ -63,16 +63,13 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpGet("Search")]                                                          //Api tìm kiếm truyền vào KeyWord là tên món ăn hoặc bất kì, lat, long nếu thay đổi location
         public IActionResult Search(string dishname,double Lat, double Long){  
-            try{
+
                 if (dishname != null){                                               //Kiểm tra nếu không có nhập gì thì trả về không có kết quả
                     Dish dish = new Dish();                                          //Khai báo model dish
                     return Ok(dish.search(dishname, Lat, Long));                     //Trả về danh sách quán ăn theo keyword
                 }
                 return Ok("Không có kết quả tìm kiếm");
-            }
-            catch{
-                return Ok("Error");
-            }
+
         }
 
         [Authorize]

@@ -251,11 +251,11 @@ namespace TLCN_WEB_API.Controllers
             }
         }
      
-        [HttpPost("Logout")]                                              // đăng xuất
+        [HttpPost("Logout")]                                              // đăng xuất IDUser
         public IActionResult Logout(string id){
             try{
                 User infoUser = new User();
-                infoUser.blockAccount(id, "1");                           //chuyển về trạng thái off
+                infoUser.logout(id);                           //chuyển về trạng thái off
                 return Ok("Thay đổi thành công");
             }
             catch{

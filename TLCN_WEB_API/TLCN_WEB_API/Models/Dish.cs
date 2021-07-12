@@ -108,6 +108,17 @@ namespace TLCN_WEB_API.Models
                 }
             }
 
+            if (StoreID.Count == 0)
+            {                                                        //bỏ dấu tên quán ăn để so sánh
+                foreach (var item in danhsachStore)
+                {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo địa điểm
+                    if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
+                    {
+                        StoreID.Add(item.StoreID);
+                    }
+                }
+            }
+
             var StoreID_Checklap = new List<string>();                             //kiêm tra ID các quán tránh trùng lặp
             foreach (var item in StoreID){
                 int dem = 0;
@@ -126,7 +137,15 @@ namespace TLCN_WEB_API.Models
                         danhsachSearch.Add(item);
                 }
             }
-            return Store.Check(danhsachSearch);
+
+            if (Lat != 0 && Long != 0)
+            {          //nếu thay đổi location tính lại khoản cách
+                foreach (var item in danhsachSearch)
+                {
+                    item.khoangcach = Store.Calculate(Convert.ToDouble(item.Lat), Convert.ToDouble(item.Long), Lat, Long).ToString();
+                }
+            }
+            return Store.Check(Store.gantoi((danhsachSearch)));
         }
 
 

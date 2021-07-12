@@ -36,6 +36,20 @@ namespace TLCN_WEB_API.Controllers
             }           
         }
 
+        [HttpGet("GetAllProvinceHaveStore")]                                //Lấy tất cả dữ liệu thành phố
+        public IActionResult GetAllProvincesHaveStore()
+        {
+            try
+            {
+                Province province = new Province();        //Khai báo model Province
+                return Ok(province.GetAllProvincesHaveStore());              //Trả về danh sách thành phố
+            }
+            catch
+            {
+                return Ok("Error");
+            }
+        }
+
         [HttpGet("GetByID")]                               //Lấy tất cả dữ liệu thành phố truyền vào IDProvince
         public IActionResult GetByID(string id){
             try{
@@ -123,5 +137,6 @@ namespace TLCN_WEB_API.Controllers
             }
             return Ok(new[] { err });
         }
+
     }
 }
