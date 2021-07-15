@@ -86,7 +86,7 @@ namespace TLCN_WEB_API.Models
         }
 
         public List<Store> search(string dishname,double Lat, double Long) {            //Hàm tìm kiếm quán ăn theo Keyword
-            dishname = convertToUnSign3(dishname.ToLower());                         //Bỏ dấu keyword
+            //dishname = convertToUnSign3(dishname.ToLower());                         //Bỏ dấu keyword
             Store Store = new Store();
             Dish  Dish = new Dish();
 
@@ -95,14 +95,35 @@ namespace TLCN_WEB_API.Models
             var danhsachDish = Dish.getAll();                                       //danh sách món ăn
 
             foreach (var item in danhsachDish){                                          //bỏ dấu tên món ăn để so sánh
-                if ((convertToUnSign3(item.DishName.ToLower())).Contains(dishname)){
+                if (item.DishName.Contains(dishname))
+                {
                     StoreID.Add(item.Store_ID);
                 }
             }
 
-            if (StoreID.Count == 0){                                                        //bỏ dấu tên quán ăn để so sánh
+            if(StoreID.Count == 0)
+            {
+                BusinessType businessType = new BusinessType();
+                var danhsachBusinessType = businessType.getAll();
+                var danhsachsearchBusinessType = new List<BusinessType>();
+                foreach(var item in danhsachBusinessType)
+                {
+                    if (item.BusinessTypeName.Contains(dishname))
+                        danhsachsearchBusinessType.Add(item);
+                }
+                foreach(var item in danhsachsearchBusinessType)
+                {
+                    foreach(var item2 in danhsachStore)
+                    {
+                        if (item.BusinessTypeID == item2.BusinessTypeID)
+                            StoreID.Add(item2.StoreID);
+                    }
+                }
+            }
+
+            if (StoreID.Count == 0 ){                                                        //bỏ dấu tên quán ăn để so sánh
                 foreach (var item in danhsachStore){                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo tên quán
-                    if ((convertToUnSign3(item.StoreName.ToLower())).Contains(dishname)){
+                    if (item.StoreName.Contains(dishname)){
                         StoreID.Add(item.StoreID);
                     }
                 }
@@ -110,11 +131,113 @@ namespace TLCN_WEB_API.Models
 
             if (StoreID.Count == 0)
             {                                                        //bỏ dấu tên quán ăn để so sánh
+                District district = new District();
+                var danhsachquan = district.getAll();
+                var listquansearch = new List<District>();
+                foreach (var item in danhsachquan)
+                {
+                    if (item.DistrictName==dishname)
+                        listquansearch.Add(item);
+                }
+                foreach(var item in listquansearch)
+                {
+                    foreach (var item2 in danhsachStore)
+                    {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo địa điểm
+
+                        if (item.DistrictID==item2.DistrictID)
+                        {
+                            StoreID.Add(item2.StoreID);
+                        }
+                    }
+                }
+                    
+            }
+
+            if (StoreID.Count == 0)
+            {                                                        //bỏ dấu tên quán ăn để so sánh
                 foreach (var item in danhsachStore)
-                {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo địa điểm
-                    if ((convertToUnSign3(item.StoreAddress.ToLower())).Contains(dishname))
+                {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo tên quán
+                    if (item.StoreAddress.Contains(dishname))
                     {
                         StoreID.Add(item.StoreID);
+                    }
+                }
+            }
+
+            if (StoreID.Count == 0) //tìm theo k dấu
+            {
+                dishname = convertToUnSign3(dishname.ToLower());
+                foreach (var item in danhsachDish)
+                {                                          //bỏ dấu tên món ăn để so sánh
+                    if (convertToUnSign3(item.DishName.ToLower()).Contains(dishname))
+                    {
+                        StoreID.Add(item.Store_ID);
+                    }
+                }
+
+                if (StoreID.Count == 0) //timf theo loaị quán ăn
+                {
+                    BusinessType businessType = new BusinessType();
+                    var danhsachBusinessType = businessType.getAll();
+                    var danhsachsearchBusinessType = new List<BusinessType>();
+                    foreach (var item in danhsachBusinessType)
+                    {
+                        if (convertToUnSign3(item.BusinessTypeName.ToLower()).Contains(dishname))
+                            danhsachsearchBusinessType.Add(item);
+                    }
+                    foreach (var item in danhsachsearchBusinessType)
+                    {
+                        foreach (var item2 in danhsachStore)
+                        {
+                            if (item.BusinessTypeID == item2.BusinessTypeID)
+                                StoreID.Add(item2.StoreID);
+                        }
+                    }
+                }
+
+                if (StoreID.Count == 0)
+                {                                                        //bỏ dấu tên quán ăn để so sánh
+                    foreach (var item in danhsachStore)
+                    {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo tên quán
+                        if (convertToUnSign3(item.StoreName.ToLower()).Contains(dishname))
+                        {
+                            StoreID.Add(item.StoreID);
+                        }
+                    }
+                }
+
+                if (StoreID.Count == 0) 
+                {                                                        //bỏ dấu tên quán ăn để so sánh
+                    District district = new District();
+                    var danhsachquan = district.getAll();
+                    var listquansearch = new List<District>();
+                    foreach (var item in danhsachquan)
+                    {
+                        if (convertToUnSign3(item.DistrictName.ToLower()) == dishname)
+                            listquansearch.Add(item);
+                    }
+                    foreach (var item in listquansearch)
+                    {
+                        foreach (var item2 in danhsachStore)
+                        {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo địa điểm
+
+                            if (item.DistrictID == item2.DistrictID)
+                            {
+                                StoreID.Add(item2.StoreID);
+                            }
+                        }
+                    }
+
+                }
+
+                if (StoreID.Count == 0)
+                {                                                        //bỏ dấu tên quán ăn để so sánh
+                    foreach (var item in danhsachStore)
+                    {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo tên quán
+                        if (convertToUnSign3(item.StoreAddress.ToLower()).Contains(dishname))
+                        {
+                            StoreID.Add(item.StoreID);
+                        }
                     }
                 }
             }

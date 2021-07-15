@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace TLCN_WEB_API.Models
 {
@@ -607,23 +608,23 @@ namespace TLCN_WEB_API.Models
             return encodetoken;
         }
 
-        public void sendMail(string Email, string text){
-            ////Gửi email
-            var messenge = new MimeMessage();
-            messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai1707@gmail.com"));      //gmail gửi 
-            messenge.To.Add(new MailboxAddress("naren", Email));
-            messenge.Subject = "Xac Nhan";
-            messenge.Body = new TextPart("plain"){            //nội dung gửi            
-                Text = "Quán " + text + " đã được xác nhận"
-            };
+        //public void sendMail(string Email, string text){
+        //    ////Gửi email
+        //    var messenge = new MimeMessage();
+        //    messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai17071999@gmail.com"));      //gmail gửi 
+        //    messenge.To.Add(new MailboxAddress("naren", Email));
+        //    messenge.Subject = "Xac Nhan";
+        //    messenge.Body = new TextPart("plain"){            //nội dung gửi            
+        //        Text = "Quán " + text + " đã được xác nhận"
+        //    };
 
-            using (var client = new SmtpClient()){                                      //kết nối gmail để đăng nhập gửi            
-                client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate("nguyenngocdai1707@gmail.com", "conyeumenhieulam");
-                client.Send(messenge);
-                client.Disconnect(true);
-            }
-        }
+        //    using (var client = new SmtpClient()){                                      //kết nối gmail để đăng nhập gửi            
+        //        client.Connect("smtp.gmail.com", 587, false);
+        //        client.Authenticate("nguyenngocdai17071999@gmail.com", "conyeumenhieulam1");
+        //        client.Send(messenge);
+        //        client.Disconnect(true);
+        //    }
+        //}
 
         public string GetEmailByID(string ID){           //Lấy thông tin Email của tài khoản truyền vào IDUser
             var danhsach = getAll();
@@ -634,48 +635,51 @@ namespace TLCN_WEB_API.Models
             return "";
         }
 
-        public void updateCodeForget(string email){
-            User infoUser = new User();
-            UserModel user = null;
-            ForGetCode dai = new ForGetCode();
-            Random a = new Random();
-            int code = a.Next(100000, 999999);             //random code
-            DateTime date = DateTime.Now;                  //thời gian tạo code
+        //public void updateCodeForget(string email){
+        //    User infoUser = new User();
+        //    UserModel user = null;
+        //    ForGetCode dai = new ForGetCode();
+        //    Random a = new Random();
+        //    int code = a.Next(100000, 999999);             //random code
+        //    DateTime date = DateTime.Now;                  //thời gian tạo code
 
-            ////Gửi email
-            var messenge = new MimeMessage();
-            messenge.From.Add(new MailboxAddress("Test Project", "nguyenngocdai1707@gmail.com"));
-            messenge.To.Add(new MailboxAddress("naren", Email));
-            messenge.Subject = "Xac nhan";
-            messenge.Body = new TextPart("plain"){
-                Text = "Code ResetPass cua ban la: " + code + ""
-            };
+        //    //Gửi email
+        //    //var messenge = new MimeMessage();
+        //    //messenge.From.Add(new MailboxAddress("Test Project", "nguyenductinh1973@gmail.com"));
+        //    //messenge.To.Add(new MailboxAddress("naren", Email));
+        //    //messenge.Subject = "Xac nhan";
+        //    //messenge.Body = new TextPart("plain")
+        //    //{
+        //    //    Text = "Code ResetPass cua ban la: " + code + ""
+        //    //};
 
-            using (var client = new SmtpClient()){
-                client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate("nguyenngocdai1707@gmail.com", "conyeumenhieulam");
-                client.Send(messenge);
-                client.Disconnect(true);
-            }
-            dai.code = code;
-            dai.date = date;
-            // get list user
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("User");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<User>();
-            string err = "";
+        //    //using (var client = new SmtpClient())
+        //    //{
+        //    //    client.Connect("smtp.gmail.com", 587, false);
+        //    //    client.Authenticate("nguyenductinh1973@gmail.com", "21061973");
+        //    //    client.Send(messenge);
+        //    //    client.Disconnect(true);
+        //    //}
 
-            foreach (var item in data){
-                list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
-            }
-            foreach (var item in list){                              //cập nhật lại thông tin để xác nhận code và ngày tạo code
-                if (item.Email == email ){
-                    item.numberVerify = code.ToString();
-                    item.dateCodeVerify = date.ToString();
-                    UpdateToFireBase(item);
-                }
-            }
-        }
+        //    dai.code = code;
+        //    dai.date = date;
+        //    // get list user
+        //    client = new FireSharp.FirebaseClient(config);
+        //    FirebaseResponse response = client.Get("User");
+        //    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        //    var list = new List<User>();
+        //    string err = "";
+
+        //    foreach (var item in data){
+        //        list.Add(JsonConvert.DeserializeObject<User>(((JProperty)item).Value.ToString()));
+        //    }
+        //    foreach (var item in list){                              //cập nhật lại thông tin để xác nhận code và ngày tạo code
+        //        if (item.Email == email ){
+        //            item.numberVerify = code.ToString();
+        //            item.dateCodeVerify = date.ToString();
+        //            UpdateToFireBase(item);
+        //        }
+        //    }
+        //}
     }
 }

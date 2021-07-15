@@ -459,7 +459,7 @@ namespace TLCN_WEB_API.Controllers
             try{
                 Store store2 = new Store();
                 double a = store2.updateRatePoint(id);
-                return Ok(a.ToString());
+                return Ok(a);
             }
             catch{
                 return Ok("Error");

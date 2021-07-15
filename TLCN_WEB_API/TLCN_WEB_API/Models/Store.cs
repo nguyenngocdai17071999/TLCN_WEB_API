@@ -68,7 +68,7 @@ namespace TLCN_WEB_API.Models
             //danh sách tìm kiếm
             foreach (var item in data) {
                 list.Add(JsonConvert.DeserializeObject<Store>(((JProperty)item).Value.ToString()));
-            }  
+            }
             if (LatNew != 0 && LongNew != 0) {          //nếu thay đổi location tính lại khoản cách
                 foreach (var item in list) {
                     if (item.Lat != "" && item.Long != "")
@@ -333,7 +333,7 @@ namespace TLCN_WEB_API.Models
             }
             if (demrate == 0) return 0;
             tongrate = tongrate/demrate;
-            return tongrate;
+            return Math.Round(tongrate, 2);
         }
 
         public bool kiemtrangaynaotruoc(string ngay1, string ngay2){ //true là ngày 1 truoc,false la ngay 2 truoc        
@@ -405,7 +405,8 @@ namespace TLCN_WEB_API.Models
                     item.Status = status;
                     AddbyidToFireBase(item.StoreID, item);
                     User infoOwner = new User();
-                    infoOwner.sendMail(infoOwner.GetEmailByID(item.UserID), item.StoreName);
+                    UserType a = new UserType();
+                    a.sendMail(infoOwner.GetEmailByID(item.UserID), item.StoreName);
                 }
                 else{
                     item.Status = status;                                                         //Nếu khóa quán thì lưu lại dữ liệu

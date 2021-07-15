@@ -287,10 +287,13 @@ namespace TLCN_WEB_API.Controllers
 
         [HttpPost("ForgetPass")]                                        //quên mật khẩu
         public IActionResult ForgetPass(string Email){
+            string err = "";
             try{
                 User infoUser = new User();
                 if (infoUser.kiemtraEmail(Email) == true){               //kiểm tra Email có tồn tại không
-                    infoUser.updateCodeForget(Email);                     //lưu lại mã code và gửi mã code đên email
+                    UserType a = new UserType();                    
+                    //a.updateCodeForget(Email,err);                     //lưu lại mã code và gửi mã code đên email
+                    return Ok(a.updateCodeForget(Email, err));
                 }
                 return Ok(new[] { "Không có Email" });
             }
