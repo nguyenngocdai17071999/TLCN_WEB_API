@@ -145,8 +145,7 @@ namespace TLCN_WEB_API.Models
                         danhsachstore.AddbyidToFireBase(item.StoreID, item);
                     }                    
                 }
-            }
-           
+            }           
         }
 
         //update dữ liệu lên firebase theo id
@@ -159,11 +158,19 @@ namespace TLCN_WEB_API.Models
         //xóa dữ liệu IDDiscount
         public void Delete(string id){
             if(id!=""){
+                
                 client = new FireSharp.FirebaseClient(config);
                 var discounts = getDiscount(id);           //lấy thông tin khuyến mãi
                 var data = new Discount();
                 SetResponse setResponse = client.Set("Discount/" + id, setnull(data));
 
+                DiscountDish discountDish = new DiscountDish();
+                var danhsachdiscountDish = discountDish.getAll();
+                foreach(var item in danhsachdiscountDish)
+                {
+                    if (item.DishcountTypeID == discounts.IDDiscountType)
+                        discountDish.Delete(item.DiscountDishID);
+                }
 
                 var danhsachkhuyenmai = getByidStore(discounts.IDStore);
                 if (danhsachkhuyenmai.Count==0)       //nếu chỉ có 1 khuyến mãi của quán

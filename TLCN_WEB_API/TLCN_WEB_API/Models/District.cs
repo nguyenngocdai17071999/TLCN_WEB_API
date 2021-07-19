@@ -92,13 +92,13 @@ namespace TLCN_WEB_API.Models
         public void Delete(string id){
             client = new FireSharp.FirebaseClient(config);
             var data = new District();
-            SetResponse setResponse = client.Set("District/" + id, data);
+            SetResponse setResponse = client.Set("District/" + id, setnull(data));
         }
         //set null
         private District setnull(District district) {
-            district.DistrictID = "";
-            district.ProvinceID = "";
-            district.DistrictName = "";
+            district.DistrictID = null;
+            district.ProvinceID = null;
+            district.DistrictName = null;
             return district;
         }
     }

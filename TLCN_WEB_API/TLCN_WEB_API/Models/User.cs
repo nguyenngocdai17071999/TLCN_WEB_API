@@ -87,7 +87,7 @@ namespace TLCN_WEB_API.Models
 
         public bool kiemtracononline(string datetimelogin) {
             TimeSpan Time = DateTime.Now - DateTime.Parse(datetimelogin);
-            if (Time.Days < 1 && Time.Minutes < 60) return true;
+            if (Time.Days < 1  && Time.Hours < 1) return true;
             return false;
         }
 

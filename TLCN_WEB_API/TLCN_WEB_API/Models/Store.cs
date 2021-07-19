@@ -259,25 +259,26 @@ namespace TLCN_WEB_API.Models
             foreach (var item in danhsachUserID)
             {
                 var danhsachcmtuser = comment.getbyId(item.StoreID, item.UserID);
+
                 string ngay = danhsachcmtuser[0].Date.ToString();
                 string cmtID = danhsachcmtuser[0].CommentID;
                 User user = new User();
-                for (int i = 1; i < danhsachcmtuser.Count; i++)
+                if (user.checkAdmin(user.GetEmailByID(danhsachcmtuser[0].UserID)) == false && user.checkOwner(user.GetEmailByID(danhsachcmtuser[0].UserID)) == false)
                 {
-                    if (user.checkAdmin(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false
-                        && user.checkOwner(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false)
+                    for (int i = 1; i < danhsachcmtuser.Count; i++)
                     {
-                        if (kiemtrangaynaotruoc(ngay, danhsachcmtuser[i].Date) == false)
-                        {
-                            ngay = danhsachcmtuser[i].Date;
-                            cmtID = danhsachcmtuser[i].CommentID;
-                        }
+                            if (kiemtrangaynaotruoc(ngay, danhsachcmtuser[i].Date) == false)
+                            {
+                                ngay = danhsachcmtuser[i].Date;
+                                cmtID = danhsachcmtuser[i].CommentID;
+                            }
+                    }
+                    foreach (var item2 in danhsachcmtuser)
+                    {
+                        if (item2.CommentID == cmtID) danhsachrate.Add(item2);
                     }
                 }
-                foreach (var item2 in danhsachcmtuser)
-                {
-                    if (item2.CommentID == cmtID) danhsachrate.Add(item2);
-                }
+               
             }
             return danhsachrate;
         }
@@ -307,21 +308,20 @@ namespace TLCN_WEB_API.Models
                 string ngay = danhsachcmtuser[0].Date.ToString();
                 string cmtID = danhsachcmtuser[0].CommentID;
                 User user = new User();
-                for (int i = 1; i < danhsachcmtuser.Count; i++)
+                if (user.checkAdmin(user.GetEmailByID(danhsachcmtuser[0].UserID)) == false && user.checkOwner(user.GetEmailByID(danhsachcmtuser[0].UserID)) == false)
                 {
-                    if(user.checkAdmin(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false 
-                        && user.checkOwner(user.GetEmailByID(danhsachcmtuser[i].UserID)) == false)
+                    for (int i = 1; i < danhsachcmtuser.Count; i++)
                     {
                         if (kiemtrangaynaotruoc(ngay, danhsachcmtuser[i].Date) == false)
                         {
                             ngay = danhsachcmtuser[i].Date;
                             cmtID = danhsachcmtuser[i].CommentID;
                         }
-                    }                                           
-                }
-                foreach(var item2 in danhsachcmtuser)
-                {
-                    if (item2.CommentID == cmtID) danhsachrate.Add(item2);
+                    }
+                    foreach (var item2 in danhsachcmtuser)
+                    {
+                        if (item2.CommentID == cmtID) danhsachrate.Add(item2);
+                    }
                 }
             }
             double tongrate = 0.0;
