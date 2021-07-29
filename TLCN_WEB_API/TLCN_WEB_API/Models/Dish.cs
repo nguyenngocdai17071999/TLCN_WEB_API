@@ -95,7 +95,7 @@ namespace TLCN_WEB_API.Models
             var danhsachDish = Dish.getAll();                                       //danh sách món ăn
 
             foreach (var item in danhsachDish){                                          //bỏ dấu tên món ăn để so sánh
-                if (item.DishName.Contains(dishname))
+                if (item.DishName.ToLower().Contains(dishname.ToLower()))
                 {
                     StoreID.Add(item.Store_ID);
                 }
@@ -108,7 +108,7 @@ namespace TLCN_WEB_API.Models
                 var danhsachsearchBusinessType = new List<BusinessType>();
                 foreach(var item in danhsachBusinessType)
                 {
-                    if (item.BusinessTypeName.Contains(dishname))
+                    if (item.BusinessTypeName.ToLower().Contains(dishname.ToLower()))
                         danhsachsearchBusinessType.Add(item);
                 }
                 foreach(var item in danhsachsearchBusinessType)
@@ -123,7 +123,7 @@ namespace TLCN_WEB_API.Models
 
             if (StoreID.Count == 0 ){                                                        //bỏ dấu tên quán ăn để so sánh
                 foreach (var item in danhsachStore){                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo tên quán
-                    if (item.StoreName.Contains(dishname)){
+                    if (item.StoreName.ToLower().Contains(dishname.ToLower())){
                         StoreID.Add(item.StoreID);
                     }
                 }
@@ -136,7 +136,7 @@ namespace TLCN_WEB_API.Models
                 var listquansearch = new List<District>();
                 foreach (var item in danhsachquan)
                 {
-                    if (item.DistrictName==dishname)
+                    if (item.DistrictName.ToLower() == dishname.ToLower())
                         listquansearch.Add(item);
                 }
                 foreach(var item in listquansearch)
@@ -157,7 +157,7 @@ namespace TLCN_WEB_API.Models
             {                                                        //bỏ dấu tên quán ăn để so sánh
                 foreach (var item in danhsachStore)
                 {                                         // nếu dựa vào tìm quán theo món ăn có sẽ k tìm theo tên quán
-                    if (item.StoreAddress.Contains(dishname))
+                    if (item.StoreAddress.ToLower().Contains(dishname.ToLower()))
                     {
                         StoreID.Add(item.StoreID);
                     }

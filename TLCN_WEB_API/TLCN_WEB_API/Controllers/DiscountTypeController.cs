@@ -111,7 +111,8 @@ namespace TLCN_WEB_API.Controllers
                 string Email = claim[1].Value;                                                 //Email của token             
                 User infoUser = new User();                                                    //Khai bao biến thông tin người dùng
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){    //kiểm tra thời gian đăng nhập còn không
-                    if (infoUser.checkAdmin(Email) == true){                                   //Kiểm tra có phải admin không
+                    if (infoUser.checkAdmin(Email) == true || infoUser.checkOwner(Email) == true)
+                    {                                   //Kiểm tra có phải admin không
                         DiscountType discountType = new DiscountType();                        //Khai báo biến Model DiscountType
                         discountType.Delete(id);                                               //Xóa data
                         return Ok(new[] { "Xóa thành công" });
@@ -137,7 +138,7 @@ namespace TLCN_WEB_API.Controllers
                 string Email = claim[1].Value;                                                  //Email của token             
                 User infoUser = new User();                                                     //Khai bao biến thông tin người dùng
                 if (infoUser.kiemtrathoigianlogin(DateTime.Parse(claim[0].Value)) == true){     //kiểm tra thời gian đăng nhập còn không
-                    if (infoUser.checkAdmin(Email) == true){                                    //Kiểm tra có phải admin không
+                    if (infoUser.checkAdmin(Email) == true ){                                    //Kiểm tra có phải admin không
                         DiscountType discountType1 = new DiscountType();                        //Khai báo biến Model DiscountType
                         discountType.DiscountRule = "Admin";
                         discountType1.AddToFireBase(discountType);                              //Thêm data
